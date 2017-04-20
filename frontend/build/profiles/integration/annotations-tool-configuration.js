@@ -414,7 +414,7 @@ define(["jquery",
                         videoTypeIE9 = "video/mp4",
                         //var videoTypesForFallBack = ["video/x-flv"];
                         videoTypesForFallBack = [],
-                        trackType = ["presenter/delivery", "presentation/delivery"],
+                        trackType = ["presenter/delivery", "presentation/delivery", "presenter/preview"],
                         mediaPackageId = decodeURI((new RegExp("id=" + "(.+?)(&|$)").exec(location.search) || [,null])[1]);
 
                     // Enable cross-domain for jquery ajax query
