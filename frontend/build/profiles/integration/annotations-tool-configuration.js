@@ -504,7 +504,10 @@ define(["jquery",
                                 selectedVideos = videos;
                             }
 
-                            if (annotationsTool.isBrowserIE9()) {
+                            if (_.every(selectedVideos, function (videos) { return videos.length == 0; })) {
+                                annotationsTool.alertError("Could not find a video");
+                            }
+                            else if (annotationsTool.isBrowserIE9()) {
                                 $("video").attr("src", videoIE9.url).attr("type", videoTypeIE9);
                             } else {
                                 $.each(selectedVideos, function (index, type) {
