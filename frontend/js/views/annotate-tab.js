@@ -317,6 +317,7 @@ define(["jquery",
             addCategory: function (category, collection, options) {
                 var categoryView;
 
+                // TODO Get rid of the double negation here ...
                 if (!options.skipTests && !this.filter(category)) {
                     return;
                 }
