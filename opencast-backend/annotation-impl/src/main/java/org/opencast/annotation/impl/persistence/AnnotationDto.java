@@ -142,6 +142,7 @@ public class AnnotationDto extends AbstractResourceDto {
     }
   };
 
+  // TODO What? Why are the following functions so different?
   public static final Function2<ExtendedAnnotationService, Annotation, JSONObject> toJson = new Function2<ExtendedAnnotationService, Annotation, JSONObject>() {
     @Override
     public JSONObject apply(ExtendedAnnotationService s, Annotation a) {
