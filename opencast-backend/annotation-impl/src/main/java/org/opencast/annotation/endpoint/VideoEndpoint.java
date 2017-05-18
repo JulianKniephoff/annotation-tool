@@ -1141,6 +1141,7 @@ public class VideoEndpoint {
             "comments", c.getId());
   }
 
+  // TODO Get rid of this function
   static private Response notFoundToBadRequest(ExtendedAnnotationException e) throws ExtendedAnnotationException {
     if (e.getCauseCode() == ExtendedAnnotationException.Cause.NOT_FOUND) {
       return BAD_REQUEST;
