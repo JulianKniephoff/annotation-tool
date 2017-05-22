@@ -325,6 +325,7 @@ define(["util",
                     _.bindAll(this.timeline, "findGroup");
                 }
 
+                // TODO Why is this not in `events`?
                 this.$el.find(".timeline-frame > div")[0].addEventListener("mousewheel", function (event) {
                     event.stopPropagation();
                 }, true);
