@@ -298,6 +298,7 @@ define(["util",
 
                 links.events.addListener(this.timeline, "timechanged", this.onTimelineMoved);
                 links.events.addListener(this.timeline, "timechange", this.onTimelineMoved);
+                // TODO Are these really needed?
                 links.events.addListener(this.timeline, "change", this.onTimelineItemChanged);
                 links.events.addListener(this.timeline, "delete", this.onTimelineItemDeleted);
                 links.events.addListener(this.timeline, "add", this.onTimelineItemAdded);
