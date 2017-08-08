@@ -625,6 +625,8 @@ define(["util",
                 annotations.on("add", proxyToAddAnnotation, this);
                 annotations.on("change", this.changeItem, this);
 
+                // TODO This is a waste of time ...
+                //   But it might be necessary because of the potential waiting for the server ...
                 this.preprocessTrack(track.id);
                 this.redraw();
             },
@@ -1229,6 +1231,7 @@ define(["util",
              */
             onTimelineItemChanged: function () {
                 var hasToPlay = (this.playerAdapter.getStatus() === PlayerAdapter.STATUS.PLAYING),
+                    // TODO This can probably be done much easier now that you have the annotation in the item
                     values = this.getSelectedItemAndAnnotation(),
                     oldItemId,
                     duration,
