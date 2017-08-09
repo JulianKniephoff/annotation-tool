@@ -902,6 +902,7 @@ define(["util",
             preprocessTrack: function (trackId) {
                 delete this.preprocessedItems[trackId];
 
+                // TODO Filter by visible time?
                 var items = _.filter(this.annotationItems, function (item) {
                     var category = item.annotation.category();
                     if (category && !category.get("visible")) return false;
