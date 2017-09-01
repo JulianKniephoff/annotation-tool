@@ -32,6 +32,7 @@ public class Responses {
    * @return the generated {@link Response}
    */
   public static Response buildOk(final JSONObject o) {
+    // TODO Why `asStringNull`? The result of that is not even legal JSON ...
     return Response.ok(asStringNull().apply(o)).build();
   }
 }
