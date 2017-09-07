@@ -65,6 +65,12 @@ define(["jquery",
                 }
 
                 Resource.prototype.initialize.apply(this, arguments);
+
+                // Fix up circular dependency
+                if (!Comments) Comments = require("collections/comments");
+
+                this.replies = new Comments(null, { annotation: this.collection.annotation, replyTo: this });
+                this.replies.fetch();
             },
 
             /**

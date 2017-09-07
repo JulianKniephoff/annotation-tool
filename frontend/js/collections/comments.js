@@ -33,6 +33,13 @@ define(["jquery",
 
         "use strict";
 
+        function fixUrlForReplies(options) {
+            if (!this.replyTo) return options;
+            return _.extend({
+                url: _.result(this, "url") + "/" + this.replyTo.id + "/replies"
+            }, options);
+        }
+
         /**
          * @constructor
          * @see {@link http://www.backbonejs.org/#Collection}
@@ -59,9 +66,11 @@ define(["jquery",
              * constructor
              * @alias module:collections-comments.Comments#initialize
              */
-            initialize: function (models, annotation) {
+            initialize: function (models, options) {
                 _.bindAll(this, "setUrl");
-                this.setUrl(annotation);
+                this.annotation = options.annotation;
+                this.replyTo = options.replyTo;
+                this.setUrl(this.annotation);
             },
 
             /**
@@ -95,6 +104,24 @@ define(["jquery",
                 if (window.annotationsTool && annotationsTool.localStorage) {
                     this.localStorage = new Backbone.LocalStorage(this.url);
                 }
+            },
+
+            /**
+             * Override in order to use the right URL for replies.
+             * @alias module:collections-comments.Comments#fetch
+             */
+            fetch: function (options) {
+                options = fixUrlForReplies.call(this, options);
+                return Backbone.Collection.prototype.fetch.call(this, options);
+            },
+
+            /**
+             * Override in order to use the right URL for replies.
+             * @alias module:collections-comments.Comments#fetch
+             */
+            create: function (model, options) {
+                options = fixUrlForReplies.call(this, options);
+                return Backbone.Collection.prototype.create.call(this, model, options);
             }
         });
         return Comments;
