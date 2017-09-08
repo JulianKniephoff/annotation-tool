@@ -53,6 +53,7 @@ var Resource = Backbone.Model.extend({
             }
         }
 
+        // TODO Does this not erroniously assign things without a `created_by` to every anonymous user?
         function updateIsPublic(access) {
             this.set("isPublic", access === ACCESS.PUBLIC);
         }
