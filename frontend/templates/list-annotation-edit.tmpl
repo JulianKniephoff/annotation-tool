@@ -63,9 +63,8 @@
             {{/if}}
         </i>
     </div>
-</div>
 
-{{#if label}} {{else}}
+{{#unless label}}
 <div id="text-container{{id}}" class="in text-container">
     <span class="text">
             <span class="freetext">
@@ -77,4 +76,3 @@
             </div>
     </span>
 </div>
-{{/if}}
