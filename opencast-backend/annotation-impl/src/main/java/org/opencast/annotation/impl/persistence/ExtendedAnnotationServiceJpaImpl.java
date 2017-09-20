@@ -1124,13 +1124,16 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   }
 
   /**
-   * Get the ID of the current user. The current user is retrieved from the security service.
+   * Get the ID of the given Opencast user.
    *
-   * @return the created resource
+   * @param user
+   *          an Opencast user
+   *
+   * @return the ID of the corresponding annotation tool user, if it exists
    */
-  private Option<Long> getCurrentUserId() {
-    final String userName = securityService.getUser().getUsername();
-    return getUserByExtId(userName).map(new Function<User, Long>() {
+  private Option<User> annotationToolUserIdForOpencastUser(org.opencastproject.security.api.User opencastUser) {
+    final String username = opencastUser.getUsername();
+    return getUserByExtId(username).map(new Function<User, Long>() {
       @Override
       public Long apply(User user) {
         return user.getId();
@@ -1139,12 +1142,23 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   }
 
   /**
+   * Get the ID of the current user. The current user is retrieved from the security service.
+   *
+   * @return the ID of the current user
+   */
+  private Option<Long> getCurrentUserId() {
+    return annotationToolUserIdForOpencastUser(
+      securityService.getUser()
+    );
+  }
+
+  /**
    * @see org.opencast.annotation.api.ExtendedAnnotationService#hasResourceAccess(Resource)
    */
   @Override
   public boolean hasResourceAccess(Resource resource) {
     org.opencastproject.security.api.User currentUser = securityService.getUser();
-    Option<Long> currentUserId = getCurrentUserId();
+    Option<Long> currentUserId = annotationToolUserIdForOpencastUser(currentUser);
 
     if (resource.getAccess() == Resource.PUBLIC)
       return true;
