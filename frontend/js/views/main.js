@@ -695,6 +695,7 @@ define(["jquery",
              * @alias module:views-main.Main#export
              */
             export: function () {
+                // TODO Respect order?
                 var tracksToExport = annotationTool.video
                     .get("tracks").getVisibleTracks();
                 var categoriesToExport = annotationTool.video
