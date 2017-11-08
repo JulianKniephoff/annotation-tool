@@ -1006,6 +1006,7 @@ public class VideoEndpoint {
       List<Track> tracks = eas.getTracks(video.getId(), Option.<Integer> none(), Option.<Integer> none(),
               Option.<Date> none(), Option.<Map<String, String>> none(), Option.<Map<String, String>> none());
       for (Track track : tracks) {
+        // TODO Use `removeIf` or sth?
         if (tracksToExport != null && !tracksToExport.contains(track.getId())) continue;
         List<Annotation> annotations = eas.getAnnotations(track.getId(), none(Double.class), none(Double.class),
                 none(Integer.class), none(Integer.class), none(Date.class), Option.<Map<String, String>> none(),
