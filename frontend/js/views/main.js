@@ -124,6 +124,7 @@ define(["jquery",
                 this.setLoadingProgress(20, i18next.t("startup.get users saved locally"));
 
                 if (annotationTool.localStorage) {
+                    // TODO Whyyyy? Why can't we provide a strategy for this in the configuration?
                     // Remove link for statistics exports, work only with backend implementation
                     this.$el.find("#export").parent().remove();
                 }
