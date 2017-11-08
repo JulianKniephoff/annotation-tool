@@ -1051,6 +1051,8 @@ public class VideoEndpoint {
           line.add(label.map(getLabelName).getOrElse(""));
           line.add(label.map(getLabelAbbreviation).getOrElse(""));
 
+          // TODO Simplify this as well
+          //   Or rewrite this and the above because the above is now less efficient?
           if (annotation.getScaleValueId().isSome()) {
             Option<ScaleValue> scaleValue = eas.getScaleValue(annotation.getScaleValueId().get());
             line.add(scaleValue.map(getScaleName.curry(eas)).getOrElse(""));
