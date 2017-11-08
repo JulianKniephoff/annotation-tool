@@ -87,6 +87,7 @@ define(["underscore",
 
                 if (attr.id) {
                     this.attributes.labels.fetch({ async: false });
+                    // TODO Should this not set `this.ready` to `true` like the handler in `validate`?
                 }
 
                 this.attributes.visible = true;
