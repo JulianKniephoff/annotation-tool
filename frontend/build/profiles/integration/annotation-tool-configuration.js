@@ -151,6 +151,7 @@ define(["jquery",
              * @param {Category[]} categories The tracks to include in the export
              * @param {Boolean} freeText Should free-text annotations be exported?
              */
+            // TODO Should we maybe even take a `Collection` of the models?
             export: function (video, tracks, categories, freeText) {
                 var parameters = new URLSearchParams();
                 _.each(tracks, function (track) {
