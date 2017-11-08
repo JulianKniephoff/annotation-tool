@@ -696,6 +696,7 @@ define(["jquery",
              */
             export: function () {
                 // TODO Respect order?
+                // TODO Put the logic in `annotationTool`?
                 var tracksToExport = annotationTool.video
                     .get("tracks").getVisibleTracks();
                 var categoriesToExport = annotationTool.video
