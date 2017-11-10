@@ -1262,6 +1262,26 @@ public abstract class AbstractExtendedAnnotationsRestService {
     return sdf.format(new Date(millis - TimeZone.getDefault().getRawOffset()));
   }
 
+  // TODO Add `throws` declaration?
+  static Option<Map<String, String>> parseTags(String tagsString) {
+    return trimToNone(tagsString).map(new Function<String, Map<String, String>>() {
+      @Override
+      public Map<String, String> apply(String tagsString) {
+        try {
+          Map<String, Object> tags = (Map<String, Object>) new JSONParser().parse(tagsString);
+          for (Object value: tags.values()) {
+            if (!(value instanceof String)) {
+              throw new WebApplicationException(BAD_REQUEST);
+            }
+          }
+          return (Map<String, String>) (Object) tags;
+        } catch (ParseException | ClassCastException e) {
+          throw new WebApplicationException(BAD_REQUEST);
+        }
+      }
+    });
+  }
+
   @SuppressWarnings("unchecked")
   public static final Function<String, Option<Map<String, String>>> parseToJsonMap = new Function<String, Option<Map<String, String>>>() {
     @Override
