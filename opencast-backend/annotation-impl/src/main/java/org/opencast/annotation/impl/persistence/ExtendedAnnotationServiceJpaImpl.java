@@ -884,12 +884,23 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
    */
   @Override
   public boolean deleteLabel(Label label) throws ExtendedAnnotationException {
+    if (!userMayDelete(label)) {
+      throw new ExtendedAnnotationException(UNAUTHORIZED);
+    }
     Resource deleteResource = deleteResource(label);
     final Label updated = new LabelImpl(label.getId(), label.getCategoryId(), label.getValue(),
             label.getAbbreviation(), label.getDescription(), label.getSettings(), deleteResource);
     updateLabel(updated);
     // return deleteById("Video.deleteById", video.getId());
     return true;
+  }
+
+  private boolean userMayDelete(Label label) {
+    String currentExtUserId = getCurrentExtUserId();
+    for (User currentUser: getUserByExtId(currentExtUserId)) {
+      return belongsTo(currentUser, label) || isAnnotateAdmin(currentExtUserId);
+    }
+    return false;
   }
 
   /**
@@ -1124,18 +1135,31 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   }
 
   /**
+   * Get the external ID of the current user.
+   */
+  private String getCurrentExtUserId() {
+    return securityService.getUser().getUsername();
+  }
+
+  /**
+   * Get the domain model of the current user. The current user is retrieved from the security service.
+   */
+  private Option<User> getCurrentUser() {
+    final String currentExtUserId = getCurrentExtUserId();
+    for (User user: getUserByExtId(getCurrentExtUserId())) {
+      return user;
+    }
+    return none();
+  }
+
+  /**
    * Get the ID of the current user. The current user is retrieved from the security service.
-   *
-   * @return the created resource
    */
   private Option<Long> getCurrentUserId() {
-    final String userName = securityService.getUser().getUsername();
-    return getUserByExtId(userName).map(new Function<User, Long>() {
-      @Override
-      public Long apply(User user) {
-        return user.getId();
-      }
-    });
+    for (User currentUser: getCurrentUser()) {
+      return currentUser.getId();
+    }
+    return none();
   }
 
   /**
@@ -1143,16 +1167,19 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
    */
   @Override
   public boolean hasResourceAccess(Resource resource) {
-    org.opencastproject.security.api.User currentUser = securityService.getUser();
-    Option<Long> currentUserId = getCurrentUserId();
+    // TODO Is this still correct? I had to fix a merge conflict here,
+    //   where the old implementation that I deleted in this commit was changed ...
+    for (User currentUser: getCurrentUser()) {
+      return belongsTo(currentUser, resource);
+    }
+    return false;
+  }
 
-    if (resource.getAccess() == Resource.PUBLIC)
-      return true;
-
-    if (resource.getCreatedBy().isNone() || currentUserId.isNone())
-      return false;
-
-    return resource.getCreatedBy().equals(currentUserId);
+  private boolean belongsTo(User user, Resource resource) {
+    for (Long createdBy: resource.getCreatedBy()) {
+      return createdBy.equals(user.getId());
+    }
+    return false;
   }
 
   public final Function<Resource, Boolean> hasResourceAccess = new Function<Resource, Boolean>() {
