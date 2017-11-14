@@ -129,6 +129,7 @@ define(["jquery",
                                 "updateInputWidth");
 
                 // Type use for delete operation
+                // TODO Why not declare this outside
                 this.typeForDelete = annotationTool.deleteOperation.targetTypes.LABEL;
 
                 // Change the edit modus, if this config is given as parameter
