@@ -40,6 +40,7 @@ public class AnnotationImpl extends ResourceImpl implements Annotation {
 
   public AnnotationImpl(long id, long trackId, Option<String> text, double start, Option<Double> duration,
           Option<String> settings, Option<Long> labelId, Option<Long> scaleValueId, Resource resource) {
+    // TODO Remove the useless `Option.option` everywhere ...
     // TODO Reindent this ...
     super(Option.option(resource.getAccess()), resource.getCreatedBy(), resource.getUpdatedBy(), resource
             .getDeletedBy(), resource.getCreatedAt(), resource.getUpdatedAt(), resource.getDeletedAt(), resource
