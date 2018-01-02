@@ -815,6 +815,11 @@ public interface ExtendedAnnotationService {
    */
   boolean hasResourceAccess(Resource resource);
 
+  // TODO Do these even belong in this interface?
+  //   They should probably be in some kind of utility module?
+  // TODO Provide additional overloads? For taking a `Video` for example?
+  //   But then we have the problem of providing default implementations again ...
+  //   This could also be asked of other methods, of course ...
   /**
    * Checks whether the current user has a certain ACL action on a media package
    * 
@@ -831,6 +836,8 @@ public interface ExtendedAnnotationService {
   /** String representing the `annotate-admin` ACL action */
   String ANNOTATE_ADMIN_ACTION = "annotate-admin";
 
+  // TODO Should this really be optional?
+  //   That is to say, can we even have a valid `Video` without the corresponding `MediaPackage`?
   /**
    * Find the Opencast media package based on its id
    * 
