@@ -170,8 +170,7 @@ define(["jquery",
                     this.loadVideo();
                 }
 
-                if ((this.isBrowserIE9() && !(this.playerAdapter.__proto__ instanceof this.PlayerAdapter)) ||
-                    (!this.isBrowserIE9() && !(this.playerAdapter instanceof PlayerAdapter))) {
+                if (!(this.playerAdapter instanceof PlayerAdapter)) {
                     throw "The player adapter is not valid! It must have PlayerAdapter as prototype.";
                 }
 
