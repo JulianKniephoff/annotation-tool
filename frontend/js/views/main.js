@@ -224,8 +224,6 @@ define(["jquery",
                 annotationsTool.playerAdapter.load();
                 this.setLoadingProgress(50, i18next.t("startup.initializing the player"));
 
-                annotationsTool.views.main = this;
-
                 /**
                  * Loading the video dependant views
                  */
