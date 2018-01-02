@@ -1016,6 +1016,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     return getUserId(securityService.getUser());
   }
 
+  // TODO Does this not have to check for `annotate` as well, somehow?
   @Override
   public boolean hasResourceAccess(Resource resource) {
     org.opencastproject.security.api.User opencastUser = securityService.getUser();
