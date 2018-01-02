@@ -114,6 +114,7 @@ public class VideoEndpoint {
 
   private final Option<VideoData> videoData;
 
+  // TODO Oh my god clean up this mess
   private VideoData.Access getVideoAccess(MediaPackage mediaPackage) {
     if (eas.hasVideoAccess(mediaPackage, ANNOTATE_ADMIN_ACTION)) return VideoData.Access.ANNOTATE_ADMIN;
     if (eas.hasVideoAccess(mediaPackage, ANNOTATE_ACTION)) return VideoData.Access.ANNOTATE;

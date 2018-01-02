@@ -230,6 +230,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
     return run(array(videoExtId), new Function0<Response>() {
       @Override
       public Response apply() {
+        // TODO Oh my god fix this uglyness everywhere ...
         final Option<MediaPackage> potentialMediaPackage = eas().findMediaPackage(videoExtId);
         if (potentialMediaPackage.isNone()) return BAD_REQUEST;
         final MediaPackage videoMediaPackage = potentialMediaPackage.get();
