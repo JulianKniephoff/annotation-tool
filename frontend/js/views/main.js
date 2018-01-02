@@ -143,7 +143,6 @@ define(["jquery",
 
                 this.setLoadingProgress(10, i18next.t("startup.starting"));
 
-
                 this.setLoadingProgress(20, i18next.t("startup.get users saved locally"));
                 // Create a new users collection and get exciting local user
                 annotationsTool.users = new Users();
@@ -162,7 +161,7 @@ define(["jquery",
                     }
                 });
 
-                this.loginView              = new LoginView();
+                this.loginView = new LoginView();
                 annotationsTool.scaleEditor = new ScaleEditorView();
 
                 this.listenTo(annotationsTool, "deleteAnnotation", annotationsTool.deleteAnnotation);
@@ -174,7 +173,7 @@ define(["jquery",
                 annotationsTool.once(annotationsTool.EVENTS.READY, function () {
                     this.loadPlugins(annotationsTool.plugins);
                     this.updateTitle(annotationsTool.video);
-                    this.tracksSelectionModal    = new TracksSelectionView();
+                    this.tracksSelectionModal = new TracksSelectionView();
 
                     if (!annotationsTool.isFreeTextEnabled()) {
                         $("#opt-annotate-text").parent().hide();
