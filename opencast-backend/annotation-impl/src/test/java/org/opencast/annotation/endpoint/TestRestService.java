@@ -68,6 +68,7 @@ public class TestRestService extends AbstractExtendedAnnotationsRestService {
     return Response.noContent().build();
   }
 
+  // TODO DRY this up (this is in the service layer tests as well?)
   private static SecurityService getSecurityService() {
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
 
@@ -78,6 +79,7 @@ public class TestRestService extends AbstractExtendedAnnotationsRestService {
     return securityService;
   }
 
+  // TODO Do I really have to mock these?
   private static AuthorizationService getAuthorizationService() {
     AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.hasPermission(EasyMock.anyObject(MediaPackage.class),

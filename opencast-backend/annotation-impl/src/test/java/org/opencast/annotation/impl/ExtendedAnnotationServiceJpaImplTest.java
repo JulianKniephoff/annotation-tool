@@ -685,6 +685,7 @@ public class ExtendedAnnotationServiceJpaImplTest {
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
 
+    // TODO Actually mock these?
     AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     SearchService searchService = EasyMock.createNiceMock(SearchService.class);
 
