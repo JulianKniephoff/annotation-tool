@@ -1026,6 +1026,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
         || resource.getAccess() == Resource.SHARED_WITH_ADMIN && isAnnotateAdmin(opencastUser, getResourceVideo(resource));
   }
 
+  // TODO Expose this?
   private boolean isAnnotateAdmin(org.opencastproject.security.api.User user, Option<Video> video) {
     if (user.hasRole(securityService.getOrganization().getAdminRole())
             || user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)) {
@@ -1047,6 +1048,9 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     });
   }
 
+  // TODO Make `access` its own type
+  //   The problem is, again, one of abstraction:
+  //   Where do you put the mapping between the abstract access values and the ACL action strings?
   @Override
   public Option<MediaPackage> findMediaPackage(String id) {
     return head(searchService.getByQuery(new SearchQuery().withId(id)).getItems()).map(
