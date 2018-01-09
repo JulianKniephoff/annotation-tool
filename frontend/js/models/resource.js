@@ -84,6 +84,7 @@ var Resource = Backbone.Model.extend({
 
         if (attr.id) {
             if (this.get("id") !== attr.id) {
+                // TODO Use `this.set("id", attr.id)`?
                 this.id = attr.id;
                 this.attributes.id = attr.id;
                 if (callbacks && callbacks.onIdChange) callbacks.onIdChange.call(this);
