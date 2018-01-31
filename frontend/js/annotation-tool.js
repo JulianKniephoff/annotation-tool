@@ -868,6 +868,7 @@ define(["jquery",
                         // At least one private track should exist, we select the first one
                         var selectedTrack = tracks.getMine()[0];
 
+                        // TODO Is this check even necessary?
                         if (!selectedTrack.get("id")) {
                             selectedTrack.on("ready", concludeInitialization, this);
                         } else {
@@ -886,6 +887,7 @@ define(["jquery",
                         tracks = this.video.get("tracks");
 
                         if (this.localStorage) {
+                            // TODO What is this function??!?!
                             tracks = tracks.getTracksForLocalStorage();
                         }
 
@@ -899,9 +901,11 @@ define(["jquery",
                                 })
                             }, {
                                 wait: true,
+                                // TODO Don't we have to `showTracks` here?
                                 success: concludeInitialization
                             });
                         } else {
+                            // TODO `showTracks`, too, does not belong in `Tracks`
                             tracks.showTracks(
                                 tracks.where({ isMine: true })
                             );
@@ -940,6 +944,7 @@ define(["jquery",
                                     }
                                 }, this)
                             });
+                            // TODO Is there no idiomatic thing for this pattern?
                             if (video.get("ready")) {
                                 createDefaultTrack();
                             } else {
