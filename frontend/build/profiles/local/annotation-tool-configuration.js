@@ -112,7 +112,7 @@ define(["jquery",
 
             /**
              * Array of tracks to import by default
-             * @type {module:player-adapter.tracksToImport}
+             * @type {?object[]}
              */
             tracksToImport: undefined,
 

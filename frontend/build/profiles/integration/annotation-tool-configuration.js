@@ -30,6 +30,8 @@ define(["jquery",
 
         "use strict";
 
+
+
         var video_title,
             video_creator,
             video_creation_date,
