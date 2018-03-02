@@ -92,10 +92,12 @@ define(["jquery",
             /**
              * Parse the attribute list passed to the model
              * @alias module:models-annotation.Annotation#parse
-             * @param  {object} data Object literal containing the model attribute to parse.
-             * @return {object}  The object literal with the list of parsed model attribute.
+             * @param {object} response Object literal containing the model attribute to parse.
+             * @return {object} The object literal with the list of parsed model attribute.
              */
-            parse: function (data) {
+            parse: function (response) {
+                response = Resource.prototype.parse.apply(this, arguments);
+                return response;
                 return Resource.prototype.parse.call(this, data, function (attr) {
                     var tempSettings,
                         categories,

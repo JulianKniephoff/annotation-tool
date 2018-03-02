@@ -105,19 +105,22 @@ define(["jquery",
             /**
              * Parse the attribute list passed to the model
              * @alias module:models-category.Category#parse
-             * @param  {object} data Object literal containing the model attribute to parse.
-             * @return {object}  The object literal with the list of parsed model attribute.
+             * @param {object} response Object literal containing the model attribute to parse.
+             * @return {object} The object literal with the list of parsed model attribute.
              */
-            parse: function (data) {
-                return Resource.prototype.parse.call(this, data, function (attr) {
-                    if (annotationTool.localStorage && _.isArray(attr.labels)) {
-                        attr.labels = new Labels(attr.labels, this);
-                    }
+            parse: function (response) {
+                // TODO Make this `apply(this, arguments)`?
+                response = Resource.prototype.parse.apply(this, arguments);
 
-                    if (!annotationTool.localStorage && attr.scale_id && (_.isNumber(attr.scale_id) || _.isString(attr.scale_id))) {
-                        attr.scale = annotationTool.video.get("scales").get(attr.scale_id);
-                    }
-                });
+                if (annotationTool.localStorage && _.isArray(response.labels)) {
+                    response.labels = new Labels(response.labels, this);
+                }
+
+                if (!annotationTool.localStorage && response.scale_id && (_.isNumber(response.scale_id) || _.isString(response.scale_id))) {
+                    response.scale = annotationTool.video.get("scales").get(response.scale_id);
+                }
+
+                return response;
             },
 
             /**

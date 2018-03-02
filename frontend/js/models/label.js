@@ -88,15 +88,16 @@ define(["jquery",
             /**
              * Parse the attribute list passed to the model
              * @alias module:models-label.Label#parse
-             * @param  {object} data Object literal containing the model attribute to parse.
-             * @return {object}  The object literal with the list of parsed model attribute.
+             * @param {object} response Object literal containing the model attribute to parse.
+             * @return {object} The object literal with the list of parsed model attribute.
              */
-            parse: function (data) {
-                return Resource.prototype.parse.call(this, data, function (attr) {
-                    if (attr.category && attr.category.settings) {
-                        attr.category.settings = util.parseJSONString(attr.category.settings);
-                    }
-                });
+            parse: function (response) {
+                response = Resource.prototype.apply(this, arguments);
+                if (response.category && response.category.settings) {
+                    // TODO Should this not be handled somewhere else?
+                    response.category.settings = util.parseJSONString(response.category.settings);
+                }
+                return response;
             },
 
             /**

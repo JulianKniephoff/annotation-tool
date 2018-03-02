@@ -132,34 +132,32 @@ var Resource = Backbone.Model.extend({
      *   and it does not have to return anything. It works directly on the passed hash
      * @return {object}  The object literal with the list of parsed model attribute.
      */
-    parse: function (data, callback) {
-        var attr = data.attributes || data;
+    parse: function (response, options) {
+        response = Backbone.Model.prototype.parse.apply(this, arguments);
 
-        if (attr.created_at) {
-            attr.created_at = util.parseDate(attr.created_at);
+        if (response.created_at) {
+            response.created_at = util.parseDate(response.created_at);
         }
-        if (attr.updated_at) {
-            attr.updated_at = util.parseDate(attr.updated_at);
+        if (response.updated_at) {
+            response.updated_at = util.parseDate(response.updated_at);
         }
-        if (attr.deleted_at) {
-            attr.deleted_at = util.parseDate(attr.deleted_at);
-        }
-
-        if (attr.tags) {
-            attr.tags = util.parseJSONString(attr.tags);
+        if (response.deleted_at) {
+            response.deleted_at = util.parseDate(response.deleted_at);
         }
 
-        if (attr.settings) {
-            attr.settings = util.parseJSONString(attr.settings);
+        if (response.tags) {
+            response.tags = util.parseJSONString(response.tags);
+        }
+
+        if (response.settings) {
+            response.settings = util.parseJSONString(response.settings);
         }
 
         if (annotationTool.user) {
-            attr.isMine = annotationTool.user.id === attr.created_by;
+            response.isMine = annotationTool.user.id === response.created_by;
         }
 
-        if (callback) callback.call(this, attr);
-
-        return data;
+        return response;
     },
 
     /**
