@@ -70,6 +70,8 @@ define(["underscore",
                     annotationsLoaded: false
                 });
 
+                // TODO Do this everywhere ...
+                //   Do we need this check at all?!
                 if (attr.annotations && _.isArray(attr.annotations)) {
                     this.set({ annotations: new Annotations(attr.annotations, { track: this }) });
                 } else {
