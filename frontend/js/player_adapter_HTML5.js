@@ -79,6 +79,7 @@ define(["jquery",
                 targetElement.preload = "auto";
 
                 window.Hls = Hls;
+                // TODO With this, the name of this class is now misleading
                 mediaElementPlayer = new mejs.MediaElementPlayer(targetElement, {
                     renderers: ['html5', 'native_hls'],
                     alwaysShowControls: true,
@@ -173,6 +174,9 @@ define(["jquery",
                     }
                 });
 
+                // TODO What happens if the player is loaded before any of the event handlers are registered?
+                //   The status will never be updated then ...
+
                 return this;
             };
 
@@ -216,6 +220,7 @@ define(["jquery",
                 self.initialized = false;
                 self.status = PlayerAdapter.STATUS.INITIALIZING;
                 mediaElement.load();
+                // TODO Whyyy
                 mediaElement.load();
             };
 
