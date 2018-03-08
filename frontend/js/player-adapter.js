@@ -22,6 +22,10 @@ define(["event-target"], function (EventTarget) {
 
     "use strict";
 
+    // TODO Document/assert that this constructor takes the target element
+    //   and also that the semantics are as such that the video is supposed to fill
+    //   the given element.
+    //   Remember to change the call to `super` accordingly, though!
     /**
      * Interface for the element making the proxy between the player and the annotations tool
      * @constructor
