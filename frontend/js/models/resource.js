@@ -36,9 +36,22 @@ var Resource = Backbone.Model.extend({
      * @param {object} attr Object literal containing the model initialion attributes.
      */
     initialize: function (attr) {
+
+        // TODO This is a hack
+        //   Alternative solutions:
+        //   - Make models used prior to app start not inherit from `Resource`
+        //   - Somehow avoid the checks based on a global object in here
+        // TODO Can we prefill the empty object to avoid even more checks?
+        //   But what we actually want is accessor methods to avoid deep reaching property chains, right?
+        // TODO Can we not somehow resolve this circular dependency?!
+        //   - I mean we did it for `Comment`/`Comments`, too ...
+        // TODO Put this in a function?
+        // Note that `Resource` is also part of the prototype chain of `User`,
+        // which is used before the `annotationTool` object is initialized.
         var annotationTool = window.annotationTool || {};
 
         if (!attr) attr = {};
+        // TODO Why even this check?
         if (annotationTool.localStorage) {
             if (annotationTool.user) {
                 if (!attr.created_by) {
@@ -54,14 +67,26 @@ var Resource = Backbone.Model.extend({
         }
 
         // TODO Does this not erroniously assign things without a `created_by` to every anonymous user?
+        // TODO See `isMine` below:
+        //   - Should this be a function?
+        //   - Or should it be set in `parse`?
+        //     This might not be enough, right?
+        //     Because then `set`-ing `access` will not update this field.
         function updateIsPublic(access) {
             this.set("isPublic", access === ACCESS.PUBLIC);
         }
         if (attr.access) updateIsPublic.call(this, attr.access);
+        // TODO Use `listenTo`?
         this.on("change:access", function (self, access) {
             updateIsPublic.call(self, access);
         });
 
+        // TODO Should this not be handled by `parse`?
+        //   I guess the problem is that we are not guaranteed
+        //   to always parse on initialization?
+        // TODO Also this is inconsistent with what `parse` does, right?
+        //   One attributes everything without an author to the current user,
+        //   the other does not.
         this.set("isMine", !attr.created_by || (annotationTool.user && attr.created_by === annotationTool.user.id));
 
         if (attr.tags) {
@@ -154,10 +179,14 @@ var Resource = Backbone.Model.extend({
             attr.settings = util.parseJSONString(attr.settings);
         }
 
+        // TODO Shit, if the configuration depends on a model, then the tool object is not created yet!
         if (annotationTool.user) {
+            // TODO Maybe this should rather be a function?
+            //   Or updated via events? See also above for `isPublic`
             attr.isMine = annotationTool.user.id === attr.created_by;
         }
 
+        // TODO Shouldn't this be gone by now? What is time?!
         if (callback) callback.call(this, attr);
 
         return data;
