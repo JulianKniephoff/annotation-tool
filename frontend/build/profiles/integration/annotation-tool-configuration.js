@@ -42,11 +42,17 @@ define(["jquery",
 
             // The backend expects `application/x-www-form-urlencoded data
             // with anything nested deeper than one level transformed to a JSON string
+            // TODO Is this still necessary?
             options.processData = true;
 
+            // TODO Is this still necessary?
             options.data = options.attrs || model.toJSON(options);
 
             // Some models (marked with `mPOST`) need to always be `PUT`, i.e. never be `POST`ed
+            // TODO Do not put this information in the model
+            //   This could be hard, though, since
+            //   1) we don't have the models at hand
+            //   2) I have no idea how to know which model is being processed here
             if (model.noPOST && method === "create") {
                 method = "update";
             }
