@@ -137,6 +137,7 @@ define(["jquery",
 
                 this.once(MainView.EVENTS.READY, function () {
                     this.updateTitle(annotationTool.video);
+                    // TOOD Put this in `createViews`?
                     this.tracksSelectionModal = new TracksSelectionView();
 
                     if (!annotationTool.isFreeTextEnabled()) {

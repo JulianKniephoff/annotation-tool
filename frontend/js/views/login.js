@@ -14,6 +14,8 @@
  *
  */
 
+// TODO Maybe move this module to a location
+//   more appropriate to its status of "configuration specific"
 /**
  * A module representing the login modal.
  * Note that this is currently only used in the local configurations.
@@ -80,6 +82,7 @@ var LoginView = Backbone.View.extend({
         this.$el.modal({ show: true, backdrop: "static", keyboard: false });
     },
 
+    // TODO Should these not be inherited somehow?
     /**
      * Show the login modal
      * @alias module:views-login.Login#show
@@ -118,6 +121,7 @@ var LoginView = Backbone.View.extend({
             userRemember = this.$el.find("#remember").prop("checked"),
             userSupervisor = this.$el.find("#supervisor").prop("checked"),
             alert = this.$el.find(".alert"),
+            // TODO This selector chain is BS ...
             userError = alert.find("#content"),
             validationErrors = false;
 
@@ -134,10 +138,14 @@ var LoginView = Backbone.View.extend({
             email: userEmail,
             role: userSupervisor ? ROLES.ADMINISTRATOR : ROLES.USER
         }, {
+            // TODO Oh em gee, fix how you handle validation after the Backbone update
+            //   Use isValid, for example, once you have this available again
             error: _.bind(function (user, error) {
+                // TODO We should probably return all validation errors at once.
                 this.$el.find("#" + error.attribute).parentsUntil("form").addClass("error");
                 userError.append(i18next.t(
                     "login error." + error.attribute + "." + error.error
+                    // TODO Höhö error.error ...
                 ));
                 alert.show();
                 validationErrors = true;

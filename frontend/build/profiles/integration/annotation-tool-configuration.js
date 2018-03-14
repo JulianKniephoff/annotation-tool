@@ -261,6 +261,7 @@ define(["jquery",
              * @return {Promise.<ROLE>} The corresponding user role in the annotations tool
              */
             getUserRoleFromExt: function (roles) {
+                // TODO The backend should probably just return these
                 return adminRoles.then(function (adminRoles) {
                     if (_.some(adminRoles.concat(['ROLE_ADMIN']), function (adminRole) {
                         return _.contains(roles, adminRole);
@@ -281,6 +282,9 @@ define(["jquery",
                     return $.when(userData.user, this.getUserRoleFromExt(userData.roles));
                 }.bind(this)).then(function (user, role) {
                     this.user = new User({
+                        // TODO Do we even need this?
+                        //   I mean the backend already knows which user is logged in
+                        //   all the time.
                         user_extid: user.username,
                         nickname: user.username,
                         email: user.email,

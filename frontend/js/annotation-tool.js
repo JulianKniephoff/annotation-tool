@@ -220,6 +220,9 @@ define(["jquery",
                     this.playerAdapter.load();
                 }, this);
 
+                // TODO It sucks that this has to be done in the end,
+                //   since it is actually the first step
+                //   in the "initialization chain."
                 this.authenticate();
             },
 
@@ -866,6 +869,7 @@ define(["jquery",
                     concludeInitialization = _.bind(function () {
 
                         // At least one private track should exist, we select the first one
+                        // TODO Can we be sure that there will always be one track here?!
                         var selectedTrack = tracks.getMine()[0];
 
                         // TODO Is this check even necessary?
@@ -887,7 +891,8 @@ define(["jquery",
                         tracks = this.video.get("tracks");
 
                         if (this.localStorage) {
-                            // TODO What is this function??!?!
+                            // TODO Maybe just filter the tracks no matter what backend is used ...
+                            //   We need to get rid of these kinds of `if`-s in the main code
                             tracks = tracks.getTracksForLocalStorage();
                         }
 

@@ -167,6 +167,7 @@ define(["jquery",
                     } else {
                         var loginView = new LoginView();
                         loginView.once(LoginView.EVENTS.LOGIN, function (user, remember) {
+                            // TODO Should the login view already save the model?
                             this.user = users.get(user);
                             if (this.user) {
                                 this.user.set(user.attributes);

@@ -27,6 +27,8 @@ define(["roles",
 
         "use strict";
 
+        // TODO should this really be a Resource?
+        //   This only caused trouble until now ...
         /**
          * @constructor
          * @see {@link http://www.backbonejs.org/#Model}
@@ -47,6 +49,7 @@ define(["roles",
                 access: ACCESS.PUBLIC
             },
 
+            // TODO After the login refactoring in the backend, do we still need this?!
             /**
              * REST endpont for this model
              * @type {string}
@@ -70,6 +73,10 @@ define(["roles",
                 var invalidResource = Resource.prototype.validate.call(this, attr);
                 if (invalidResource) return invalidResource;
 
+                // TODO We should probably not validate the user_extid,
+                //   as we did before I deleted that check, right?
+                //   It is an internal field that should always be valid.
+                //   "At most" we should assert it somewhere ...
 
                 if (!attr.nickname) {
                     return {

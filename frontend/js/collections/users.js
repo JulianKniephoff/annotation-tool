@@ -32,6 +32,9 @@ define(["models/user",
          * @memberOf module:collections-users
          * @alias module:collections-users.User
          */
+        // TODO Do we even need this collection?
+        //   It is currently only used in the local profile
+        //   and even there it could be replaced by using the models directly ...
         var Users = Backbone.Collection.extend({
             /**
              * Model of the instances contained in this collection
