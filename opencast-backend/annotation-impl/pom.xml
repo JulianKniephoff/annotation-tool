@@ -194,6 +194,7 @@
   <build>
     <resources>
       <resource>
+        <!-- TODO Can we make it so that we don't have to specify this **default** path here? -->
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
       </resource>

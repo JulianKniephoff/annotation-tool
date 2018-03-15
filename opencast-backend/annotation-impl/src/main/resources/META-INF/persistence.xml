@@ -16,6 +16,7 @@
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables"/>
       <property name="eclipselink.logging.logger" value="JavaLogger"/>
+      <!-- TODO wat -->
       <property name="eclipselink.create-ddl-jdbc-file-name" value="create-matterhorn-extended-annotation-impl.jdbc"/>
       <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-matterhorn-extended-annotation-impl.jdbc"/>
     </properties>

@@ -153,6 +153,7 @@
         </dependencies>
         <configuration>
           <skip>${checkstyle.skip}</skip>
+          <!-- TODO Should we rename these? -->
           <configLocation>docs/checkstyle/matterhorn-checkstyle.xml</configLocation>
           <headerLocation>docs/checkstyle/matterhorn-header.txt</headerLocation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
