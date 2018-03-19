@@ -42,6 +42,7 @@ define(["jquery",
          * @see module:Backbone.LocalStorage
          */
         Backbone.Collection.prototype.localStorage = function () {
+            // TODO Is it okay that this might be created repeatedly?
             return new Backbone.LocalStorage(_.result(this, "url"));
         };
 
