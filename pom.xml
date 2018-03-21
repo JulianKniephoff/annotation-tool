@@ -15,6 +15,7 @@
   <url>https://github.com/opencast/annotation-tool</url>
   <inceptionYear>2017</inceptionYear>
 
+  <!-- TODO Many of these should only be defined for the Opencast backend modules, right? -->
   <properties>
     <revision>0-SNAPSHOT</revision>
 

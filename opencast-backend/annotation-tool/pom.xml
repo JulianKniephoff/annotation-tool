@@ -26,6 +26,7 @@
       <artifactId>annotation-tool-frontend</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- TODO Why does this have dependencies at all?! -->
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
