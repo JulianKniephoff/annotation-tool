@@ -404,6 +404,7 @@ define(["jquery",
                         resolveView("player", annotationTool.playerAdapter);
                     }
                     annotationTool.once(annotationTool.EVENTS.VIDEO_LOADED, function () {
+                        // TODO Is this still the way to go now?
                         if (annotationTool.playerAdapter.getStatus() === PlayerAdapter.STATUS.PAUSED) {
                             videoLoaded();
                         } else {
@@ -516,6 +517,8 @@ define(["jquery",
              */
             ready: function () {
                 this.setLoadingProgress(100, i18next.t("startup.ready"));
+                // TODO Is this the right place?
+                //   It probably does not really matter, since you will want to get rid of this function anyway
                 this.loadingBox.hide();
                 this.onWindowResize();
                 $(window).resize(this.onWindowResize);
