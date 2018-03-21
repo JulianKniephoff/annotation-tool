@@ -140,6 +140,7 @@ define(["jquery",
                     // TOOD Put this in `createViews`?
                     this.tracksSelectionModal = new TracksSelectionView();
 
+                    // TODO Make this work again, too
                     if (!annotationTool.isFreeTextEnabled()) {
                         $("#opt-annotate-text").parent().hide();
                     }
