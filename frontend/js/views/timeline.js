@@ -236,6 +236,7 @@ define(["util",
 
                 this.playerAdapter = attr.playerAdapter;
 
+                // TODO This should be in a `render` method
                 this.$el.html(template());
 
                 // Type use for delete operation
