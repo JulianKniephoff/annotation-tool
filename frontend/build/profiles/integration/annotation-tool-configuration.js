@@ -66,7 +66,9 @@ define(["jquery",
 
         // Initiate loading the video metadata from Opencast
         var mediaPackageId = util.queryParameters.id;
+        // TODO Do we need this?
         $.support.cors = true;
+        // TODO Use higher level methods than `ajax` directly?
         var searchResult = $.ajax({
             url: "/search/episode.json",
             crossDomain: true,
@@ -85,6 +87,8 @@ define(["jquery",
             dataType: "json"
         });
         // Find out which roles should have admin rights
+        // TODO We should not have to do this. The backend could just send the correct role,
+        //   when we request the user!
         var adminRoles = mediaPackage.then(function (mediaPackage) {
             // First we need to find the proper XACML file
             var attachments = util.array(mediaPackage.attachments.attachment);
@@ -108,11 +112,18 @@ define(["jquery",
             return $.ajax({
                 url: selectedXACML.url,
                 crossDomain: true,
+                // TODO This is the default, no?
+                //   No, jQuery actually guesses.
+                //   So can we remove this everywhere?
                 dataType: "xml"
             });
         }).then(function (xacmlData) {
             // Then we need to extract the appropriate rules
             return $(xacmlData).find("Rule").filter(function (index, rule) {
+                // TODO The action action name should not be hard coded?! But see above;
+                //   actually we don't want to conduct this search
+                // TODO Do we need all selectors?
+                // TODO Can we get/handle text with selectors as well?
                 return $(rule).find("Action AttributeValue").text() === "annotate-admin";
             }).map(function (index, rule) {
                 return $(rule).find("Condition AttributeValue").text();
@@ -244,6 +255,8 @@ define(["jquery",
              * }
              * @return {Object} The literal object containing all the parameters described in the example.
              */
+            // TODO Do we even need this function ...?
+            //   Or the parameters it returns?
             getVideoParameters: function () {
                 return searchResult.then(function (result) {
                     return {

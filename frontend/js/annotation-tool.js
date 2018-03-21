@@ -922,6 +922,13 @@ define(["jquery",
                 $.when(this.getVideoExtId(), this.getVideoParameters()).then(
                     _.bind(function (videoExtId, videoParameters) {
                         // If we are using the localstorage
+                        // TODO Unify these cases?
+                        //   And make them nice ...
+                        // TODO But you can't really, can you?
+                        //   Because you need a collection for the local case,
+                        //   but you don't for the remote one ...
+                        //   Can you not make the `extid`s the `idAttribute` somehow,
+                        //   and use that as the primary key on the server as well?
                         if (this.localStorage) {
                             videos.fetch({
                                 success: _.bind(function () {
@@ -942,6 +949,8 @@ define(["jquery",
                             video = videos.at(0);
                             this.video = video;
                             video.set(videoParameters);
+                            // TODO Integrate this check better with the other role stuff.
+                            //   Like: There is code to assign the suer a role.
                             video.save(null, {
                                 error: _.bind(function (model, response, options) {
                                     if (response.status === 403) {
@@ -951,6 +960,9 @@ define(["jquery",
                                 }, this)
                             });
                             // TODO Is there no idiomatic thing for this pattern?
+                            // TODO Emitting the `"ready"` event should be decoupled from the constructor
+                            //   so that we can get rid of this dance
+                            // TODO Why is this only done for localStorage?!
                             if (video.get("ready")) {
                                 createDefaultTrack();
                             } else {
