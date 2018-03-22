@@ -119,6 +119,7 @@ public final class Collections {
    * Apply a binary function (operator) to a start value and all elements of the list in turn.
    * <p/>
    * Example: (+) 0 [1, 2, 3] -> (((0 + 1) + 2) + 3)
+   * TODO Remove these whitespaces
    * 
    * @deprecated use {@link Monadics}
    */
