@@ -808,6 +808,7 @@ define(["util",
                     dismissModal();
                 }, this);
 
+                // TODO Rather use button types here?
                 modal.find(".submit").on("click", saveTrack);
                 modal.on("keypress", function (event) {
                     if (event.keyCode === 13) {
