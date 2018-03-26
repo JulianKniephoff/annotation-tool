@@ -23,6 +23,8 @@ define(["underscore",
         "templates/scale-value-editor",
         "handlebarsHelpers"],
        function (_, Backbone, ScaleValueEditorTmpl) {
+       // TODO Oh my god reindent this ...
+       //   But you probably just want to reindent everything ...
 
             "use strict";
 
