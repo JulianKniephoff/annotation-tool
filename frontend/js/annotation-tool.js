@@ -113,6 +113,7 @@ define(["jquery",
                 }
             },
 
+            // TODO This needs a comment!
             alertModal: new AlertView(),
 
             /**
