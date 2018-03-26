@@ -103,6 +103,7 @@ define(["jquery",
                     "click .create-scale-value": "createScaleValue",
                     "change select#scale-id": "changeScale",
                     "keydown #save-scale": "saveOnInsert"
+                    // TODO Why are some of these ids and others classes?!
                 },
 
                 /**
