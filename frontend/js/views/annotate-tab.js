@@ -115,6 +115,7 @@ define(["jquery",
              * @alias module:views-annotate-tab.AnnotateTab#paginationBulletTemplate
              * @type {HandlebarsTemplate}
              */
+            // TODO make this nicer
             paginationBulletTemplate: Handlebars.compile("<li><button type=\"button\" class=\"page-link\" data-page=\"{{number}}\">{{number}}</button></li>"),
 
             /**
