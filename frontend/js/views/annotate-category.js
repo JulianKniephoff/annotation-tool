@@ -135,6 +135,7 @@ define(["jquery",
                 this.model = attr.category;
 
                 this.render();
+                // TODO Why does this not happen in `render`?
                 this.addLabels(this.model.get("labels"));
 
                 labels = this.model.get("labels");
@@ -176,6 +177,7 @@ define(["jquery",
                     labelView.updateInputWidth();
                 }, this);
 
+                // TDDO Is this necessary?!
                 this.delegateEvents(this.events);
             },
 
@@ -348,6 +350,7 @@ define(["jquery",
             render: function () {
                 var modelJSON = this.model.toJSON();
 
+                // TODO Gwaah
                 this.undelegateEvents();
 
                 modelJSON.notEdit = !this.editModus;
@@ -382,6 +385,7 @@ define(["jquery",
 
                 this.updateInputWidth();
 
+                // TODO Unnecessary, right?
                 this.delegateEvents(this.events);
 
                 return this;

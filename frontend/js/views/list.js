@@ -150,6 +150,8 @@ define(["underscore",
                     this.addAnnotation(newAnnotation, annotationTrack);
                 }, this));
 
+                // TODO This is never called, because the event should have been `"remove"`
+                // this.listenTo(ann, "destroy", this.removeOne);
                 this.listenTo(ann, "change:start change:duration", this.updateView);
 
                 this.addList(ann.toArray(), annotationTrack, _.isNumber(index) && index === (this.tracks.length - 1));
@@ -431,6 +433,7 @@ define(["underscore",
                     track.stopListening();
                 }, this);
 
+                // TODO Why not `remove`?
                 _.each(this.annotationViews, function (annView) {
                     annView.undelegateEvents();
                     annView.stopListening();
