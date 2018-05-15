@@ -109,6 +109,7 @@ define(["underscore",
                 this.listenTo(annotationTool, "togglefreetext", this.render);
 
                 this.autoExpand = options.autoExpand;
+                // TODO Why not listen to the player adapter directly?
                 annotationTool.addTimeupdateListener(this.potentiallyOpenCurrentItems, 900);
 
                 this.$el.html(template());
@@ -380,6 +381,7 @@ define(["underscore",
              */
             potentiallyOpenCurrentItems: function () {
                 var previousAnnotations = [];
+                // TODO Actually make this an anonymous event handler at registration site?!
                 return function () {
                     if (!this.autoExpand) return;
 
