@@ -436,6 +436,7 @@ define(["jquery",
                 });
 
                 function setupClosing(view, container) {
+                    // TODO Memoize these, etc. etc.
                     $(".opt-" + view).show();
 
                     // TODO Rather use `itemDestroyed` somehow?
@@ -688,11 +689,14 @@ define(["jquery",
              */
             toggleView: function (event) {
                 var view = event.currentTarget.dataset.view;
+                // TODO Memoize the root somewhere more globally?
                 var root = goldenLayout.root.contentItems[0];
                 if (this.views[view]) {
                     // Note that the objects returned by `ContentItem#getComponentsByName`
                     // unfortunately do now allow for their own removal from the layout,
                     // hence our copying some of the functionality of that method.
+                    // TODO Why does this extract the `instance` property?!
+                    //root.getComponentsByName(view)[0].remove();
                     root.getItemsByFilter(function (item) {
                         return item.componentName === view;
                     })[0].remove();
