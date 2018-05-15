@@ -14,6 +14,11 @@
  *
  */
 
+// TODO Oh my god name things consistently ("item"??!? Is that a carousel item? Or a category?)
+// TODO I can't edit past the third or fourth item because the container would have to scroll
+// TODO Can't add categories in Firefox xD
+// TODO Why is the loading performance so slow now?
+
 /*jshint multistr: true */
 /*global saveAs */
 
@@ -214,6 +219,9 @@ define(["jquery",
                 this.addCategories(this.categories, this.filter);
 
                 this.titleLink = attr.button;
+                // TODO Unbind these ...
+                // TODO Why is this even done so shitty?
+                //   i.e. why do we manipulate a parent element here?
                 this.titleLink.find("i.add").on("click", this.onAddCategory);
                 this.titleLink.find("i.export").on("click", this.onExport);
                 this.titleLink.find("i.import").on("click", this.chooseFile);
@@ -229,6 +237,7 @@ define(["jquery",
                     extensions    : "*.json"
                 });
 
+                // TODO Unbind these
                 this.titleLink.find(".file").on("click", function (event) {
                     // We need to stop the propagation of this click event,
                     // which we trigger ourselves in `chooseFile`
@@ -242,7 +251,10 @@ define(["jquery",
 
                 this.listenTo(this.categories, "add", this.addCategory);
                 this.listenTo(this.categories, "remove", this.removeOne);
+                // TODO Why both?
+                //this.listenTo(this.categories, "destroy", this.removeOne);
 
+                // TODO Why is this a global event?!
                 this.listenTo(annotationTool, annotationTool.EVENTS.ANNOTATE_TOGGLE_EDIT, this.onSwitchEditModus);
 
                 this.hasEditMode = _.contains(this.roles, annotationTool.user.get("role"));
@@ -255,6 +267,8 @@ define(["jquery",
              * @alias module:views-annotate-tab.AnnotateTab#render
              */
             render: function () {
+                // TODO I think it is confusing that the first time through this function,
+                //   we actually don't have any category views to display.
 
                 // We want to keep the event handlers on the subviews intact,
                 // so we remove them from the DOM prior to clearing the view;
@@ -280,11 +294,14 @@ define(["jquery",
                 _.each(categoryViews, this.insertCategoryView, this);
 
                 this.updateNavigation();
+                // TODO See if this works after removing something
                 this.carouselElement.find(".item").eq(this.currentPage).addClass("active");
 
                 this.initCarousel();
             },
 
+            // TODO What is this even?!
+            // TODO Shouldn't it be called automatically somehow, if at all?
             /**
              * Make the tab ready to be displayed after it having been selected.
              * @alias module:views-annotate-tab.AnnotateTab#select
@@ -364,6 +381,7 @@ define(["jquery",
              * @param {Category} Category from which the view has to be deleted
              */
             removeOne: function (delCategory) {
+                // TODO Save the views in a hash-map?
                 _.find(this.categoryViews, function (catView, index) {
                     if (delCategory === catView.model) {
                         catView.remove();
@@ -424,6 +442,7 @@ define(["jquery",
             initCarousel: function () {
                 this.carouselElement
                     .carousel({ interval: false })
+                    // TODO Unbind this?
                     .on("slid", this.onCarouselSlid);
             },
 
@@ -463,6 +482,7 @@ define(["jquery",
                 this.updateNavigation();
 
                 _.each(this.categoryViews, function (catView) {
+                    // TODO Wtf?
                     catView.updateInputWidth();
                 }, this);
             },
@@ -561,6 +581,7 @@ define(["jquery",
             chooseFile: function (event) {
                 event.preventDefault();
                 event.stopImmediatePropagation();
+                // TODO What
                 this.titleLink.find(".file").click();
             },
 

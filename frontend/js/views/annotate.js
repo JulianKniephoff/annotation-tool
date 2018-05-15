@@ -176,6 +176,7 @@ define(["jquery",
                 this.listenTo(this.tracks, "select", this.changeTrack);
                 this.playerAdapter = attr.playerAdapter;
 
+                // TODO Rename `categories` to `structured`
                 this.layout = _.pick(attr, "freeText", "categories");
                 if (!this.layout.freeText) this.freeTextElement.hide();
                 if (!this.layout.categories) this.categoriesElement.hide();
@@ -250,6 +251,7 @@ define(["jquery",
 
                     this.trackDIV.html(track.get("name"));
 
+                // TODO When/why would this even happen?!
                 } else {
                     // Otherwise, we disable the input and inform the user that no track is set
                     this.$el.find(".annotate").css("display", "none");
@@ -305,6 +307,7 @@ define(["jquery",
                 var tabId = event.currentTarget.dataset.tabid;
 
                 $(event.currentTarget).one("shown", _.bind(function () {
+                    // TODO Nooo!
                     this.categoriesTabs[tabId].initCarousel();
                 }, this));
 
@@ -370,6 +373,8 @@ define(["jquery",
                 // trigger an event that all element switch in edit modus
                 annotationTool.trigger(annotationTool.EVENTS.ANNOTATE_TOGGLE_EDIT, status);
             },
+
+            // TODO Somehow merge the two functions below?
 
             /**
              * Toggle layout for free text annotation only
