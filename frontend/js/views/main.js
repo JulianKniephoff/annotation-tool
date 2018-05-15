@@ -81,6 +81,8 @@ define(["jquery",
              * @alias module:views-main.MainView#loadingBox
              * @type {DOMElement}
              */
+            // TODO Create and remove the loading box programmatically,
+            //   instead of having it on the page
             loadingBox: $("#loading"),
 
             /**
