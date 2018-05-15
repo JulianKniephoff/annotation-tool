@@ -1580,6 +1580,9 @@ define(["util",
              * @param {Double} seconds The time in seconds to convert to Date
              * @returns {Date} Formated date for the timeline
              */
+            // TODO Put this in `util`?
+            //   The loop controller uses this function as well ...
+            //   But maybe that is okay?
             getFormatedDate: function (seconds) {
                 var newDate = new Date(seconds * 1000);
                 newDate.setTime(newDate.getTime() + newDate.getTimezoneOffset() * 60 * 1000);
