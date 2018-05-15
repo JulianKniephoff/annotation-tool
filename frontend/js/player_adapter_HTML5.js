@@ -216,6 +216,7 @@ define(["jquery",
             /**
              * Load the video
              */
+            // TODO Get rid of this
             this.load = function () {
                 self.initialized = false;
                 self.status = PlayerAdapter.STATUS.INITIALIZING;

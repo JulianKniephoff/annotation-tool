@@ -13,6 +13,14 @@
  *  permissions and limitations under the License.
  */
 
+// TODO JSDoc comments for the internal functions?!
+// TODO What to do when the video or the timeline is not visible?
+// TODO Maybe this **should** use a model and a collection for the loops.
+//   Especially if I am caching their boundaries anyway
+//   and if the things in the timeline are Backbone views, too.
+//   We could then use Backbone event handling techniques for control flow.
+// TODO Maybe toggling the controller should just create/delete a whole new instance every time
+
 /**
  * A module representing the loop modal
  * @module views-loop
@@ -56,6 +64,7 @@ var LoopView = Backbone.View.extend({
         var playerAdapter = options.playerAdapter;
         var duration = playerAdapter.getDuration();
         var timeline = options.timeline;
+        // TODO Should we rather use events to communicate with the timeline?
 
         var enabled = false;
         var loopLength = Math.max(
@@ -89,10 +98,13 @@ var LoopView = Backbone.View.extend({
             slider = this.$el.find("#slider");
 
             slider.slider({
+                // TODO These values are bogus
+                //   What if the video is too short?
                 min: MINIMAL_LOOP,
                 max: Math.floor(duration),
                 step: 1,
                 formater: function (value) {
+                    // TODO More formatting possibilities for translators
                     return value + i18next.t("loop controller.seconds");
                 }
             }).on("slideStop", function (event) {
@@ -119,6 +131,8 @@ var LoopView = Backbone.View.extend({
         }
 
         function cleanupLoops() {
+            // TODO Since we now know that the timeline also overrides items when we add,
+            //   maybe we should not remove all of them?!
             // We assume that the number of loops has not changed since generating the timeline items
             // because we of course would have called `cleanupLoops` otherwise!
             for (var i = 0; i < numberOfLoops; ++i) {
@@ -138,6 +152,7 @@ var LoopView = Backbone.View.extend({
                 };
                 start += loopLength;
                 end += loopLength;
+                // TODO We add the current item twice now ...
                 addTimelineItem(loop, false);
             }
             syncCurrentLoop();
@@ -188,11 +203,16 @@ var LoopView = Backbone.View.extend({
             playerAdapter.setCurrentTime(loops[currentLoop].start);
             playerAdapter.play();
         });
+        // TODO We might have to change the semantics of the seeking event/state in the player adapter
+        //   Why did I think that?
         $playerAdapter.on(PlayerAdapter.EVENTS.SEEKING + ".loop", function () {
             if (!enabled) return;
+            // TODO Don't we want to do this always?
+            //   That is, also when the player is just playing but we are disabled?
             resetCurrentLoop();
         });
 
+        // TODO I guess the proper way would be to create a backbone view for this?!
         timeline.$el.on("click.loop", ".loop", function (event) {
             var loop = event.target.dataset.loop;
             jumpToLoop(loop);
@@ -216,6 +236,7 @@ var LoopView = Backbone.View.extend({
                 var newLength = parseInt(event.target.value, 10);
                 if (isNaN(newLength) || newLength <= 0 || newLength > duration) {
                     annotationTool.alertError(i18next.t("loop controller.invalid loop length"));
+                    // TODO This is potentially too much work!
                     lengthInput.val(loopLength);
                     slider.slider("setValue", loopLength);
                     return;
@@ -223,6 +244,9 @@ var LoopView = Backbone.View.extend({
                 setLength(newLength);
             },
             "change #constrain-annotations": function (event) {
+                // TODO This should be done nicer ...
+                // TODO Should these survive disabling the loops?
+                //   What about removing the loop controller?
                 if (event.target.checked) {
                     annotationTool.annotationConstraints = currentLoopConstraints();
                 } else {
@@ -248,6 +272,11 @@ var LoopView = Backbone.View.extend({
         }
 
         function resetCurrentLoop() {
+            // TODO Can we not make it so that we can toggle the `current` class
+            //   on the timeline items?
+            //   That way we would not have to do this dance and redraw the whole thing at the end ...
+            // TODO Avoid name clashes in the timeline items ...
+            // TODO Note that we now depend on the fact that the timeline actually overrides items
             addTimelineItem(currentLoop, false);
             syncCurrentLoop();
             if (annotationTool.annotationConstraints) {
@@ -257,6 +286,7 @@ var LoopView = Backbone.View.extend({
         }
 
         function currentLoopConstraints() {
+            // TODO Cache current loop boundaries ...?
             var boundaries = loops[currentLoop];
             return {
                 start: boundaries.start,
@@ -264,6 +294,7 @@ var LoopView = Backbone.View.extend({
             };
         }
 
+        // TODO Use JSDoc override mechanisms?
         /**
          * Remove the loop controller from the screen
          * @alias module:views-loop.Loop#remove

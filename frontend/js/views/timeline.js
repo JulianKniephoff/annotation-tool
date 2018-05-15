@@ -553,6 +553,7 @@ define(["util",
              * @alias module:views-timeline.TimelineView#addItem
              */
             addItem: function (id, item) {
+                // TODO Don't we have to make sure that this is always before the rest of the tracks?!
                 item.group = "<!-- extra -->" + item.group;
                 this.extraItems[id] = item;
             },

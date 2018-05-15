@@ -21,6 +21,8 @@ define([
     moment
 ) { "use strict";
 
+// TODO Put (some of) these in `_` using `_.mixin`?
+
 // TODO I don't like that this is here;
 //   I want it on top of the file.
 //   But then I would have to call this variable `exports`
