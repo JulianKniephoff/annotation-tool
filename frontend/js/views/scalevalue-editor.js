@@ -212,6 +212,8 @@ define(["underscore",
                  */
                 getSortedCollection: function () {
                     // Sort the model in the right scale value order
+                    // TODO Shuold the collection not already be sorted?
+                    //   I mean isn't that the point of giving a `Collection` a `comparator`?
                     return this.model.collection.sortBy(function (scaleValue) {
                         return scaleValue.get("order");
                     });
