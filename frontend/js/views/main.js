@@ -74,6 +74,7 @@ define(["jquery",
              * @alias module:views-main.MainView#el
              * @type {DOMElement}
              */
+            // TODO Can we make it so that this is GL, eventually?
             el: $("body"),
 
             /**
@@ -143,6 +144,7 @@ define(["jquery",
                     this.tracksSelectionModal = new TracksSelectionView();
 
                     // TODO Make this work again, too
+                    // TODO What is this function?!
                     if (!annotationTool.isFreeTextEnabled()) {
                         $("#opt-annotate-text").parent().hide();
                     }
@@ -289,6 +291,10 @@ define(["jquery",
                 ]; }));
 
                 function disableViewMenuItem(view) {
+                    // TODO Better styling
+                    //   or should we just hide them?
+                    // TODO Should clicking on the menu items still just close the thing?
+                    // TODO On that note: Do we want to be able to add components by clicking as well?
                     viewMenuItems[view].addClass("checked");
                 }
 
@@ -356,6 +362,7 @@ define(["jquery",
                 // can never be closed!
                 // Or rather: Closing them and reopening them re-resolves their dependencies,
                 // which -- in combination with the above -- can lead to surprising behavior.
+                // TODO This kind of name-clashes with the list of views ...
                 this.views = {};
                 function resolveView(name, view) {
                     self.views[name] = view;
@@ -431,11 +438,13 @@ define(["jquery",
                 function setupClosing(view, container) {
                     $(".opt-" + view).show();
 
+                    // TODO Rather use `itemDestroyed` somehow?
                     container.on("destroy", function () {
 
                         viewMenuItems[view].removeClass("checked");
                         viewMenuItems[view].prop("disabled", false);
 
+                        // TODO Do we want some kind of general menu plugin mechanism?
                         $(".opt-" + view).hide();
 
                         self.views[view].remove();
@@ -451,6 +460,7 @@ define(["jquery",
                         resolveView("list", new ListView({
                             el: container.getElement(),
                             playerAdapter: player,
+                            // TODO UGH!
                             autoExpand: $("#opt-auto-expand").hasClass("checked")
                         }));
                     });
@@ -461,6 +471,8 @@ define(["jquery",
                         resolveView("annotate", new AnnotateView({
                             playerAdapter: player,
                             el: container.getElement(),
+                            // TODO Ugh, this seems like an ugly hack!
+                            // TODO Cache these somewhere, you use these like 100 times
                             freeText: $("#opt-annotate-text").hasClass("checked"),
                             categories: $("#opt-annotate-categories").hasClass("checked")
                         }));
@@ -468,6 +480,10 @@ define(["jquery",
                 });
 
                 goldenLayout.registerComponent("loop", function (container) {
+                    // TODO Do we want to preserve the state of the loops,
+                    //   even when the loop controller is closed?
+                    // TODO Do we want to at least restore loops being shown
+                    //   when the loop controller is made visible again?
                     requireViews(["player", "timeline"], function (player, timeline) {
                         setupClosing("loop", container);
                         resolveView("loop", new LoopView({
@@ -486,6 +502,7 @@ define(["jquery",
                 );
                 this.listenTo(this, "view", _.after(numberVisibleViews, function () {
 
+                    // TODO The loop drag source should probably live in the timeline, actually
                     _.each(closableViews, function (view) {
                         goldenLayout.createDragSource(
                             viewMenuItems[view].find(".drag-source"),
@@ -496,6 +513,7 @@ define(["jquery",
                     var viewOptionsDropdown = $("#view-options .dropdown-toggle");
                     //$("#view-options .dropdown-menu").off("mouseleave");
                     $("#view-options .dropdown-menu").mouseleave(function (event) {
+                        // TODO Is there a constant for this?
                         if (event.buttons & 1) {
                             // Note that we explicitly assume the menu to be open!
                             // Otherwise, how would this event ever happen?
@@ -550,6 +568,8 @@ define(["jquery",
 
                 var addComment = _.bind(function () {
                     if (!annotationTool.activeAnnotation) return;
+                    // TODO Should we rather remove the shortcut when the view is hidden?
+                    //   This would be an argument **for** putting this code into the list view as well...
                     if (!this.views.list) return;
                     var annotationView = this.views.list.getViewFromAnnotation(
                         annotationTool.activeAnnotation.get("id")
