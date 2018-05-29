@@ -38,6 +38,18 @@ define(["jquery",
 
         "use strict";
 
+        // TODO You probably need to do this for the other views in the comments hierarchy as well?!
+        function wrap(methodName, wrapper) {
+            return _.wrap(_.bind(this[methodName], this), wrapper);
+        }
+
+        function stopPropagation(handler, event) {
+            event.stopPropagation();
+            handler(event);
+        }
+
+        // TODO Now you can wrap all the event handlers ez
+
         /**
          * @constructor
          * @see {@link http://www.backbonejs.org/#View}
