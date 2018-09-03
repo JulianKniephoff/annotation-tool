@@ -57,14 +57,19 @@ define(["underscore",
              * @alias module:views-comment.Comment#events
              * @type {object}
              */
+            // TODO We `ignoreInReplies` everywhere, can we DRY this up?
             events: {
                 "click": util.stopPropagation,
                 "click i.delete-comment": "onDeleteComment",
+                // TODO OMG these names ...
                 "dblclick span.comment": "onEditComment",
                 "click i.edit-comment": "onEditComment",
                 "click i.add-reply": "onAddReply",
                 "keyup textarea": "keyupInsertProxy",
                 "click button[type=submit]": "onSubmit",
+                // TODO This won't work anymore now, right?
+                //   Not, actually this is fine because the edit buttons disappear in edit mode.
+                //   However, this is still not really nice
                 "click button[type=button]": "onCancel"
             },
 
@@ -191,6 +196,7 @@ define(["underscore",
                 this.render();
                 this.trigger("cancel");
             },
+                    // TODO Does this really belong here?
 
             /**
              * Render this view

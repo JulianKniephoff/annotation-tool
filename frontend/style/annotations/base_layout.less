@@ -126,6 +126,7 @@ body {
         button {
             &:extend(.dropdown-menu > li > a);
 
+            // TODO this should not be needed
             &:hover {
                 &:extend(.dropdown-menu > li > a:hover);
             }
@@ -165,3 +166,5 @@ body {
         margin-bottom: 10px;
     }
 }
+// TODO Is this a good name?
+//   `.controls` is unfortunately already badly misused ...

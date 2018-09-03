@@ -49,6 +49,11 @@
 
                   <li class="menu-category" data-i18n="menu.view.views.head"></li>
                   <li><button type="button" class="opt-view" data-view="annotate">
+                    <!-- TODO These click targets should probably not live in a button as well ... -->
+                    <!-- TODO I don't like that this is in this source order,
+                           but the floating thing must come first for firefox.
+                           We could make the button or the li display: float,
+                           but that has other subtle implications. -->
                     <i class="check icon-check"></i>
                     <span data-i18n="menu.view.views.annotate view"></span>
                     <i data-i18n="[title]menu.view.drag here" class="drag-source icon icon-move"></i>

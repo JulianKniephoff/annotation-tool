@@ -27,6 +27,9 @@ define(["underscore",
 
         "use strict";
 
+        // TODO This is basically a generic list view now.
+        //   Maybe once you have others like it, replace them by a generic view
+
         /**
          * @constructor
          * @see {@link http://www.backbonejs.org/#View}

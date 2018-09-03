@@ -185,11 +185,13 @@ define(["jquery",
                 annotationTool.colorsManager.updateColors(categories.models);
 
                 _.each(DEFAULT_TABS, function (params) {
+                // TODO Use templates for this?
                     this.addTab(categories, params);
                 }, this);
 
                 this.tabsContainerElement.find("div.tab-pane:first-child").addClass("active");
                 this.tabsButtonsElement.find("a:first-child").parent().first().addClass("active");
+                // TODO You need to clean up this handler?
             },
 
             /**

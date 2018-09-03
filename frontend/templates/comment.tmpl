@@ -14,6 +14,9 @@
 			<i class="edit-comment icon-pencil" title="{{t "annotation.comments.edit.button"}}"></i>
 			<i class="delete-comment icon-trash" title="{{t "annotation.comments.delete"}}"></i>
 		{{/if}}
+			{{! TODO This is duplicated in `list-annotation.tmpl`}}
+			{{!   Well not quite, right?}}
+                        {{! TODO Why does the above reference `...replies.count`, not `numberOfReplies`?}}
 	</div>
 	<span class="comment">{{displayRaw text}}</span>
 {{else}}
@@ -22,6 +25,7 @@
 		<button type="button" class="btn">{{t "annotation.comments.edit.cancel"}}</button>
 		<button type="submit" class="btn btn-primary">{{t "annotation.comments.edit.save"}}</button>
 	</div>
+	{{! TODO The name sucks}}
 {{/unless}}
 
 <div class="replies"></div>

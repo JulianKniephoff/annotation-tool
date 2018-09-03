@@ -61,6 +61,9 @@ i.check {
 		margin-bottom: 0;
 		position: relative;
 		z-index: 10;
+	// TODO Should (some of) these styles be more "global"?
+	//   I mean it kind of describes how we want a tab thing to look like
+	//   But it **is** a rather specific tab thing
 
 		> li button {
 			&.active buttno {
@@ -70,6 +73,7 @@ i.check {
 		}
 	}
 
+	// TODO Remove this id and similar IDs
 	#label-tabs-contents {
 		display: flex;
 		flex-grow: 1;

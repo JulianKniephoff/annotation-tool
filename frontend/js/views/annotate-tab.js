@@ -150,6 +150,8 @@ define(["jquery",
              * @alias module:views-annotate-tab.AnnotateTab#titleLink
              * @type {DOMElement}
              */
+            // TODO Normally the tab title should be its own view,
+            //   instead of this view fussing around in another views DOM elements.
             titleLink: undefined,
 
             /**

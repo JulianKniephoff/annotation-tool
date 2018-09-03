@@ -2,8 +2,17 @@
     <a data-toggle="tab" data-tabid="{{id}}" data-target="#labelTab-{{id}}">
         {{name}}
         <i class='icon-upload import edit' title="{{t "annotate.upload categories"}}"></i>
+{{! TODO Does the toggle data have to be on the links/buttons?}}
+    {{! TODO Should this be a button?}}
+    {{!   I think you need to know more about the semantics and accessibility}}
+    {{!   of all the elements and also things like `role="button"`}}
+    {{!   However, having this as a button is problematic because there are buttons nested in here ...}}
+    {{! TODO Should this be a form?}}
+        {{! TODO Ideally this icon would be (part of) the label for the input next to it}}
+        <button type="button" class="button-icon import"><i class="icon-upload" title="{{t "annotate.upload categories"}}"></i></button>
         <input class="file" type="file" id="file-{{id}}">
         <i class='icon-download export edit' title="{{t "annotate.download categories"}}"></i>
         <i class='icon-plus-sign add edit'></i>
     </a>
+    {{! TODO Provide a translated title}}
 </li>

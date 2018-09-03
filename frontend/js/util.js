@@ -21,6 +21,9 @@ define([
     moment
 ) { "use strict";
 
+// TODO I don't like that this is here;
+//   I want it on top of the file.
+//   But then I would have to call this variable `exports`
 /**
  * A module containing helper functions needed in many different places
  * @exports util
@@ -159,6 +162,7 @@ var util = {
         .mapObject(decodeURIComponent)
         .value(),
 
+    // TODO Ugh this name
     /**
      * A combinator calling the given method on its argument.
      * @param {String} name The name of the method to call on the argument of the returned function
@@ -176,6 +180,7 @@ var util = {
      * @return The value belonging to the given key
      */
 
+    // TODO This name is shitty
     /**
      * Dynamically extend a given object with definitions for certain keys
      * @param {Object} object The object to extend
@@ -190,7 +195,13 @@ var util = {
     }
 };
 
+// TODO What else belongs here?
 util.extend(util, [
+    // TODO Is it worth creating reducing redundancy in the creation
+    //   when you get it back in the docs?!
+    //   But you will have to write it this way anyway.
+    //   Because you can't define these methods in the exports.
+    //   The only thing you would save is `@static`, right?
     /**
      * Event handler to prevent the browser's default behavior
      * @function preventDefault

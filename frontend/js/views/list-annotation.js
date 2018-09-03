@@ -187,7 +187,11 @@ define(["jquery",
                 if (event.type === "keydown" && !(event.keyCode === 13 && !event.shiftKey)) {
                     return;
                 }
+                // TODO This should save (and cancel should cancel) all the other fields as well ...
+                //   It would probably be useful to just create a new view then,
+                //   with an empty annotation as model ... or would it?
 
+                // TODO Oh my god this structure ...
                 var newValue = this.$el.find(".freetext textarea").val();
                 this.model.save({ text: newValue });
 
@@ -391,6 +395,8 @@ define(["jquery",
                 modelJSON.state = this.getState().id;
 
                 this.$el.html($(this.currentState.render(modelJSON)));
+                // TODO Could you re-delegate events insteadl?
+                //   But that would not allow `commentContainer` to use `on` directly, right?
 
                 this.$el.attr("id", this.id);
 
@@ -476,6 +482,8 @@ define(["jquery",
                     this.onSelect(true);
                 }
 
+                // TODO why do all of thee state togglers initiate rendering themselves,
+                //   instead of letting `setState` do that?
                 this.render();
             },
 

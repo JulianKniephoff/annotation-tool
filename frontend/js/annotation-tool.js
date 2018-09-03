@@ -1012,6 +1012,7 @@ define(["jquery",
 
                         success: function () {
                             if (annotationTool.localStorage) {
+                                // TODO Why?!
                                 annotationTool.video.save();
                             }
                             if (callback) {
