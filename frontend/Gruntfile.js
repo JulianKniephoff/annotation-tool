@@ -120,6 +120,9 @@ module.exports = function (grunt) {
                 syncImport: true,
                 compress: true,
                 sourceMap: true,
+                // TODO This should not be necessary,
+                //   but is, because we are not necessarily outputting
+                //   to the document root
                 sourceMapURL: '/style/style.css.map',
                 sourceMapBasepath: 'style'
             },
