@@ -80,6 +80,7 @@ define(["jquery",
 
                 mediaElementPlayer = new mejs.MediaElementPlayer(targetElement, {
                     alwaysShowControls: true,
+                    // TODO This does not work in IE11 ...
                     stretching: "fill",
                     success: function (mediaElement) {
                         if (sources) {
@@ -103,7 +104,7 @@ define(["jquery",
 
                     // If duration is valid, we changed status
                     self.status = PlayerAdapter.STATUS.PAUSED;
-                    self.dispatchEvent(new Event(PlayerAdapter.EVENTS.READY));
+                    self.dispatchEvent(new CustomEvent(PlayerAdapter.EVENTS.READY));
 
                     if (self.waitToPlay) {
                         self.play();
@@ -116,7 +117,7 @@ define(["jquery",
                     }
 
                     self.status = PlayerAdapter.STATUS.PLAYING;
-                    self.dispatchEvent(new Event(PlayerAdapter.EVENTS.PLAY));
+                    self.dispatchEvent(new CustomEvent(PlayerAdapter.EVENTS.PLAY));
                 });
 
                 $(targetElement).bind("playing", function () {
@@ -129,18 +130,18 @@ define(["jquery",
                     }
 
                     self.status = PlayerAdapter.STATUS.PAUSED;
-                    self.dispatchEvent(new Event(PlayerAdapter.EVENTS.PAUSE));
+                    self.dispatchEvent(new CustomEvent(PlayerAdapter.EVENTS.PAUSE));
                 });
 
                 $(targetElement).bind("ended", function () {
                     self.status = PlayerAdapter.STATUS.ENDED;
-                    self.dispatchEvent(new Event(PlayerAdapter.EVENTS.ENDED));
+                    self.dispatchEvent(new CustomEvent(PlayerAdapter.EVENTS.ENDED));
                 });
 
                 $(targetElement).bind("seeking", function () {
                     self.oldStatus = self.status;
                     self.status = PlayerAdapter.STATUS.SEEKING;
-                    self.dispatchEvent(new Event(PlayerAdapter.EVENTS.SEEKING));
+                    self.dispatchEvent(new CustomEvent(PlayerAdapter.EVENTS.SEEKING));
                 });
 
                 $(targetElement).bind("seeked", function () {
@@ -158,12 +159,12 @@ define(["jquery",
                     ) {
                         self.status = PlayerAdapter.STATUS.PLAYING;
                     }
-                    self.dispatchEvent(new Event(PlayerAdapter.EVENTS.TIMEUPDATE));
+                    self.dispatchEvent(new CustomEvent(PlayerAdapter.EVENTS.TIMEUPDATE));
                 });
 
                 $(targetElement).bind("error", function () {
                     self.status = PlayerAdapter.STATUS.ERROR_NETWORK;
-                    self.dispatchEvent(new Event(PlayerAdapter.EVENTS.ERROR));
+                    self.dispatchEvent(new CustomEvent(PlayerAdapter.EVENTS.ERROR));
                 });
 
                 $(targetElement).bind("contextmenu", function (e) {
