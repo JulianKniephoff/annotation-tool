@@ -23,6 +23,7 @@
     <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
     <joda-time.version>2.9.4</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
+    <!-- TODO This does **not** do what you want ... -->
     <annotation.basedir>${basedir}</annotation.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
