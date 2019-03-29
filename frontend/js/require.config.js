@@ -29,6 +29,7 @@ require.config({
         "moment": "libs/moment-with-locales",
         "hls": "libs/mediaelement/renderers/hls",
         "mediaelementplayer": "libs/mediaelement/mediaelement-and-player",
+        // TODO Do we need to express the dependencies of the translation files somewhere?!
         "mediaelement/lang": "libs/mediaelement/lang",
         "sortable": "libs/Sortable.min",
         "goldenlayout": "libs/goldenlayout"
