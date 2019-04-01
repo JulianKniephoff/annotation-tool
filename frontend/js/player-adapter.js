@@ -91,6 +91,7 @@ define(["event-target"], function (EventTarget) {
          * @method resetSize
          * @memberof module:player-adapter.PlayerAdapter#
          */
+        // TODO What is this even for?
         "resetSize"
     ].forEach(function (method) {
         PlayerAdapter.prototype[method] = function () {
