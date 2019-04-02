@@ -311,6 +311,9 @@ define(["util",
                 this.listenTo(this.tracks, "change", this.changeTrack);
                 this.listenTo(annotationTool, annotationTool.EVENTS.ANNOTATION_SELECTION, this.onSelectionUpdate);
 
+                // TODO Should these two cases be covered by **one** event?
+                //   The tool would have to listen to the categories, then,
+                //   and relay changes appropriately.
                 this.listenTo(annotationTool.video.get("categories"), "change:visible", this.update);
                 this.listenTo(annotationTool, "togglefreetext", this.update);
 

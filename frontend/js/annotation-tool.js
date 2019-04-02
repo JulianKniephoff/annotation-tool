@@ -151,6 +151,8 @@ define(["jquery",
 
                 this.addTimeupdateListener(this.updateSelectionOnTimeUpdate, 900);
 
+                // TODO Should these not be documented properties?
+
                 this.currentSelection = [];
 
                 this.tracksOrder = [];
@@ -543,6 +545,8 @@ define(["jquery",
                 this.trigger("order", order);
             },
 
+            // TODO Is this the right place for this?
+            // TODO Rename `views/main#toggleFreeTextAnnotations` ...
             /**
              * Shows or hides the free text annotations
              * @alias annotationTool.toggleFreeTextAnnotations

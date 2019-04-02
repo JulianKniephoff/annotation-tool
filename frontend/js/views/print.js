@@ -73,6 +73,9 @@ define(["underscore", "backbone", "templates/print", "handlebarsHelpers"], funct
                 .flatten()
                 .filter(function (annotation) {
                     var category = annotation.category();
+                    // TODO Factor at least this visibility logic in a function ...
+                    //   A function that just gives you the visible annotations
+                    //   would probably be a good idea as well.
                     if (!category) return annotationTool.freeTextVisible;
                     return category.get("visible");
                 });

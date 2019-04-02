@@ -1,5 +1,8 @@
 <button class="btn-nav" type="button">
     {{#if freeTextVisible}}
+        <!-- TODO You should not need `icon-white` here -->
+        <!--   This should be managed via the `navbar` styles -->
+        <!--   But they again don't work with buttons ... -->
         {{t "annotate.hide free text"}}
         <i class="icon-white icon-eye-open" title="{{t "annotate.hide freetext"}}"></i>
     {{else}}

@@ -151,10 +151,12 @@ define(["jquery",
                             "toggleStructuredAnnotations");
 
                 // Parameter for stop on write
+                // TODO Should this not be saved in the tool ...?
                 this.continueVideo = false;
 
                 this.$el.html(template());
 
+                // TODO Put this in a function
                 this.$el.find("#toggle-free-text").html(
                     toggleFreeTextButtonTemplate({
                         freeTextVisible: annotationTool.freeTextVisible
@@ -395,6 +397,7 @@ define(["jquery",
                 this.categoriesElement.toggle();
             },
 
+                // TODO Can we not bind this directly to the event?
             /**
              * Shows or hides the free text annotations
              * @alias module:views-annotate.Annotate#toggleFreeTextAnnotations
