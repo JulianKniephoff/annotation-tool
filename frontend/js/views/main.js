@@ -558,6 +558,7 @@ define(["jquery",
              */
             setupKeyboardShortcuts: function () {
 
+                // TODO Why are these in functions?
                 var setActiveAnnotationDuration = function () {
                     if (!annotationTool.activeAnnotation) return;
 
@@ -585,6 +586,8 @@ define(["jquery",
                     });
                 }, this);
 
+                // TODO Use double quotes?!
+                // TODO Why even use Mousetrap and not simple event handlers?
                 Mousetrap.bind('.', setActiveAnnotationDuration);
                 Mousetrap.bind('r', function (event) {
                     // We prevent the default behavior, i.e. inserting the letter "r", here,
