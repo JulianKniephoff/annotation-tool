@@ -600,6 +600,7 @@ define(["jquery",
                     addComment();
                 });
                 Mousetrap.bind('space', _.bind(function () {
+                    // TODO This is a horrible hack
                     // See whether the player has the focus; it manages this function itself.
                     if ($.contains(this.playerContainer, document.activeElement)) return;
 
