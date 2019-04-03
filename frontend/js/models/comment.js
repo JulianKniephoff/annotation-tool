@@ -54,16 +54,26 @@ define(["underscore",
              * @return {string} If the validation failed, an error message will be returned.
              */
             validate: function (attr) {
+                // TODO Why does the following need to happen in `validate`?
+                //   Things go horribly wrong otherwise ...
+
                 // Fix up circular dependency
                 if (!Comments) Comments = require("collections/comments");
 
+                // TODO The condition is only necessary because we are in `validate`,
+                //   which is potentially called often.
                 if (!this.replies) {
                     this.replies = new Comments(null, {
                         annotation: this.collection.annotation,
                         replyTo: this
                     });
 
+                    // TODO After the Backbone update
+                    //this.listenTo(this.replies, "update reply", function () {
                     this.listenTo(this.replies, "add remove reset reply", function () {
+                        // TODO Maybe pass along more information?
+                        // TODO Fire a change event?
+                        //   Would probably be more idiomatic, right?
                         this.trigger("reply");
                     });
                 }

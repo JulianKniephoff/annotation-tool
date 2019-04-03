@@ -101,6 +101,8 @@ define(["jquery",
                 });
 
                 this.model.fetchComments();
+                // TODO After the Backbone update
+                //this.listenTo(this.model.get("comments"), "update reply", this.render);
                 this.listenTo(this.model.get("comments"), "add remove reset reply", this.render);
 
                 if (this.model.get("label")) {
