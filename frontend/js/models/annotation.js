@@ -102,12 +102,6 @@ define(["jquery",
                         delete attr.scaleValue;
                     }
 
-                    if (annotationTool.user.get("id") === attr.created_by) {
-                        attr.isMine = true;
-                    } else {
-                        attr.isMine = false;
-                    }
-
                     if (attr.label) {
                         if (attr.label.category && (tempSettings = util.parseJSONString(attr.label.category.settings))) {
                             attr.label.category.settings = tempSettings;
@@ -223,11 +217,19 @@ define(["jquery",
              * @return {JSON} JSON representation of the instance
              */
             toJSON: function () {
-                var json = Resource.prototype.toJSON.call(this);
+                var json = this.toExportJSON();
                 delete json.comments;
+                return json;
+            },
 
-                if (json.label && json.label.toJSON) {
-                    json.label = json.label.toJSON();
+            // TODO Docs
+            // TODO hack, yada yada
+            toExportJSON: function () {
+                var json = Resource.prototype.toJSON.call(this);
+
+                if (json.label) {
+                    json.label_id = json.label.id;
+                    delete json.label;
                 }
 
                 if (json.scalevalue) {
@@ -237,6 +239,11 @@ define(["jquery",
                         json.scale_value_id = json.scalevalue.id;
                     }
                 }
+
+                if (json.scalevalue && json.scalevalue.toJSON) {
+                    json.scalevalue = json.scalevalue.toJSON();
+                }
+
                 return json;
             },
 

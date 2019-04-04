@@ -192,6 +192,7 @@ define(["jquery",
                     this.listenTo(this.video, "change:tracks", updateTracksOrder);
                     updateTracksOrder(this.getTracks());
 
+                    // TODO What, there is already track import stuff?
                     var trackImported = false;
 
                     if (!_.isUndefined(this.tracksToImport)) {

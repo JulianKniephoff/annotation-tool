@@ -65,6 +65,8 @@ define(["jquery",
                 // Fix up circular dependency
                 if (!Comments) Comments = require("collections/comments");
 
+                // TODO Should the replies be in `attributes`?
+                //   Then you would not need `toJSON`, I think.
                 if (!this.replies) this.replies = new Comments(null, {
                     annotation: this.collection.annotation,
                     replyTo: this
@@ -93,6 +95,15 @@ define(["jquery",
                 return this.isNew()
                     ? _.result(this.collection, "url")
                     : _.result(this.collection, "urlRoot");
+            },
+
+            // TODO Docs
+            toJSON: function () {
+                var json = Resource.prototype.toJSON.call(this);
+                json.replies = this.replies.map(function (reply) {
+                    return reply.toJSON();
+                });
+                return json;
             }
         });
 

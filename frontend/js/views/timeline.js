@@ -109,6 +109,9 @@ define(["util",
              */
             events: {
                 "click #add-track": "initTrackModal",
+                // TODO Do these really belong here?
+                "click #import-tracks": "importTracks",
+                "click #export-tracks": "exportTracks",
                 "click .timeline-group": "onSelectTrack",
                 "dblclick .timeline-group": "onUpdateTrack",
                 "click .update": "onUpdateTrack",
@@ -845,8 +848,102 @@ define(["util",
                 });
             },
 
+            // TODO Docs
+
+            importTracks: function () {
+                alert("Importing!!!");
+            },
+
+            exportTracks: function () {
+
+                // TODO This code does not really belong here, right?
+
+                // Collect tracks to export
+
+                var dump = {};
+
+                // TODO Think hard about which attributes we really need
+
+                dump.tracks = annotationTool.video.get("tracks")
+                    .getVisibleTracks()
+                    .map(function (track) {
+                        // TODO Get rid of the labels and categories in this dump,
+                        //   and also the parts of the scales that are in here
+                        var json = track.toExportJSON();
+                        json.annotations = json.annotations.filter(function (annotation) {
+                            // TODO Implement this
+                            // TODO And also use it in the other places ...
+                            return true;
+                            // TODO Implement this
+                            //return annotationTool.isVisible(annotation);
+                        });
+                        return json;
+                    });
+
+                var annotations = _.chain(dump.tracks)
+                    .pluck("annotations")
+                    .flatten();
+
+                // TODO I feel like there should be a more efficient way to do this
+                // TODO Look at how you exported categories and labels
+
+                // TODO There is a bit of structural duplication in this ...
+
+                // TODO Use lazy stuff for this ... stuff
+
+                // TODO Use `Set`?
+                // TODO This is probably not very performant
+                // TODO Is this the right key?
+                var usedLabels = new Set(
+                    annotations.pluck("label_id")
+                        .compact()
+                        .value()
+                );
+                // TODO This needs to include the labels
+                dump.categories = annotationTool.video.get("categories")
+                    .filter(function (category) {
+                        return category.get("labels").some(function (label) {
+                            return usedLabels.has(label.id);
+                        });
+                    })
+                    // TODO Use `invoke`?
+                    .map(function (category) {
+                        return category.toJSON();
+                    });
+
+                //dump.scales = annotations
+                //    // TODO Is this the right key?
+                //    .unique("scalevalue_id")
+                //    .map(/* TODO Get the scale ID */)
+                //    .unique()
+                //    .map(/* TODO Get the scale */)
+                //    // TODO This should now include all the labels
+                //    // TODO Or should it not?!
+                //    .value();
+
+                // TODO Same for scales/scale values
+
+                // Offer the collected tracks for download
+
+                if (this.exportURL) {
+                    URL.revokeObjectURL(this.exportURL);
+                }
+
+                var downloadLink = document.createElement("a");
+                this.exportURL = URL.createObjectURL(
+                    // TODO Get rid of the JSON formatting
+                    new Blob([JSON.stringify(dump, null, 2)], { type: "application/json" })
+                );
+                downloadLink.href = this.exportURL;
+                downloadLink.download = "tracks.json";
+                downloadLink.click();
+
+                // TODO Maybe do the CSV/Excel export like this as well?
+                // TODO Or do this in the backend?!
+            },
+
             /**
-             * Get the track corresponding to the group header, givne an element inside the latter.
+             * Get the track corresponding to the group header, given an element inside the latter.
              * @alias module:views-timeline.TimelineView#getTrackFromGroupHeader
              * @param {Element} element An element inside a group header
              * @return {Track} The track the surrounding group header belongs to

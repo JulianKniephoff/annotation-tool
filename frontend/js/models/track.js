@@ -153,7 +153,17 @@ define(["jquery",
                 delete json.annotations;
 
                 return json;
-            }
+            },
+
+            // TODO Docs
+            // TODO This is a hack, but at least there is a precedence
+            toExportJSON: function () {
+                var json = Resource.prototype.toJSON.call(this);
+                json.annotations = json.annotations.map(function (annotation) {
+                    return annotation.toExportJSON();
+                });
+                return json;
+            },
         }, {
             FIELDS: {
                 VISIBLE             : "visible",
