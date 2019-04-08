@@ -175,8 +175,6 @@ define(["jquery",
                     }).join("&");
             },
 
-            tracksToImport: undefined,
-
             /**
              * Define if the structured annotations are or not enabled
              * @alias module:annotation-tool-configuration.Configuration.isStructuredAnnotationEnabled

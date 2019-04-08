@@ -81,12 +81,6 @@ define(["jquery",
             localStorage: true,
 
             /**
-             * Array of tracks to import by default
-             * @type {?object[]}
-             */
-            tracksToImport: undefined,
-
-            /**
              * Define if the structured annotations are or not enabled
              * @alias module:annotation-tool-configuration.Configuration.isStructuredAnnotationEnabled
              * @return {boolean} True if this feature is enabled
