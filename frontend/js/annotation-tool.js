@@ -180,7 +180,7 @@ define(["jquery",
 
                     var updateTracksOrder = _.bind(function (tracks) {
                         this.tracksOrder = _.chain(tracks.getVisibleTracks())
-                            .map("id")
+                            .pluck("id")
                             .sortBy(function (trackId) {
                                 return _.indexOf(this.tracksOrder, trackId);
                             }, this).value();
