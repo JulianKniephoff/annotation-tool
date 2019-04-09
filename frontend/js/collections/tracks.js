@@ -70,13 +70,18 @@ define(["jquery",
 
                 this.video = video;
 
+                // TODO This does not belong here
+                // TODO Use `listenTo`?
                 this.on("add", function (track) {
                     // Show the new track
-                    this.showTracks(track, true);
+                    // TODO Wait, this only shows the first track?!
+                    this.showTracks([track], true);
 
                     // Select the new track
+                    // TODO Should this not fire some kind of event?!
                     annotationTool.selectedTrack = track;
                 });
+                // TODO Listen to removal as well to fix the selection
             },
 
             /**
@@ -126,13 +131,9 @@ define(["jquery",
              * @param  {array} tracks an array containing the tracks ids to display
              */
             showTracksById: function (ids) {
-                var tracks = [];
-
-                _.each(ids, function (id) {
-                    tracks.push(this.get(id));
-                }, this);
-
-                this.showTracks(tracks);
+                this.showTracks(_.map(ids, function (id) {
+                    return this.get(id);
+                }, this));
             },
 
             /**
@@ -141,34 +142,17 @@ define(["jquery",
              * @param  {boolean} keepPrevious define if the previous visible tracks should be kept if enough place
              */
             showTracks: function (tracks, keepPrevious) {
-                var max = annotationTool.MAX_VISIBLE_TRACKS || Number.MAX_VALUE,
-                    self = this,
-                    selectedTrack = annotationTool.selectedTrack,
-                    showTrack = function (track) {
-                        track.set(Track.FIELDS.VISIBLE, true);
-                        self.visibleTracks.push(track);
-                    },
-                    tracksToHide = this.visibleTracks,
-                    i;
-
-                if (_.isUndefined(tracks)) {
-                    return;
-                } else if (!_.isArray(tracks)) {
-                    tracks = [tracks];
+                function showTrack(track) {
+                    track.set(Track.FIELDS.VISIBLE, true);
+                    this.visibleTracks.push(track);
                 }
 
-                if (tracks.length > max) {
-                    console.warn("The list of tracks to show is higher than the maximum number of visible tracks. \
-                                    Only the first " + max + " will be displayed.");
+                var selectedTrack = annotationTool.selectedTrack,
+                    tracksToHide = this.visibleTracks;
 
-                    for (i = tracks.length - 1; i >= max; i--) {
-                        tracks.splice(i, 1);
-                    }
-                }
-
-                if (keepPrevious && tracks.length < max) {
+                if (keepPrevious) {
                     tracksToHide = [];
-                    for (i = 0; i < ((this.visibleTracks.length - max) + tracks.length); i++) {
+                    for (var i = 0; i < ((this.visibleTracks.length - max) + tracks.length); i++) {
                         tracksToHide.push(this.visibleTracks[i]);
                     }
                 }
@@ -177,19 +161,21 @@ define(["jquery",
                 this.hideTracks(tracksToHide);
 
                 _.each(tracks, function (track) {
+                    // TODO Does this belong here?
                     if (!track.get("annotationsLoaded")) {
                         track.fetchAnnotations();
                     }
-                    showTrack(track);
+                    showTrack.call(this, track);
                 }, this);
 
+                // TODO Track selection should be managed by the tool, I guess ...
                 if (_.isUndefined(selectedTrack) || (!_.isUndefined(selectedTrack) && !selectedTrack.get(Track.FIELDS.VISIBLE))) {
                     selectedTrack = _.find(this.visibleTracks, function (track) {
                                         return track.get("isMine");
                                     }, this);
                     annotationTool.selectTrack(selectedTrack);
                 }
-
+                // TODO WTF?! See above ...
                 annotationTool.selectTrack(selectedTrack);
 
                 this.trigger(EVENTS.VISIBILITY, this.visibleTracks);
@@ -203,13 +189,6 @@ define(["jquery",
                 var newVisibleTracks = [],
                     idsToRemove = [];
 
-                // Check if the given tracks are valid
-                if (_.isUndefined(tracks)) {
-                    return;
-                } else if (!_.isArray(tracks)) {
-                    tracks = [tracks];
-                }
-
                 // Create a list of tracks id to remove
                 _.each(tracks, function (track) {
                     idsToRemove.push(track.id);
@@ -218,6 +197,7 @@ define(["jquery",
                 // Go through the list of tracks to see which one has to be removed
                 _.each(this.visibleTracks, function (track) {
                     if (_.contains(idsToRemove, track.id)) {
+                        // TODO mmh
                         track.set(Track.FIELDS.VISIBLE, false);
                     } else {
                         newVisibleTracks.push(track);

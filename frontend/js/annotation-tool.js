@@ -164,7 +164,13 @@ define(["jquery",
 
                 this.currentSelection = [];
 
-                this.tracksOrder = [];
+                // TODO Now that this is also used for storing the visible tracks,
+                //   the name is no longer fitting.
+                // TODO Also note that you now have two sources for the visible tracks ...
+                this.tracksOrder = localStorage.getItem("tracksOrder");
+                if (this.tracksOrder != null) {
+                    this.tracksOrder = this.tracksOrder.split(",");
+                }
 
                 this.colorsManager = new ColorsManager();
 
@@ -175,19 +181,50 @@ define(["jquery",
                     this.fetchData();
                 }, this);
 
+                // TODO Redo this using promises ...
                 this.once(this.EVENTS.MODELS_INITIALIZED, function () {
                     this.views.main = new MainView();
 
+                    // TODO You need to make sure this is called in the right order
+                    // TODO Use this variable below
+                    var tracks = this.getTracks();
+                    this.listenTo(tracks, "add", function (track) {
+                        // TODO select the new track
+                    });
+                    this.listenTo(tracks, "remove", function () {
+                        // TODO Potentially look for a new track to select
+                    });
+                    // TODO What else do we need to listen to?
+                    // TODO Also do showTracks?! When?!
+
+                    // TODO Is this even the right time to do this?
+                    // TODO Do we even need to bind this?
                     var updateTracksOrder = _.bind(function (tracks) {
+                        console.log("foo");
+                        // TODO When this is called, the visible tracks are not updated yet ...
+                        //   Can you just lazy-calculate it?!
                         this.tracksOrder = _.chain(tracks.getVisibleTracks())
                             .pluck("id")
                             .sortBy(function (trackId) {
                                 return _.indexOf(this.tracksOrder, trackId);
-                            }, this).value();
+                            }, this)
+                            .value();
+                        localStorage.setItem("tracksOrder", this.tracksOrder);
                     }, this);
-                    this.listenTo(this.video, "change:tracks", updateTracksOrder);
-                    updateTracksOrder(this.getTracks());
-                }, this);
+                    var onUpdateTracks = function (track, tracks) {
+                        updateTracksOrder(tracks);
+                    };
+                    // TODO Why is this not called on remove??!??!??!
+                    this.listenTo(this.getTracks(), "add destroy", onUpdateTracks);
+                    // TODO Is this ever actually called?!
+                    //this.listenTo(this.video, "change:tracks", updateTracksOrder);
+                    // TODO Maybe put the reading of the tracks order here, too?
+                    if (this.tracksOrder != null) {
+                        this.getTracks().showTracksById(this.tracksOrder);
+                    } else {
+                        updateTracksOrder(this.getTracks());
+                    }
+                });
 
                 this.once(this.EVENTS.VIDEO_LOADED, function () {
 
@@ -515,7 +552,10 @@ define(["jquery",
              * @param {Array} order The new track order
              */
             orderTracks: function (order) {
+                // TODO Can you not use `tracks.sort` for this?
                 this.tracksOrder = order;
+                // TODO I don't think this is the right place for this ...
+                localStorage.setItem("tracksOrder", order);
                 this.trigger("order", order);
             },
 
@@ -854,12 +894,13 @@ define(["jquery",
                                 success: concludeInitialization
                             });
                         } else {
-                            tracks.showTracks(
+                            tracks.showTracks([
                                 _.first(
                                     tracks.where({ isMine: true }),
+                                    // TODO Gwaah
                                     this.MAX_VISIBLE_TRACKS || Number.MAX_VALUE
                                 )
-                            );
+                            ]);
                             concludeInitialization();
                         }
                     }, this);
@@ -1038,6 +1079,7 @@ define(["jquery",
                     destroyAnnotation();
                     track.destroy({
                         success: function () {
+                            // TODO Why do we even need this?
                             if (annotationTool.localStorage) {
                                 annotationTool.video.save();
                             }
@@ -1047,7 +1089,15 @@ define(["jquery",
                         },
                         error: function (error) {
                             console.warn("Cannot delete track: " + error);
-                        }
+                        },
+                        // TODO Since there is only one place where this is used,
+                        //   namely in the timeline,
+                        //   this is probably fine, but maybe you want to add
+                        //   an option to just pass through here.
+                        // TODO In fact, why even pass `callback`;
+                        //   just pass through all the options,
+                        //   maybe after modifying them a bit
+                        wait: true
                     });
                 }
             },

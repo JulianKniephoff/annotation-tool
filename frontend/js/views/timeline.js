@@ -424,7 +424,6 @@ define(["util",
                     this.updateDraggingCtrl();
                 }
                 this.markTrackSelected(annotationTool.selectedTrack);
-
                 this.$el.find(".timeline-groups-text").width(this.$el.width());
             },
 
@@ -1437,39 +1436,27 @@ define(["util",
             onDeleteTrack: function (event) {
                 event.stopImmediatePropagation();
 
-                var track = this.getTrackFromGroupHeader(event.target),
-                    self = this,
-                    values,
-                    newTrack,
-                    callback;
-
+                var track = this.getTrackFromGroupHeader(event.target);
                 // If track already deleted
                 if (!track) {
                     return;
                 }
 
                 // Destroy the track and redraw the timeline
-                callback = $.proxy(function () {
+                var callback = _.bind(function () {
                     _.each(this.annotationItems, function (item) {
                         if (item.trackId === track.id) {
                             delete this.annotationItems[item.id];
                         }
                     }, this);
 
-                    self.tracks.remove(track);
-
                     // If the track was selected
-                    if (!annotationTool.selectedTrack || annotationTool.selectedTrack.id === track.id) {
-                        if (self.tracks.length > 0) { // If there is still other tracks
-                            self.tracks.each(function (t) {
-                                if (t.get("isMine")) {
-                                    newTrack = t;
-                                }
-                            });
-                            self.markTrackSelected(newTrack);
-                        }
-                    } else {
-                        self.markTrackSelected(annotationTool.selectedTrack);
+                    // TODO Wait, you can't just mark an arbitrary track as selected ...
+                    // TODO Also you redraw afterwards anyway
+                    if (annotationTool.selectedTrack && annotationTool.selectedTrack.id === track.id) {
+                        this.markTrackSelected(this.tracks.find(function (track) {
+                            return track.get("isMine");
+                        }));
                     }
 
                     delete this.trackItems[track.id];
@@ -1488,6 +1475,7 @@ define(["util",
              */
             changeTrack: function (track, options) {
                 // If the track is not visible, we do nothing
+                // TODO Do we need this check ...?
                 if (!track.get(Track.FIELDS.VISIBLE)) {
                     return;
                 }

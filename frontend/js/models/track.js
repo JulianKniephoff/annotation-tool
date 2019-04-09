@@ -74,6 +74,7 @@ define(["jquery",
 
                 // the tack is not visible at initialisation
                 this.set({
+                    // TODO mh
                     visible: false,
                     annotationsLoaded: false
                 });
@@ -156,6 +157,7 @@ define(["jquery",
             }
         }, {
             FIELDS: {
+                // TODO mh
                 VISIBLE             : "visible",
                 CREATED_BY          : "created_by",
                 CREATED_BY_NICKNAME : "created_by_nickname"

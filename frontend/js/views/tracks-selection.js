@@ -122,6 +122,7 @@ define(["jquery",
                                 id: created_by,
                                 nickname: tracks[0].get("created_by_nickname"),
                                 tracks: _.invoke(tracks, "toJSON"),
+                                // TODO mmmmh
                                 visible: _.every(tracks, function (track) { return track.get("visible"); })
                             };
                         }).value();

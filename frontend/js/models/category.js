@@ -188,6 +188,8 @@ define(["jquery",
              * @alias module:models-category.Category#toggleVisibility
              */
             toggleVisibility: function () {
+                // TODO It would be cool if we got rid of this as well, of course ...
+                //   Or can we somehow make it so that only this attribute is saved in localStorage?
                 this.set("visible", !this.get("visible"));
             },
 
