@@ -45,6 +45,7 @@ define(["underscore",
              */
             defaults: {
                 access: ACCESS.PRIVATE,
+                // TODO Most of these defaults are unnecessary
                 created_at: null,
                 created_by: null,
                 updated_at: null,
@@ -138,10 +139,13 @@ define(["underscore",
                     return "\"description\" attribute must be a string";
                 }
 
+                // TODO Is this necessary/the right place for this
                 if (attr.labels) {
                     attr.labels.each(function (value) {
+                        // TODO What why parse??!?
                         var parseValue = value.parse({category: this.toJSON()});
 
+                        // TODO wHAAA
                         if (parseValue.category) {
                             parseValue = parseValue.category;
                         }

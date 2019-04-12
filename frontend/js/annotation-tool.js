@@ -1115,6 +1115,7 @@ define(["jquery",
                     );
                     category.destroy({
                         success: function () {
+                            // TODO This whole function is probably repeated in all the delete operations, right?
                             if (annotationTool.localStorage) {
                                 annotationTool.video.save();
                             }
