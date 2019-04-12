@@ -559,6 +559,9 @@ define(["jquery",
             setupKeyboardShortcuts: function () {
 
                 // TODO Why are these in functions?
+                // TODO I don't like how some shortcuts are handled here and some are not
+                //   Maybe you need `backbone-mousetrap`
+
                 var setActiveAnnotationDuration = function () {
                     if (!annotationTool.activeAnnotation) return;
 
@@ -623,11 +626,13 @@ define(["jquery",
                 if (
                     ["input", "textarea"].includes(event.target.tagName.toLowerCase())
                         || !event.key.match(/^[1-9]$/)
+                    // TODO What else should interrupt?!
                 ) {
                     this.interruptAnnotationShortcut();
                     return;
                 }
 
+                // TODO Restore the old focus at some point?
                 this.$el.find("#annotation-shortcut-focus")[0].focus();
 
                 var selectedEntity = Number(event.key) - 1;
@@ -641,6 +646,7 @@ define(["jquery",
                         this.interruptAnnotationShortcut();
                         return;
                     }
+                    // TODO Why does the category store the attributes of the scale, not the whole model ...?
                     var scaleId = annotationShortcutState.category.get("scale_id");
                     if (!scaleId) {
                         var scale = annotationShortcutState.category.get("scale");
@@ -655,6 +661,7 @@ define(["jquery",
                         this.interruptAnnotationShortcut();
                         return;
                     }
+                    // TODO Factor this out ...
                     annotationShortcutState.params.label = annotationShortcutState.label;
                     annotationShortcutState.params.text = annotationShortcutState.label.get("value");
                 } else {
@@ -666,8 +673,10 @@ define(["jquery",
                     annotationShortcutState.params.scalevalue = scaleValue;
                 }
 
+                // TODO We test certain things twice here ...
                 if (scaleValue || annotationShortcutState.label && !annotationShortcutState.scale) {
                     var annotation = annotationTool.createAnnotation(annotationShortcutState.params);
+                    // TODO Factor this out
                     annotationTool.setSelection([annotation], true);
                     this.interruptAnnotationShortcut();
                 } else {
