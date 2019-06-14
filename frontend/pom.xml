@@ -31,6 +31,7 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
+              <!-- TODO Might as well just set it to 8.16, which should be the latest 8.x -->
               <nodeVersion>v8.15.0</nodeVersion>
             </configuration>
           </execution>
