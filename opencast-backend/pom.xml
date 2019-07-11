@@ -47,9 +47,12 @@
           <configuration>
             <instructions>
               <Import-Package>
+                <!-- TODO There are normally only needed for the `impl`-bundle -->
+                <!-- TODO Can we combine these somehow? -->
                 javax.ws.rs;version=2.0.1,
                 javax.ws.rs.core;version=2.0.1,
                 org.opencastproject.*;version="${opencast.version}",
+                <!-- TODO While we are add it, it sucks that we have to repeat the default here as well -->
                 *
               </Import-Package>
             </instructions>
