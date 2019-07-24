@@ -274,6 +274,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
           @Override
           public Response some(Video v) {
             if (!eas().hasResourceAccess(v))
+              // TODO Is this the right code?!
               return UNAUTHORIZED;
 
             Resource resource = eas().updateResource(v, tags);
