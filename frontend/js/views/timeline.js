@@ -117,11 +117,11 @@ define(["util",
              * @constant
              */
             VOID_TRACK: {
-                isMine      : true,
-                id          : "empty-timeline",
-                name        : i18next.t("timeline.no track available.short"),
-                description : i18next.t("timeline.no track available.long"),
-                empty       : true
+                isMine: true,
+                id: "empty-timeline",
+                name: i18next.t("timeline.no track available.short"),
+                description: i18next.t("timeline.no track available.long"),
+                empty: true
             },
 
             /**

@@ -27,8 +27,8 @@ define(["underscore",
         "use strict";
 
         var EVENTS = {
-            VISIBILITY : "visiblity",
-            SELECTED   : "selected_track"
+            VISIBILITY: "visiblity",
+            SELECTED: "selected_track"
         },
 
         /**
@@ -98,7 +98,7 @@ define(["underscore",
              * @return {array} Array containing the list of tracks created by the current user
              */
             getMine: function () {
-                return this.where({isMine: true});
+                return this.where({ isMine: true });
             },
 
             /**
@@ -107,7 +107,7 @@ define(["underscore",
              * @return {array} Array containing the list of the visible tracks
              */
             getTracksForLocalStorage: function () {
-                return this.remove(this.where({isMine: false, access: 0}));
+                return this.remove(this.where({ isMine: false, access: 0 }));
             },
 
             /**

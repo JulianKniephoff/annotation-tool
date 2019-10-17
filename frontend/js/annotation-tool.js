@@ -334,7 +334,7 @@ define(["jquery",
 
             /**
              * Add a timeupdate listener with the given interval
-             * @alias   annotationTool.addTimeupdateListener
+             * @alias annotationTool.addTimeupdateListener
              * @param {Object} callback the listener callback
              * @param {Number} (interval) the interval between each timeupdate event
              */

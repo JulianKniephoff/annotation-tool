@@ -43,7 +43,7 @@ define(["underscore",
              * @static
              */
             defaults: {
-                start   : 0,
+                start: 0,
                 duration: 0
             },
 
@@ -77,7 +77,7 @@ define(["underscore",
              * Parse the attribute list passed to the model
              * @alias module:models-annotation.Annotation#parse
              * @param  {object} data Object literal containing the model attribute to parse.
-             * @return {object}  The object literal with the list of parsed model attribute.
+             * @return {object} The object literal with the list of parsed model attribute.
              */
             parse: function (data) {
                 return Resource.prototype.parse.call(this, data, function (attr) {
@@ -111,7 +111,7 @@ define(["underscore",
                         attr.comments = new Comments(attr.comments, { annotation: this });
                     }
 
-                    if (!annotationTool.localStorage &&  attr.label_id && (_.isNumber(attr.label_id) || _.isString(attr.label_id))) {
+                    if (!annotationTool.localStorage && attr.label_id && (_.isNumber(attr.label_id) || _.isString(attr.label_id))) {
                         categories = annotationTool.video.get("categories");
 
                         categories.each(function (cat) {
@@ -126,7 +126,7 @@ define(["underscore",
                         attr.label = label;
                     }
 
-                    if (!annotationTool.localStorage &&  attr.scalevalue) {
+                    if (!annotationTool.localStorage && attr.scalevalue) {
                         attr.scaleValue = attr.scalevalue;
                     }
                 });
@@ -154,15 +154,15 @@ define(["underscore",
                     }
                 }
 
-                if (attr.start &&  !_.isNumber(attr.start)) {
+                if (attr.start && !_.isNumber(attr.start)) {
                     return "\"start\" attribute must be a number!";
                 }
 
-                if (attr.text &&  !_.isString(attr.text)) {
+                if (attr.text && !_.isString(attr.text)) {
                     return "\"text\" attribute must be a string!";
                 }
 
-                if (attr.duration &&  (!_.isNumber(attr.duration) || (_.isNumber(attr.duration) && attr.duration < 0))) {
+                if (attr.duration && (!_.isNumber(attr.duration) || (_.isNumber(attr.duration) && attr.duration < 0))) {
                     return "\"duration\" attribute must be a positive number";
                 }
 

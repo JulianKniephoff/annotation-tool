@@ -188,10 +188,11 @@ define(["underscore",
              * @param {string} color the new color
              */
             setColor: function (color) {
-                var settings = _.clone(this.get("settings"));
-                settings.color = color;
-
-                this.set("settings", settings);
+                this.set("settings", _.extend(
+                    {},  // Create a new object to fire `change` events
+                    this.get("settings"),
+                    { color: color }
+                ));
             },
 
             /**
