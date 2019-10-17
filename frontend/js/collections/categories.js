@@ -81,15 +81,6 @@ define(["underscore",
              */
             getMine: function () {
                 return this.where({ isMine: true });
-            },
-
-            /**
-             * Get the categories visible by everyone
-             * @alias module:collections-categories.Categories#getPublic
-             * @return {array} Array containing the list of categories visible by everyone
-             */
-            getPublic: function () {
-                return this.where({ isPublic: true });
             }
         });
 
