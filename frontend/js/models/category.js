@@ -94,21 +94,20 @@ define(["underscore",
             },
 
             /**
-             * Parse the attribute list passed to the model
-             * @alias module:models-category.Category#parse
-             * @param  {object} data Object literal containing the model attribute to parse.
-             * @return {object}  The object literal with the list of parsed model attribute.
+             * @override
              */
-            parse: function (data) {
-                return Resource.prototype.parse.call(this, data, function (attr) {
-                    if (annotationTool.localStorage && _.isArray(attr.labels)) {
-                        attr.labels = new Labels(attr.labels, { category: this });
-                    }
+            parse: function () {
+                var attr = Resource.prototype.parse.apply(this, arguments);
 
-                    if (!annotationTool.localStorage && attr.scale_id && (_.isNumber(attr.scale_id) || _.isString(attr.scale_id))) {
-                        attr.scale = annotationTool.video.get("scales").get(attr.scale_id);
-                    }
-                });
+                if (annotationTool.localStorage && _.isArray(attr.labels)) {
+                    attr.labels = new Labels(attr.labels, { category: this });
+                }
+
+                if (!annotationTool.localStorage && attr.scale_id && (_.isNumber(attr.scale_id) || _.isString(attr.scale_id))) {
+                    attr.scale = annotationTool.video.get("scales").get(attr.scale_id);
+                }
+
+                return attr;
             },
 
             /**

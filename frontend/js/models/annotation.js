@@ -74,56 +74,55 @@ define(["underscore",
             },
 
             /**
-             * Parse the attribute list passed to the model
-             * @alias module:models-annotation.Annotation#parse
-             * @param  {object} data Object literal containing the model attribute to parse.
-             * @return {object} The object literal with the list of parsed model attribute.
+             * @override
              */
-            parse: function (data) {
-                return Resource.prototype.parse.call(this, data, function (attr) {
-                    var tempSettings,
-                        categories,
-                        tempLabel,
-                        label;
+            parse: function () {
+                var attr = Resource.prototype.parse.apply(this, arguments);
 
-                    if (attr.scaleValue) {
-                        attr.scalevalue = attr.scaleValue;
-                        delete attr.scaleValue;
+                var tempSettings,
+                    categories,
+                    tempLabel,
+                    label;
+
+                if (attr.scaleValue) {
+                    attr.scalevalue = attr.scaleValue;
+                    delete attr.scaleValue;
+                }
+
+                if (attr.label) {
+                    if (attr.label.category && (tempSettings = util.parseJSONString(attr.label.category.settings))) {
+                        attr.label.category.settings = tempSettings;
                     }
 
-                    if (attr.label) {
-                        if (attr.label.category && (tempSettings = util.parseJSONString(attr.label.category.settings))) {
-                            attr.label.category.settings = tempSettings;
+                    if ((tempSettings = util.parseJSONString(attr.label.settings))) {
+                        attr.label.settings = tempSettings;
+                    }
+                }
+
+                if (annotationTool.localStorage && _.isArray(attr.comments)) {
+                    attr.comments = new Comments(attr.comments, { annotation: this });
+                }
+
+                if (!annotationTool.localStorage && attr.label_id && (_.isNumber(attr.label_id) || _.isString(attr.label_id))) {
+                    categories = annotationTool.video.get("categories");
+
+                    categories.each(function (cat) {
+
+                        if ((tempLabel = cat.attributes.labels.get(attr.label_id))) {
+                            label = tempLabel;
+                            return true;
                         }
 
-                        if ((tempSettings = util.parseJSONString(attr.label.settings))) {
-                            attr.label.settings = tempSettings;
-                        }
-                    }
+                    }, this);
 
-                    if (annotationTool.localStorage && _.isArray(attr.comments)) {
-                        attr.comments = new Comments(attr.comments, { annotation: this });
-                    }
+                    attr.label = label;
+                }
 
-                    if (!annotationTool.localStorage && attr.label_id && (_.isNumber(attr.label_id) || _.isString(attr.label_id))) {
-                        categories = annotationTool.video.get("categories");
+                if (!annotationTool.localStorage && attr.scalevalue) {
+                    attr.scaleValue = attr.scalevalue;
+                }
 
-                        categories.each(function (cat) {
-
-                            if ((tempLabel = cat.attributes.labels.get(attr.label_id))) {
-                                label = tempLabel;
-                                return true;
-                            }
-
-                        }, this);
-
-                        attr.label = label;
-                    }
-
-                    if (!annotationTool.localStorage && attr.scalevalue) {
-                        attr.scaleValue = attr.scalevalue;
-                    }
-                });
+                return attr;
             },
 
             /**

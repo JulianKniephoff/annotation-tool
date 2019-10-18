@@ -78,17 +78,14 @@ define(["underscore",
             },
 
             /**
-             * Parse the attribute list passed to the model
-             * @alias module:models-label.Label#parse
-             * @param  {object} data Object literal containing the model attribute to parse.
-             * @return {object}  The object literal with the list of parsed model attribute.
+             * @override
              */
-            parse: function (data) {
-                return Resource.prototype.parse.call(this, data, function (attr) {
-                    if (attr.category && attr.category.settings) {
-                        attr.category.settings = util.parseJSONString(attr.category.settings);
-                    }
-                });
+            parse: function () {
+                var attr = Resource.prototype.parse.apply(this, arguments);
+                if (attr.category && attr.category.settings) {
+                    attr.category.settings = util.parseJSONString(attr.category.settings);
+                }
+                return attr;
             },
 
             /**
