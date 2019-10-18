@@ -18,12 +18,12 @@
  * A module representing a categories collection
  * @module collections-categories
  */
-define(["underscore",
+define(["util",
+        "underscore",
         "models/category",
         "backbone"],
 
-    function (_, Category, Backbone) {
-
+    function (util, _, Category, Backbone) {
         "use strict";
 
         /**
@@ -80,7 +80,7 @@ define(["underscore",
              * @return {array} Array containing the list of categories created by the current user
              */
             getMine: function () {
-                return this.where({ isMine: true });
+                return this.filter(util.caller("isMine"));
             }
         });
 

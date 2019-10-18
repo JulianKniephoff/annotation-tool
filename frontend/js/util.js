@@ -165,7 +165,7 @@ var util = {
      */
     caller: function (name) {
         return function (o) {
-            return o[name].apply(o, arguments);
+            return o[name].apply(o);
         };
     },
 

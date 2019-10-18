@@ -18,7 +18,8 @@
  * Module containing the tool main object
  * @module annotation-tool
  */
-define(["jquery",
+define(["util",
+        "jquery",
         "underscore",
         "backbone",
         "i18next",
@@ -31,7 +32,7 @@ define(["jquery",
         "colors",
         "handlebarsHelpers"],
 
-    function ($, _, Backbone, i18next, Videos, MainView, AlertView, DeleteModalTmpl, DeleteContentTmpl, PlayerAdapter, ColorsManager) {
+    function (util, $, _, Backbone, i18next, Videos, MainView, AlertView, DeleteModalTmpl, DeleteContentTmpl, PlayerAdapter, ColorsManager) {
 
         "use strict";
 
@@ -904,7 +905,7 @@ define(["jquery",
                         } else {
                             tracks.showTracks(
                                 _.first(
-                                    tracks.where({ isMine: true }),
+                                    tracks.filter(util.caller("isMine")),
                                     this.MAX_VISIBLE_TRACKS || Number.MAX_VALUE
                                 )
                             );

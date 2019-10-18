@@ -670,8 +670,8 @@ define(["util",
                 return {
                     model: track,
                     trackId: track.id,
-                    isMine: track.get("isMine"),
-                    isPublic: track.get("isPublic"),
+                    isMine: track.isMine(),
+                    isPublic: track.isPublic(),
                     voidItem: true,
                     start: this.startDate - 5000,
                     end: this.startDate - 4500,
@@ -717,9 +717,9 @@ define(["util",
                     annotation: annotation,
                     id: annotation.id,
                     trackId: track.id,
-                    isPublic: track.get("isPublic"),
-                    isMine: track.get("isMine"),
-                    editable: track.get("isMine"),
+                    isPublic: track.isPublic(),
+                    isMine: track.isMine(),
+                    editable: track.isMine(),
                     start: start,
                     end: end,
                     itemContent: this.itemTemplate(annotationJSON),
@@ -1253,7 +1253,7 @@ define(["util",
 
                 // If the annotation is not owned by the current user or the annotation is moved outside the timeline,
                 // the update is canceled
-                if (!values.newTrack.get("isMine") || !values.annotation.get("isMine") ||
+                if (!values.newTrack.isMine() || !values.annotation.isMine() ||
                     end > this.playerAdapter.getDuration() ||
                     start > this.playerAdapter.getDuration()) {
                     this.timeline.cancelChange();
@@ -1323,8 +1323,8 @@ define(["util",
                             itemContent: self.itemTemplate(annJSON),
                             id: annJSON.id,
                             trackId: values.newTrack.id,
-                            isPublic: values.newTrack.get("isPublic"),
-                            isMine: values.newTrack.get("isMine"),
+                            isPublic: values.newTrack.isPublic(),
+                            isMine: values.newTrack.isMine(),
                             model: values.newTrack
                         };
 
@@ -1448,7 +1448,7 @@ define(["util",
                     if (!annotationTool.selectedTrack || annotationTool.selectedTrack.id === track.id) {
                         if (self.tracks.length > 0) { // If there is still other tracks
                             self.tracks.each(function (t) {
-                                if (t.get("isMine")) {
+                                if (t.isMine()) {
                                     newTrack = t;
                                 }
                             });
@@ -1486,7 +1486,7 @@ define(["util",
                 _.each(_.values(this.annotationItems).concat(_.values(this.trackItems)), function (item) {
                     if (item.trackId === track.get("id") && item.groupContent !== newGroup) {
                         item.groupContent = newGroup;
-                        item.isPublic = track.get("isPublic");
+                        item.isPublic = track.isPublic();
                         redrawRequired = true;
                     }
                 }, this);
@@ -1542,7 +1542,7 @@ define(["util",
              */
             onSelectTrack: function (event) {
                 var track = this.getTrackFromGroupHeader(event.target);
-                if (!track.get("isMine")) return;
+                if (!track.isMine()) return;
                 if (!track) return;
                 annotationTool.selectTrack(
                     this.getTrackFromGroupHeader(event.target)

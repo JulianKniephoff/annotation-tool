@@ -18,12 +18,13 @@
  * A module representing a tracks collection
  * @module collections-tracks
  */
-define(["underscore",
+define(["util",
+        "underscore",
+        "access",
         "models/track",
         "backbone"],
 
-    function (_, Track, Backbone) {
-
+    function (util, _, ACCESS, Track, Backbone) {
         "use strict";
 
         var EVENTS = {
@@ -98,7 +99,7 @@ define(["underscore",
              * @return {array} Array containing the list of tracks created by the current user
              */
             getMine: function () {
-                return this.where({ isMine: true });
+                return this.filter(util.caller("isMine"));
             },
 
             /**
@@ -107,7 +108,13 @@ define(["underscore",
              * @return {array} Array containing the list of the visible tracks
              */
             getTracksForLocalStorage: function () {
-                return this.remove(this.where({ isMine: false, access: 0 }));
+                return this.remove(this.filter(function (track) {
+                    return (
+                        track.get("access") === ACCESS.PRIVATE
+                    ) && (
+                        !track.isMine()
+                    );
+                }));
             },
 
             /**
@@ -234,7 +241,7 @@ define(["underscore",
 
                 if (_.isUndefined(selectedTrack) || (!_.isUndefined(selectedTrack) && !selectedTrack.get(Track.FIELDS.VISIBLE))) {
                     selectedTrack = _.find(this.visibleTracks, function (track) {
-                                        return track.get("isMine");
+                                        return track.isMine();
                                     }, this);
                     annotationTool.selectTrack(selectedTrack);
                 }
