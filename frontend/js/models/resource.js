@@ -61,8 +61,6 @@ var Resource = Backbone.Model.extend({
      * @return {string} If the validation failed, an error message will be returned.
      */
     validate: function (attr, callbacks) {
-        var created = this.get("created_at");
-
         if (attr.id) {
             if (this.get("id") !== attr.id) {
                 this.id = attr.id;
@@ -83,6 +81,7 @@ var Resource = Backbone.Model.extend({
             return "\"access\" attribute is not valid.";
         }
 
+        var created = this.get("created_at");
         if (attr.created_at) {
             if (!util.parseDate(attr.created_at)) {
                 return "\"created_at\" attribute must represent a date!";
