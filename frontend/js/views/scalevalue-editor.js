@@ -113,10 +113,8 @@ define(["underscore",
 
                     if (currentOrder > 0) {
                         previous = sortedCollection[currentOrder - 1];
-                        previous.set("order", currentOrder);
-                        this.model.set("order", currentOrder - 1);
-                        previous.save();
-                        this.model.save();
+                        previous.save({ order: currentOrder });
+                        this.model.set({ order: currentOrder - 1 });
                     }
 
                     this.onChange();
@@ -133,10 +131,8 @@ define(["underscore",
 
                     if (currentOrder < (sortedCollection.length - 1)) {
                         next = sortedCollection[currentOrder + 1];
-                        next.set("order", currentOrder);
-                        this.model.set("order", currentOrder + 1);
-                        next.save();
-                        this.model.save();
+                        next.save({ order: currentOrder });
+                        this.model.set({ order: currentOrder + 1 });
                     }
 
                     this.onChange();
@@ -164,12 +160,10 @@ define(["underscore",
 
                     if (!isNaN(value)) {
                         $value.removeClass("error");
-                        this.model.set({
+                        this.model.save({
                             name: name,
                             value: value
                         });
-
-                        this.model.save();
                     } else {
                         $value.val("");
                         $value.addClass("error");
@@ -193,8 +187,7 @@ define(["underscore",
                         // Update order for following item
                         if (currentOrder < (sortedCollection.length - 1)) {
                             for (i = currentOrder + 1; i < sortedCollection.length; i++) {
-                                sortedCollection[i].set("order", i - 1);
-                                sortedCollection[i].save();
+                                sortedCollection[i].save({ order: i - 1 });
                             }
                         }
 

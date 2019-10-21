@@ -1351,11 +1351,10 @@ define(["util",
 
                 } else {
                     this.annotationItems[values.annotation.id] = values.item;
-                    values.annotation.set({
+                    values.annotation.save({
                         start: start,
                         duration: duration
                     });
-                    values.annotation.save();
 
                     annotationTool.playerAdapter.setCurrentTime(values.annotation.get("start"));
                     this.preprocessTrack(values.item.trackId);

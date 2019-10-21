@@ -252,11 +252,10 @@ define(["jquery",
              * @param {event} e Event related to this action
              */
             onFocusOut: function () {
-                this.model.set({
+                this.model.save({
                     "value"        : _.escape(this.$el.find("input.item-value").val()),
                     "abbreviation" : _.escape(this.$el.find("input.item-abbreviation").val())
                 });
-                this.model.save();
             },
 
             /**
@@ -272,9 +271,9 @@ define(["jquery",
                 }
 
                 if (e.keyCode === 13) { // If "return" key
-                    this.model.set({
-                        "value"        : _.escape(this.$el.find("input.item-value").val()),
-                        "abbreviation" : _.escape(this.$el.find("input.item-abbreviation").val())
+                    this.model.save({
+                        value: _.escape(this.$el.find("input.item-value").val()),
+                        abbreviation: _.escape(this.$el.find("input.item-abbreviation").val())
                     });
                     this.model.save();
                 } else if (e.keyCode === 39 && this.getCaretPosition(e.target) === e.target.value.length ||

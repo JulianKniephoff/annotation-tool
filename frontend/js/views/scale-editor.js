@@ -237,12 +237,10 @@ define(["jquery",
                         name = this.$el.find(".modal-body .scale-name").val();
                         description = this.$el.find(".modal-body .scale-description").val();
 
-                        this.currentScale.set({
+                        this.currentScale.save({
                             name: name,
                             description: description
-                        });
-
-                        this.currentScale.save(null, { async: false });
+                        }, { async: false });
                         this.currentScale.get("scaleValues").each(function (scaleValue) {
                             scaleValue.save();
                         });

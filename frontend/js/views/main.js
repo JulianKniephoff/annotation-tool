@@ -536,8 +536,9 @@ define(["jquery",
 
                     var currentTime = annotationTool.playerAdapter.getCurrentTime();
                     var start = annotationTool.activeAnnotation.get("start");
-                    annotationTool.activeAnnotation.set("duration", currentTime - start);
-                    annotationTool.activeAnnotation.save();
+                    annotationTool.activeAnnotation.save({
+                        duration: currentTime - start
+                    });
                 };
 
                 var addComment = _.bind(function () {
