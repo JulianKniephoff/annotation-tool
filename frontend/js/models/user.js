@@ -30,7 +30,7 @@ define(["roles",
         /**
          * @constructor
          * @see {@link http://www.backbonejs.org/#Model}
-         * @augments module:Backbone.Model
+         * @augments module:models-resource.Resource
          * @memberOf module:models-user
          * @alias module:models-user.User
          */
@@ -64,7 +64,8 @@ define(["roles",
              * Validate the attribute list passed to the model
              * @alias module:models-user.User#validate
              * @param {Object} attr Object literal containing the model attribute to validate.
-             * @return {string} If the validation failed, an error message will be returned.
+             * @return {{attribute: string, error: string}} The offending attribute
+             *     and what is wrong with it
              */
             validate: function (attr) {
                 var invalidResource = Resource.prototype.validate.call(this, attr);

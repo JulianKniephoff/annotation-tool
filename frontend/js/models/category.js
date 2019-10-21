@@ -31,7 +31,7 @@ define(["underscore",
         /**
          * @constructor
          * @see {@link http://www.backbonejs.org/#Model}
-         * @augments module:Backbone.Model
+         * @augments module:models-resource.Resource
          * @memberOf module:models-category
          * @alias module:models-category.Category
          */
@@ -185,7 +185,7 @@ define(["underscore",
             /**
              * Change category color
              * @alias module:models-category.Category#setColor
-             * @param  {string} color the new color
+             * @param {string} color the new color
              */
             setColor: function (color) {
                 var settings = _.clone(this.get("settings"));

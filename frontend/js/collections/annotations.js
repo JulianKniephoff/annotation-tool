@@ -48,7 +48,6 @@ define([
          * @alias module:collections-annotations.Annotations#initialize
          */
         initialize: function (models, options) {
-
             if (!_.isUndefined(options.track)) {
                 this.track = options.track;
             }
