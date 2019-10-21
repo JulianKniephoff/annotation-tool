@@ -72,6 +72,9 @@ define(["underscore",
 
                 // TODO Do this everywhere ...
                 //   Do we need this check at all?!
+                // TODO Why even differentiate here?!
+                //   This pattern is in many other places as well ...
+                // TODO Is this even the right place to do it and do we have to do it ...?
                 if (attr.annotations && _.isArray(attr.annotations)) {
                     this.set({ annotations: new Annotations(attr.annotations, { track: this }) });
                 } else {
