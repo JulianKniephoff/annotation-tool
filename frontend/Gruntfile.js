@@ -394,6 +394,7 @@ module.exports = function (grunt) {
                 strict: true,
                 removeUnusedDependencies: false,
                 exceptsPaths: [
+                    // TODO You still want to make sure that these are loaded only when needed ...
                     // Loaded for side-effects only
                     'handlebarsHelpers',
                     'localstorage',
@@ -437,6 +438,7 @@ module.exports = function (grunt) {
      *  Register custom tasks
      ==================================================*/
 
+    // TODO `amdcheck` should come from some kind of base task to all of these tasks ...
     // Default task
     grunt.registerTask('default', ['amdcheck', 'jshint:all', 'less', 'copy:local-all', 'copy:local-index']);
     grunt.registerTask('baseDEV', ['handlebars:all', 'less', 'copy:all', 'processhtml:dev', 'copy:less', 'copy:config', 'copy:locales', 'concurrent:dev']);
