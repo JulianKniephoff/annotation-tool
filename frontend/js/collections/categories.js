@@ -21,58 +21,21 @@
 define(["util",
         "underscore",
         "models/category",
-        "backbone"],
+        "collections/base"],
 
-    function (util, _, Category, Backbone) {
+    function (util, _, Category, Base) {
         "use strict";
 
         /**
          * @constructor
-         * @see {@link http://www.backbonejs.org/#Collection}
-         * @augments module:Backbone.Collection
+         * @augments module:collections-base.Base
          * @memberOf module:collections-categories
          * @alias module:collections-categories.Categories
          */
-        var Categories = Backbone.Collection.extend({
-
-            /**
-             * Model of the instances contained in this collection
-             * @alias module:collections-categories.Categories#initialize
-             */
+        var Categories = Base.extend({
+            name: "categories",
+            parent: "video",
             model: Category,
-
-            /**
-             * constructor
-             * @alias module:collections-categories.Categories#initialize
-             */
-            initialize: function (models, options) {
-                this.video = options.video;
-            },
-
-            /**
-             * Get the url for this collection
-             * @alias module:collections-categories.Categories#url
-             * @return {String} The url of this collection
-             */
-            url: function () {
-                return (this.video ? _.result(this.video, "url") : "") + "/categories";
-            },
-
-            /**
-             * Parse the given data
-             * @alias module:collections-categories.Categories#parse
-             * @param  {object} data Object or array containing the data to parse.
-             * @return {object}      the part of the given data related to the categories
-             */
-            parse: function (data) {
-                if (data.categories && _.isArray(data.categories)) {
-                    return data.categories;
-                } else if (_.isArray(data)) {
-                    return data;
-                } else {
-                    return null;
-                }
-            },
 
             /**
              * Get the categories created by the current user

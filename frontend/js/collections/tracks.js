@@ -22,9 +22,9 @@ define(["util",
         "underscore",
         "access",
         "models/track",
-        "backbone"],
+        "collections/base"],
 
-    function (util, _, ACCESS, Track, Backbone) {
+    function (util, _, ACCESS, Track, Base) {
         "use strict";
 
         var EVENTS = {
@@ -34,17 +34,13 @@ define(["util",
 
         /**
          * @constructor
-         * @see {@link http://www.backbonejs.org/#Collection}
-         * @augments module:Backbone.Collection
+         * @augments module:collections-base.Base
          * @memberOf module:collections-tracks
          * @alias module:collections-tracks.Tracks
          */
-        Tracks = Backbone.Collection.extend({
-
-            /**
-             * Model of the instances contained in this collection
-             * @alias module:collections-tracks.Tracks#initialize
-             */
+        Tracks = Base.extend({
+            name: "tracks",
+            parent: "video",
             model: Track,
 
             /**
@@ -66,7 +62,7 @@ define(["util",
                                 "getAllCreators",
                                 "showTracksByCreators");
 
-                this.video = options.video;
+                Base.prototype.initialize.apply(this, arguments);
 
                 this.on("add", function (track) {
                     // Show the new track
@@ -75,22 +71,6 @@ define(["util",
                     // Select the new track
                     annotationTool.selectedTrack = track;
                 });
-            },
-
-            /**
-             * Parse the given data
-             * @alias module:collections-tracks.Tracks#parse
-             * @param  {object} data Object or array containing the data to parse.
-             * @return {object}      the part of the given data related to the tracks
-             */
-            parse: function (data) {
-                if (data.tracks && _.isArray(data.tracks)) {
-                    return data.tracks;
-                } else if (_.isArray(data)) {
-                    return data;
-                } else {
-                    return null;
-                }
             },
 
             /**
@@ -303,15 +283,6 @@ define(["util",
 
 
                 this.visibleTracks = newVisibleTracks;
-            },
-
-            /**
-             * Get the url for this collection
-             * @alias module:collections-tracks.Tracks#url
-             * @return {String} The url of this collection
-             */
-            url: function () {
-                return _.result(this.video, "url") + "/tracks";
             }
         }, {
             EVENTS: EVENTS

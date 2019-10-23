@@ -90,7 +90,7 @@ define(["underscore",
             urlRoot: function () {
                 return this.isNew()
                     ? _.result(this.collection, "url")
-                    : _.result(this.collection, "urlRoot");
+                    : _.result(this.collection, "urlRoot") + "/" + this.collection.name;
             }
         });
 

@@ -19,31 +19,21 @@
  * @module collections-users
  */
 define(["models/user",
-        "backbone"],
+        "collections/base"],
 
-    function (User, Backbone) {
+    function (User, Base) {
 
         "use strict";
 
         /**
          * @constructor
-         * @see {@link http://www.backbonejs.org/#Collection}
-         * @augments module:Backbone.Collection
+         * @augments module:collections-base.Base
          * @memberOf module:collections-users
          * @alias module:collections-users.User
          */
-        var Users = Backbone.Collection.extend({
-            /**
-             * Model of the instances contained in this collection
-             * @alias module:collections-users.User#initialize
-             */
-            model: User,
-
-            /**
-             * The REST endpoint url
-             * @type {String}
-             */
-            url: "/users"
+        var Users = Base.extend({
+            name: "users",
+            model: User
         });
 
         return Users;

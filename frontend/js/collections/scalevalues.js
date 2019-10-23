@@ -20,63 +20,23 @@
  */
 define(["underscore",
         "models/scalevalue",
-        "backbone"],
+        "collections/base"],
 
-    function (_, ScaleValue, Backbone) {
+    function (_, ScaleValue, Base) {
 
         "use strict";
 
         /**
          * @constructor
-         * @see {@link http://www.backbonejs.org/#Collection}
-         * @augments module:Backbone.Collection
+         * @augments module:collections-base.Base
          * @memberOf module:collections-scalevalues
          * @alias module:collections-scalevalues.ScaleValues
          */
-        var ScaleValues = Backbone.Collection.extend({
-
-            /**
-             * Model of the instances contained in this collection
-             * @alias module:collections-scalevalues.ScaleValues#initialize
-             */
+        var ScaleValues = Base.extend({
+            name: "scalevalues",
+            parent: "scale",
             model: ScaleValue,
-
-            /**
-             * constructor
-             * @alias module:collections-scalevalues.ScaleValues#initialize
-             */
-            initialize: function (models, options) {
-                this.scale = options.scale;
-            },
-
-            /**
-             * Parse the given data
-             * @alias module:collections-scalevalues.ScaleValues#parse
-             * @param  {object} data Object or array containing the data to parse.
-             * @return {object}      the part of the given data related to the scalevalues
-             */
-            parse: function (data) {
-                if (data.scaleValues && _.isArray(data.scaleValues)) {
-                    return data.scaleValues;
-                } else if (_.isArray(data)) {
-                    return data;
-                } else {
-                    return null;
-                }
-            },
-
-            comparator: function (scaleValue) {
-                return scaleValue.get("order");
-            },
-
-            /**
-             * Get the url for this collection
-             * @alias module:collections-scalevalues.ScaleValues#url
-             * @return {String} The url of this collection
-             */
-            url: function () {
-                return _.result(this.scale, "url") + "/scalevalues";
-            }
+            comparator: "order"
         });
 
         return ScaleValues;

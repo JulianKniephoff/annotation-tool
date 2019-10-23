@@ -20,59 +20,22 @@
  */
 define(["underscore",
         "models/scale",
-        "backbone"],
+        "collections/base"],
 
-    function (_, Scale, Backbone) {
+    function (_, Scale, Base) {
 
         "use strict";
 
         /**
          * @constructor
-         * @see {@link http://www.backbonejs.org/#Collection}
-         * @augments module:Backbone.Collection
+         * @augments module:collections-base.Base
          * @memberOf module:collections-scales
          * @alias module:collections-scales.Scales
          */
-        var Scales = Backbone.Collection.extend({
-
-            /**
-             * Model of the instances contained in this collection
-             * @alias module:collections-scales.Scales#initialize
-             */
-            model: Scale,
-
-            /**
-             * constructor
-             * @alias module:collections-scales.Scales#initialize
-             */
-            initialize: function (models, options) {
-                this.video = options.video;
-            },
-
-            /**
-             * Parse the given data
-             * @alias module:collections-scales.Scales#parse
-             * @param  {object} data Object or array containing the data to parse.
-             * @return {object}      the part of the given data related to the scales
-             */
-            parse: function (data) {
-                if (data.scales && _.isArray(data.scales)) {
-                    return data.scales;
-                } else if (_.isArray(data)) {
-                    return data;
-                } else {
-                    return null;
-                }
-            },
-
-            /**
-             * Get the url for this collection
-             * @alias module:collections-scales.Scales#url
-             * @return {String} The url of this collection
-             */
-            url: function () {
-                return (this.video ? _.result(this.video, "url") : "") + "/scales";
-            }
+        var Scales = Base.extend({
+            name: "scales",
+            parent: "video",
+            model: Scale
         });
 
         return Scales;

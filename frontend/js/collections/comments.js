@@ -20,25 +20,21 @@
  */
 define(["underscore",
         "models/comment",
-        "backbone"],
+        "collections/base"],
 
-    function (_, Comment, Backbone) {
+    function (_, Comment, Base) {
 
         "use strict";
 
         /**
          * @constructor
-         * @see {@link http://www.backbonejs.org/#Collection}
-         * @augments module:Backbone.Collection
+         * @augments module:collections-base.Base
          * @memberOf module:collections-comments
          * @alias module:collections-comments.Comments
          */
-        var Comments = Backbone.Collection.extend({
-
-            /**
-             * Model of the instances contained in this collection
-             * @alias module:collections-comments.Comments#initialize
-             */
+        var Comments = Base.extend({
+            name: "comments",
+            parent: "annotation",
             model: Comment,
 
             /**
@@ -46,24 +42,8 @@ define(["underscore",
              * @alias module:collections-comments.Comments#initialize
              */
             initialize: function (models, options) {
-                this.annotation = options.annotation;
+                Base.prototype.initialize.apply(this, arguments);
                 this.replyTo = options.replyTo;
-            },
-
-            /**
-             * Parse the given data
-             * @alias module:collections-comments.Comments#parse
-             * @param  {object} data Object or array containing the data to parse.
-             * @return {object}      the part of the given data related to the comments
-             */
-            parse: function (resp) {
-                if (resp.comments && _.isArray(resp.comments)) {
-                    return resp.comments;
-                } else if (_.isArray(resp)) {
-                    return resp;
-                } else {
-                    return null;
-                }
             },
 
             /**
@@ -75,18 +55,6 @@ define(["underscore",
                 return this.replyTo
                     ? _.result(this.replyTo, "url") + "/replies"
                     : _.result(this.annotation, "url") + "/comments";
-            },
-
-            /**
-             * The "root" URL of this collection.
-             * This is needed to update comments, even when they are in a collection of replies.
-             * See {@link module:models-Comment.Comment#urlRoot}.
-             * Note: This is only named `urlRoot` to suggest a relation to Backbones URL generation mechanism;
-             * on collections this name has no meaning normally.
-             * @alias module:collections-comments
-             */
-            urlRoot: function () {
-                return _.result(this.annotation, "url") + "/comments";
             },
 
             /**

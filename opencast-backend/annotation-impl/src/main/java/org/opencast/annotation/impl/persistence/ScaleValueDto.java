@@ -129,7 +129,7 @@ public class ScaleValueDto extends AbstractResourceDto {
 
   public static JSONObject toJson(ExtendedAnnotationService s, int offset, List<ScaleValue> scaleValues) {
     return jO(p("offset", offset), p("count", scaleValues.size()),
-            p("scaleValues", jA(mlist(scaleValues).map(toJson.curry(s)))));
+            p("scalevalues", jA(mlist(scaleValues).map(toJson.curry(s)))));
   }
 
 }

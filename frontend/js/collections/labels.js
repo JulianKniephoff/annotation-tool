@@ -19,60 +19,23 @@
  * @module collections-labels
  */
 define(["underscore",
-        "backbone",
+        "collections/base",
         "models/label"],
 
-    function (_, Backbone, Label) {
+    function (_, Base, Label) {
 
         "use strict";
 
         /**
          * @constructor
-         * @see {@link http://www.backbonejs.org/#Collection}
-         * @augments module:Backbone.Collection
+         * @augments module:collections-base.Base
          * @memberOf module:collections-labels
          * @alias module:collections-labels.Labels
          */
-        var Labels = Backbone.Collection.extend({
-
-            /**
-             * Model of the instances contained in this collection
-             * @alias module:collections-labels.Labels#initialize
-             */
-            model: Label,
-
-            /**
-             * constructor
-             * @alias module:collections-labels.Labels#initialize
-             */
-            initialize: function (models, options) {
-                this.category = options.category;
-            },
-
-            /**
-             * Parse the given data
-             * @alias module:collections-labels.Labels#parse
-             * @param  {object} data Object or array containing the data to parse.
-             * @return {object}      the part of the given data related to the labels
-             */
-            parse: function (resp) {
-                if (resp.labels && _.isArray(resp.labels)) {
-                    return resp.labels;
-                } else if (_.isArray(resp)) {
-                    return resp;
-                } else {
-                    return null;
-                }
-            },
-
-            /**
-             * Get the url for this collection
-             * @alias module:collections-labels.Labels#url
-             * @return {String} The url of this collection
-             */
-            url: function () {
-                return _.result(this.category, "url") + "/labels";
-            }
+        var Labels = Base.extend({
+            name: "labels",
+            parent: "category",
+            model: Label
         });
 
         return Labels;

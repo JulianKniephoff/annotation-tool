@@ -19,32 +19,21 @@
  * @module collections-videos
  */
 define(["models/video",
-        "backbone"],
+        "collections/base"],
 
-    function (Video, Backbone) {
+    function (Video, Base) {
 
         "use strict";
 
         /**
          * @constructor
-         * @see {@link http://www.backbonejs.org/#Collection}
-         * @augments module:Backbone.Collection
+         * @augments module:collections-base.Base
          * @memberOf module:collections-videos
          * @alias module:collections-videos.Videos
          */
-        var Videos = Backbone.Collection.extend({
-
-            /**
-             * Model of the instances contained in this collection
-             * @alias module:collections-videos.Videos#initialize
-             */
-            model: Video,
-
-            /**
-             * The REST endpoint url
-             * @type {String}
-             */
-            url: "/videos"
+        var Videos = Base.extend({
+            name: "videos",
+            model: Video
         });
 
         return Videos;
