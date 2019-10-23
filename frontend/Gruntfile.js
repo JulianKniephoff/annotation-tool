@@ -402,6 +402,8 @@ module.exports = function (grunt) {
                     'jquery.FileReader',
                     'slider',
                     'bootstrap',
+                    // TODO What are these really used for
+                    //   and why do they have the `/libs` prefix?
                     'libs/Blob',
                     'libs/BlobBuilder',
                     'libs/swfobject',
