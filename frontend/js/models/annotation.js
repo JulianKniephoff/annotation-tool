@@ -251,6 +251,11 @@ define(["underscore",
              */
             category: function () {
                 var label = this.get("label");
+                // TODO This seems very roundabout,
+                //   but I think we do it this way,
+                //   because sometimes the label is just a JSON object
+                //   or something like this.
+                //   Which is bullshit of course.
                 return label && annotationTool.video.get("categories").get(label.category.id);
             }
         });
