@@ -1087,6 +1087,8 @@ define(["jquery",
                     return target.get("name");
                 },
                 destroy: function (track, callback) {
+                    // TODO Why is this not handled in the backend ...?
+                    //   Well it can't really for the localStorage use case ...
                     _.invoke(
                         _.clone(track.get("annotations").models),
                         "destroy",
