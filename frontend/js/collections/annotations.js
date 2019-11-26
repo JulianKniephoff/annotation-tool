@@ -14,6 +14,8 @@
  *
  */
 
+// TODO This collection is so simple now,
+//   there is probably a pattern we can extract here.
 /**
  * A module representing an annotations collection
  * @module collections-annotations
