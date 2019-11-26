@@ -1035,6 +1035,8 @@ define(["jquery",
                 },
                 destroy: function (target, callback) {
 
+                    // TODO We probably need to delete replies here, right?
+
                     target.destroy({
 
                         success: function () {
