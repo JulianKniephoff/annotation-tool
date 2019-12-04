@@ -38,8 +38,22 @@ define(["underscore", "backbone", "localstorage"], function (_, Backbone) {
         // The backend expects `application/x-www-form-urlencoded data
         // with anything nested deeper than one level transformed to a JSON string
         options.processData = true;
+        options.data = _.object(_.map(
+            options.attrs || model.toJSON(options),
+            function (value, key) {
+                value = JSON.stringify(value);
 
-        options.data = options.attrs || model.toJSON(options);
+                // If the nested value stringified to a string (i.e. something like `"\"hello\""`,
+                // we parse it back and use the inner string.
+                // This happens for `Date`s for example.
+                var parsedValue = JSON.parse(value);
+                if (_.isString(parsedValue)) {
+                    value = parsedValue;
+                }
+
+                return [key, value];
+            }
+        ));
 
         // Path along authentication data
         if (annotationsTool.user) {
