@@ -132,18 +132,12 @@ public class VideoEndpoint {
         if (tagsMap.isSome() && tagsMap.get().isNone())
           return BAD_REQUEST;
 
-        try {
+        Resource resource = eas.createResource(tagsMap.bind(Functions.<Option<Map<String, String>>> identity()));
+        final Track t = eas.createTrack(videoId, name, trimToNone(description), Option.option(access),
+                trimToNone(settings), resource);
 
-          Resource resource = eas.createResource(tagsMap.bind(Functions.<Option<Map<String, String>>> identity()));
-          final Track t = eas.createTrack(videoId, name, trimToNone(description), Option.option(access),
-                  trimToNone(settings), resource);
-
-          return Response.created(trackLocationUri(t))
-                  .entity(Strings.asStringNull().apply(TrackDto.toJson.apply(eas, t))).build();
-        } catch (ExtendedAnnotationException e) {
-          // here not_found leads to a bad_request
-          return notFoundToBadRequest(e);
-        }
+        return Response.created(trackLocationUri(t))
+                .entity(Strings.asStringNull().apply(TrackDto.toJson.apply(eas, t))).build();
       }
     });
   }
@@ -856,13 +850,5 @@ public class VideoEndpoint {
   private URI commentLocationUri(Comment c, long videoId, long trackId) {
     return uri(host.getEndpointBaseUrl(), "videos", videoId, "tracks", trackId, "annotations", c.getAnnotationId(),
             "comments", c.getId());
-  }
-
-  static private Response notFoundToBadRequest(ExtendedAnnotationException e) throws ExtendedAnnotationException {
-    if (e.getCauseCode() == ExtendedAnnotationException.Cause.NOT_FOUND) {
-      return BAD_REQUEST;
-    } else {
-      throw e;
-    }
   }
 }
