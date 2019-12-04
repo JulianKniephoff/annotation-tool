@@ -15,6 +15,11 @@
  */
 package org.opencast.annotation.impl.persistence;
 
+import static org.opencast.annotation.util.Lambda.lambda;
+import static org.opencast.annotation.util.Optionals.match;
+import static org.opencast.annotation.util.Optionals.none;
+import static org.opencast.annotation.util.Optionals.some;
+
 import static org.opencast.annotation.impl.persistence.AnnotationDto.toAnnotation;
 import static org.opencast.annotation.impl.persistence.CategoryDto.toCategory;
 import static org.opencast.annotation.impl.persistence.CommentDto.toComment;
@@ -151,27 +156,23 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
    */
   @Override
   public boolean clearDatabase() throws ExtendedAnnotationException {
-    return tx(new Function<EntityManager, Boolean>() {
-      @SuppressWarnings("unchecked")
-      @Override
-      public Boolean apply(EntityManager em) {
-        named.update(em, "Annotation.clear");
-        named.update(em, "Track.clear");
-        named.update(em, "User.clear");
-        named.update(em, "Video.clear");
-        named.update(em, "Category.clear");
-        named.update(em, "Label.clear");
-        named.update(em, "Annotation.clear");
-        named.update(em, "Track.clear");
-        named.update(em, "User.clear");
-        named.update(em, "Video.clear");
-        named.update(em, "Category.clear");
-        named.update(em, "Label.clear");
-        named.update(em, "Scale.clear");
-        named.update(em, "ScaleValue.clear");
-        named.update(em, "Comment.clear");
-        return true;
-      }
+    return tx(lambda(em -> {
+      named.update(em, "Annotation.clear");
+      named.update(em, "Track.clear");
+      named.update(em, "User.clear");
+      named.update(em, "Video.clear");
+      named.update(em, "Category.clear");
+      named.update(em, "Label.clear");
+      named.update(em, "Annotation.clear");
+      named.update(em, "Track.clear");
+      named.update(em, "User.clear");
+      named.update(em, "Video.clear");
+      named.update(em, "Category.clear");
+      named.update(em, "Label.clear");
+      named.update(em, "Scale.clear");
+      named.update(em, "ScaleValue.clear");
+      named.update(em, "Comment.clear");
+      return true;
     });
   }
 
@@ -466,23 +467,6 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     annotations = filterByCategoryAccess(annotations);
 
     return annotations;
-    // return since.fold(new Option.Match<Date, List<Annotation>>() {
-    // @Override
-    // public List<Annotation> some(final Date since) {
-    // return penv.tx(new Function<EntityManager, List<Annotation>>() {
-    // @Override
-    // public List<Annotation> apply(EntityManager em) {
-    // return findAll(em, toAnnotation, offset, limit, "Annotation.findAllOfTrackSince", id(trackId),
-    // tuple("since", since));
-    // }
-    // });
-    // }
-    //
-    // @Override
-    // public List<Annotation> none() {
-    // return findAllById(toAnnotation, offset, limit, "Annotation.findAllOfTrack", trackId);
-    // }
-    // });
   }
 
   /**
@@ -530,17 +514,10 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   public List<Scale> getScales(Option<Long> videoId, final Option<Integer> offset, final Option<Integer> limit,
           Option<Date> since, final Option<Map<String, String>> tagsAnd, final Option<Map<String, String>> tagsOr)
           throws ExtendedAnnotationException {
-    List<Scale> scales = videoId.fold(new Option.Match<Long, List<Scale>>() {
-      @Override
-      public List<Scale> some(Long id) {
-        return findAllById(toScale, offset, limit, "Scale.findAllOfVideo", id);
-      }
-
-      @Override
-      public List<Scale> none() {
-        return tx(named.<ScaleDto> findAllM("Scale.findAllOfTemplate", offset, limit)).map(toScale).value();
-      }
-    });
+    List<Scale> scales = videoId.fold(match(
+      some(id -> findAllById(toScale, offset, limit, "Scale.findAllOfVideo", id)),
+      none(() -> tx(named.<ScaleDto> findAllM("Scale.findAllOfTemplate", offset, limit)).map(toScale).value())
+    );
 
     if (tagsAnd.isSome())
       scales = filterAndTags(scales, tagsAnd.get());
@@ -549,22 +526,6 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
       scales = filterOrTags(scales, tagsOr.get());
 
     return scales;
-    // return since.fold(new Option.Match<Date, List<Scale>>() {
-    // @Override
-    // public List<Scale> some(final Date since) {
-    // return penv.tx(new Function<EntityManager, List<Scale>>() {
-    // @Override
-    // public List<Scale> apply(EntityManager em) {
-    // return findAll(em, toScale, offset, limit, "Scale.findAllOfVideoSince", id(videoId), tuple("since", since));
-    // }
-    // });
-    // }
-    //
-    // @Override
-    // public List<Scale> none() {
-    // return findAllById(toScale, offset, limit, "Scale.findAllOfVideo", videoId);
-    // }
-    // });
   }
 
   public List<ScaleValue> getScaleValuesByScaleId(final long scaleId) throws ExtendedAnnotationException {
@@ -675,48 +636,37 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   @Override
   public Option<Category> createCategoryFromTemplate(final long videoId, final long templateCategoryId,
           final Resource resource) throws ExtendedAnnotationException {
-    return getCategory(templateCategoryId, false).fold(new Option.Match<Category, Option<Category>>() {
-      @Override
-      public Option<Category> some(Category c) {
-        Long scaleId = null;
+    return getCategory(templateCategoryId, false).map(lambda(c -> {
+      Long scaleId = null;
 
-        // Copy scale
-        if (c.getScaleId().isSome()) {
-          Option<Scale> scale = getScale(c.getScaleId().get(), false);
-          if (scale.isNone())
-            throw new ExtendedAnnotationException(Cause.SERVER_ERROR);
+      // Copy scale
+      if (c.getScaleId().isSome()) {
+        Option<Scale> scale = getScale(c.getScaleId().get(), false);
+        if (scale.isNone())
+          throw new ExtendedAnnotationException(Cause.SERVER_ERROR);
 
-          scaleId = createScale(Option.some(videoId), scale.get().getName(), scale.get().getDescription(), resource)
-                  .getId();
+        scaleId = createScale(Option.some(videoId), scale.get().getName(), scale.get().getDescription(), resource)
+                .getId();
 
-          for (ScaleValue sv : getScaleValuesByScaleId(c.getScaleId().get())) {
-            createScaleValue(scaleId, sv.getName(), sv.getValue(), sv.getOrder(), resource);
-          }
+        for (ScaleValue sv : getScaleValuesByScaleId(c.getScaleId().get())) {
+          createScaleValue(scaleId, sv.getName(), sv.getValue(), sv.getOrder(), resource);
         }
-
-        // Copy category
-        final CategoryDto copyDto = CategoryDto.create(Option.some(videoId), option(scaleId), c.getName(),
-                c.getDescription(), c.hasDuration(), c.getSettings(), resource);
-        Category category = (Category) tx(new Function<EntityManager, Object>() {
-          @Override
-          public Object apply(EntityManager em) {
-            return Queries.persist(copyDto).apply(em).toCategory();
-          }
-        });
-
-        // Copy labels
-        for (Label l : getLabelsByCategoryId(templateCategoryId)) {
-          createLabel(category.getId(), l.getValue(), l.getAbbreviation(), l.getDescription(), l.getSettings(),
-                  resource);
-        }
-        return Option.some(category);
       }
 
-      @Override
-      public Option<Category> none() {
-        return Option.none(Category.class);
+      // Copy category
+      final CategoryDto copyDto = CategoryDto.create(Option.some(videoId), option(scaleId), c.getName(),
+              c.getDescription(), c.hasDuration(), c.getSettings(), resource);
+      Category category = (Category) tx(
+        lambda(em -> Queries.persist(copyDto).apply(em).toCategory())
+      );
+
+      // Copy labels
+      for (Label l : getLabelsByCategoryId(templateCategoryId)) {
+        createLabel(category.getId(), l.getValue(), l.getAbbreviation(), l.getDescription(), l.getSettings(),
+                resource);
       }
-    });
+      return Option.some(category);
+    }));
   }
 
   /**
@@ -750,6 +700,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   public List<Category> getCategories(final Option<Long> videoId, final Option<Integer> offset,
           final Option<Integer> limit, Option<Date> since, final Option<Map<String, String>> tagsAnd,
           final Option<Map<String, String>> tagsOr) throws ExtendedAnnotationException {
+    // TODO Also do something for this case ...
     List<Category> categories = videoId.fold(new Option.Match<Long, List<Category>>() {
       @Override
       public List<Category> some(Long id) {
@@ -758,17 +709,14 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
 
       @Override
       public List<Category> none() {
-        return (List<Category>) tx(new Function<EntityManager, Object>() {
-          @Override
-          public Object apply(EntityManager em) {
-            Query query = Queries.named.query(em, "Category.findAllOfTemplate", CategoryDto.class);
-            for (Integer l : limit)
-              query.setMaxResults(l);
-            for (Integer o : offset)
-              query.setFirstResult(o);
-            return mlist(query.getResultList()).map(toCategory).value();
-          }
-        });
+        return (List<Category>) tx(lambda(em -> {
+          Query query = Queries.named.query(em, "Category.findAllOfTemplate", CategoryDto.class);
+          for (Integer l : limit)
+            query.setMaxResults(l);
+          for (Integer o : offset)
+            query.setFirstResult(o);
+          return mlist(query.getResultList()).map(toCategory).value();
+        }));
       }
     });
 
@@ -779,23 +727,6 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
       categories = filterOrTags(categories, tagsOr.get());
 
     return categories;
-    // return since.fold(new Option.Match<Date, List<Category>>() {
-    // @Override
-    // public List<Category> some(final Date since) {
-    // return penv.tx(new Function<EntityManager, List<Category>>() {
-    // @Override
-    // public List<Category> apply(EntityManager em) {
-    // return findAll(em, toCategory, offset, limit, "Category.findAllOfVideoSince", id(videoId),
-    // tuple("since", since));
-    // }
-    // });
-    // }
-    //
-    // @Override
-    // public List<Category> none() {
-    // return findAllById(toCategory, offset, limit, "Category.findAllOfVideo", videoId);
-    // }
-    // });
   }
 
   /**
@@ -975,6 +906,8 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
 
   /** Transform any exception from the JPA persistence layer into an API exception. */
   public static final Function<Exception, ExtendedAnnotationException> exhandler = new Function<Exception, ExtendedAnnotationException>() {
+    // TODO Lambdaify these as well?
+    //   I guess the better question is why is this declared like is in the first place
     @Override
     public ExtendedAnnotationException apply(Exception e) {
       if (e instanceof ExtendedAnnotationException) {
@@ -991,6 +924,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
 
   private static final ExtendedAnnotationException notFound = new ExtendedAnnotationException(Cause.NOT_FOUND);
 
+  // TODO See above
   public static final Function0<ExtendedAnnotationException> throwNotFound = new Function0<ExtendedAnnotationException>() {
     @Override
     public ExtendedAnnotationException apply() {
@@ -1130,12 +1064,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
    */
   private Option<Long> getCurrentUserId() {
     final String userName = securityService.getUser().getUsername();
-    return getUserByExtId(userName).map(new Function<User, Long>() {
-      @Override
-      public Long apply(User user) {
-        return user.getId();
-      }
-    });
+    return getUserByExtId(userName).map(lambda(User::getId));
   }
 
   /**
@@ -1157,6 +1086,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     return resource.getCreatedBy().equals(currentUserId);
   }
 
+  // TODO See the other static `Function`-declarations
   public final Function<Resource, Boolean> hasResourceAccess = new Function<Resource, Boolean>() {
     @Override
     public Boolean apply(Resource resource) {
@@ -1165,21 +1095,17 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   };
 
   private boolean hasCategoryAccess(Annotation annotation) {
-    return annotation.getLabelId().bind(new Function<Long, Option<Label>>() {
-      @Override
-      public Option<Label> apply(Long labelId) {
-        boolean includeDeletedLabels = true;
-        return getLabel(labelId, includeDeletedLabels);
-      }
-    }).bind(new Function<Label, Option<Category>>() {
-      @Override
-      public Option<Category> apply(Label label) {
-        boolean includeDeletedCategories = true;
-        return getCategory(label.getCategoryId(), includeDeletedCategories);
-      }
+    return annotation.getLabelId().bind(lambda(labelId -> {
+      boolean includeDeletedLabels = true;
+      return getLabel(labelId, includeDeletedLabels);
+    })).bind(lambda(label -> {
+      boolean includeDeletedCategories = true;
+      return getCategory(label.getCategoryId(), includeDeletedCategories);
+    }))
     // TODO It would be nice if we could use the second overload of `fold` here
     // TODO Create a helper function to create `Match` objects that enables type inference ...
-    }).fold(new Match<Category, Boolean>() {
+    // TODO Solve this case ...
+    .fold(new Match<Category, Boolean>() {
       // annotations without category are always accessible
       @Override
       public Boolean none() {
@@ -1192,16 +1118,13 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     });
   }
 
+  // TODO See the others
   private final Function<Annotation, Boolean> hasCategoryAccess = new Function<Annotation, Boolean>() {
     @Override
     public Boolean apply(Annotation annotation) {
       return hasCategoryAccess(annotation);
     }
   };
-
-  public <T> List<T> apply(T bla) {
-    return new ArrayList<T>();
-  }
 
   private <T extends Resource> List<T> filterOrTags(List<T> originalList, Map<String, String> tags) {
     if (tags.size() < 1)
@@ -1235,18 +1158,16 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     if (tags.size() < 1) {
       return originalList;
     } else {
-      return mlist(originalList).filter(new Predicate<T>() {
-        @Override
-        public Boolean apply(T resource) {
-          Map<String, String> resourceTags = resource.getTags();
-          for (String key : tags.keySet()) {
-            String value = resourceTags.get(key);
-            if (value == null || !value.equals(tags.get(key)))
-              return false;
-          }
-          return true;
+      // TODO Use streaming API instead?
+      return mlist(originalList).filter(lambda(resouce -> {
+        Map<String, String> resourceTags = resource.getTags();
+        for (String key : tags.keySet()) {
+          String value = resourceTags.get(key);
+          if (value == null || !value.equals(tags.get(key)))
+            return false;
         }
-      }).value();
+        return true;
+      })).value();
     }
   }
 }
