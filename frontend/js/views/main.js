@@ -315,7 +315,7 @@ define(["jquery",
                     var annotationView = this.listView.getViewFromAnnotation(
                         annotationsTool.activeAnnotation.get("id")
                     );
-                    annotationView.toggleCommentsState();
+                    annotationView.comment();
                     var wasPlaying = annotationsTool.playerAdapter.getStatus() === PlayerAdapter.STATUS.PLAYING;
                     annotationsTool.playerAdapter.pause();
                     annotationView.once("cancel", function () {

@@ -697,11 +697,16 @@ define(["jquery",
                     if (!listView) return;
 
                     _.each(previousAnnotations, function (annotation) {
-                        listView.getViewFromAnnotation(annotation.id).collapse(true);
+                        var annotationView = listView.getViewFromAnnotation(annotation.id);
+                        listView.autoCollapseAnnotation(
+                            listView.getViewFromAnnotation(annotation.id)
+                        );
                     });
                     var currentAnnotations = this.getCurrentAnnotations();
                     _.each(currentAnnotations, function (annotation) {
-                        listView.getViewFromAnnotation(annotation.id).expand(true);
+                        var annotationView = listView.getViewFromAnnotation(annotation.id);
+                        annotationView.expand();
+                        annotationView.automaticallyExpanded = true;
                     });
                     previousAnnotations = currentAnnotations;
                 };

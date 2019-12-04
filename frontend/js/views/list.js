@@ -200,17 +200,21 @@ define(["jquery",
 
                 if (!isPartofList) {
                     if (lastAddedAnnotationView) {
-                        lastAddedAnnotationView.toggleCollapsedState(undefined, true);
+                        this.autoCollapseAnnotation(lastAddedAnnotationView);
                     }
-                    view.toggleCollapsedState();
-                    view.once("change:state", function () {
-                        if (view === lastAddedAnnotationView) {
-                            lastAddedAnnotationView = undefined;
-                        }
-                    });
 
                     annotationsTool.setSelection([annotation], false);
                     lastAddedAnnotationView = view;
+                }
+                this.listenTo(view, "state:change", function (view) {
+                    delete view.automaticallyExpanded;
+                });
+            },
+
+            autoCollapseAnnotation: function (annotationView) {
+                if (annotationView.automaticallyExpanded) {
+                    annotationView.collapse();
+                    delete annotationView.automaticallyExpanded;
                 }
             },
 
@@ -237,12 +241,7 @@ define(["jquery",
             editAnnotationCallback: function (editView) {
                 _.each(this.annotationViews, function (view) {
                     if (view.id !== editView.id) {
-                        var state = view.getState();
-                        if (state === AnnotationView.STATES.EDIT) {
-                            view.toggleEditState();
-                        } else if (state === AnnotationView.STATES.COMMENTS) {
-                            view.toggleCommentsState();
-                        }
+                        view.ceaseAllEditing();
                     }
                 }, this);
             },
@@ -424,7 +423,7 @@ define(["jquery",
              */
             expandAll: function (event) {
                 _.each(this.annotationViews, function (annView) {
-                    annView.toggleExpandedState(event, true);
+                    annView.expand();
                 });
             },
 
@@ -434,7 +433,7 @@ define(["jquery",
              */
             collapseAll: function (event) {
                 _.each(this.annotationViews, function (annView) {
-                    annView.toggleCollapsedState(event, true);
+                    annView.collapse();
                 });
             },
 

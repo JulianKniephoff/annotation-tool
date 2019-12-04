@@ -115,6 +115,7 @@ define(["jquery",
                                 "saveScaling",
                                 "stopPropagation",
                                 "toggleEditState",
+                                "stopEditing",
                                 "toggleCollapsedState",
                                 "toggleExpandedState",
                                 "toggleCommentsState",
@@ -134,15 +135,7 @@ define(["jquery",
                     collection: this.model.get("comments")
                 });
                 this.commentContainer.on({
-                    cancel: function () {
-                        self.trigger("cancel", self);
-                        self.toggleCommentsState();
-                    },
-                    edit: function () {
-                        self.trigger("edit", self);
-                        self.setState(ListAnnotation.STATES.COMMENTS, ListAnnotation.STATES.EXPANDED);
-                        self.render();
-                    }
+                    edit: this.stopEditing
                 });
 
                 this.model.fetchComments();
@@ -160,9 +153,6 @@ define(["jquery",
                 if (this.scale) {
                     this.scaleValues = this.scale.get("scaleValues");
                 }
-
-                // Add backbone events to the model
-                _.extend(this.model, Backbone.Events);
 
                 this.listenTo(this.model, "change", this.render);
                 this.listenTo(this.model.get("comments"), "change", this.render);
@@ -185,22 +175,14 @@ define(["jquery",
             },
 
             /**
-             * Set the state to the given newState or the fallbackState if newState is already set
+             * Set the state to the given state
              * @alias module:views-list-annotation.ListAnnotation#setState
-             * @param {State} newState The new state to set if not already activated
-             * @param {State} fallbackState The fallback state if the new state is already set
+             * @param {State} state The new state to set
              */
-            setState: function (newState, fallbackState) {
-                var fallback = false;
-                if (!_.isUndefined(fallbackState) && this.getState() === newState) {
-                    this.currentState = fallbackState;
-                    fallback = true;
-                } else {
-                    this.currentState = newState;
-                }
-                this.trigger("change:state", this, { fallback: fallback });
-
-                this.manuallyExpanded = this.currentState === ListAnnotation.STATES.EXPANDED;
+            setState: function (state) {
+                this.currentState = state;
+                this.render();
+                this.trigger("change:state", this, { state: state });
             },
 
             /**
@@ -283,14 +265,14 @@ define(["jquery",
                     return;
                 }
 
-                this.model.set({text: newValue});
+                this.model.set({ text: newValue });
                 this.model.save();
 
                 if (event.type === "keydown") {
                     $(event.currentTarget).blur();
                 }
 
-                this.toggleEditState(event);
+                this.stopEditing();
             },
 
             /**
@@ -544,6 +526,7 @@ define(["jquery",
              * @alias module:views-list-annotation.ListAnnotation#onSelect
              */
             onSelect: _.debounce(function (force) {
+                // TODO Put this in `annotationsTool`
                 // If annotation already selected
                 if (annotationsTool.hasSelection() && annotationsTool.getSelection()[0].get("id") === this.model.get("id")) {
                     if (!_.isBoolean(force) || (_.isBoolean(force) && !force)) {
@@ -587,6 +570,69 @@ define(["jquery",
             },
 
             /**
+             * Collapse this annotation
+             * @alias module:views-list-annotation.ListAnnotation#collapse
+             */
+            collapse: function () {
+                this.setState(ListAnnotation.STATES.COLLAPSED);
+                this.trigger("collapse");
+            },
+
+            /**
+             * Expand this annotation
+             * @alias module:views-list-annotation.ListAnnotation#expand
+             */
+            expand: function () {
+                this.setState(ListAnnotation.STATES.EXPANDED);
+                this.trigger("expand");
+            },
+
+            /**
+             * Put this annotation in edit mode
+             * @alias module:views-list-annotation.ListAnnotation#edit
+             */
+            edit: function () {
+                this.setState(ListAnnotation.STATES.EDIT);
+                // TODO Factor this triggering into `setState`?
+                //   Then the state would have to contain the event that should be generated,
+                //   but that should not be a problem.
+                this.trigger("edit");
+                this.onSelect(true);
+            },
+
+            /**
+             * Exit editing mode on this annotation
+             * @alias module:views-list-annotation.ListAnnotation#stopEditing
+             */
+            stopEditing: function () {
+                this.setState(ListAnnotation.STATES.EXPANDED);
+                this.trigger("edit:stop");
+            },
+
+            /**
+             * Cease all editing activity in this annotation,
+             * i.e. exit editing mode for the annotation itself
+             * and all its comments/replies.
+             * @alias module:views-list-annotation.ListAnnotation#ceaseAllEditing
+             */
+            ceaseAllEditing: function () {
+                // TODO Can we not factor this out this recursion?
+                //   We will have to do this in the comments container as well.
+                //this.commentContainer.stopEditing();
+                this.stopEditing();
+            },
+
+            /**
+             * Show a form to add a new comment
+             * @alias module:views-list-annotation.ListAnnotation#comment
+             */
+            comment: function () {
+                this.setState(ListAnnotation.STATES.COMMENTS);
+                this.commentContainer.setState(CommentsContainer.STATES.ADD);
+                this.trigger("comment");
+            },
+
+            /**
              * Toggle the visibility of the text container
              * @alias module:views-list-annotation.ListAnnotation#toggleCollapsedState
              * @param  {event} event Event object
@@ -624,28 +670,6 @@ define(["jquery",
                     this.setState(ListAnnotation.STATES.EXPANDED, ListAnnotation.STATES.COLLAPSED);
                 }
                 this.render();
-            },
-
-            /**
-             * Expand the text container
-             * @alias module:views-list-annotation.ListAnnotation#expand
-             * @param  {Boolean} auto Is this an automatic expansion as opposed to one initiated by the user?
-             */
-            expand: function (auto) {
-                var wasManuallyExpanded = this.manuallyExpanded;
-                this.toggleExpandedState(undefined, true);
-                this.manuallyExpanded = wasManuallyExpanded || !auto;
-            },
-
-            /**
-             * Collapse the text container
-             * @alias module:views-list-annotation.ListAnnotation#collapse
-             * @param  {Boolean} autoOnly Only really collapse the view when it was opened automatically.
-             *                            See {@link expand}.
-             */
-            collapse: function (autoOnly) {
-                if (autoOnly && this.manuallyExpanded) return;
-                this.toggleCollapsedState(undefined, true);
             },
 
             /**
@@ -692,10 +716,9 @@ define(["jquery",
                     events: {
                         "click"                      : "onSelect",
                         "click .proxy-anchor "       : "stopPropagation",
-                        "click a.collapse"           : "toggleCollapsedState",
-                        "click i.icon-comment-amount": "toggleCommentsState",
-                        "click i.icon-comment"       : "toggleCommentsState"
-                        //"dblclick"                   : "toggleEditState"
+                        "click a.collapse"           : "expand",
+                        "click i.icon-comment-amount": "comment",
+                        "click i.icon-comment"       : "comment"
                     }
                 },
                 EXPANDED: {
@@ -705,15 +728,11 @@ define(["jquery",
                     events: {
                         "click"                      : "onSelect",
                         "click .proxy-anchor "       : "stopPropagation",
-                        "click a.collapse"           : "toggleCollapsedState",
-                        "click i.icon-comment-amount": "toggleCommentsState",
-                        "click i.icon-comment"       : "toggleCommentsState",
-                        "click .toggle-edit"         : "toggleEditState",
+                        "click a.collapse"           : "collapse",
+                        "click i.icon-comment-amount": "comment",
+                        "click i.icon-comment"       : "comment",
+                        "click .toggle-edit"         : "edit",
                         "click i.delete"             : "deleteFull"
-                        //"dblclick span.text"         : "toggleEditState",
-                        //"dblclick span.start"        : "toggleEditState",
-                        //"dblclick span.end"          : "toggleEditState",
-                        //"dblclick span.category"     : "toggleEditState"
                     }
                 },
                 EDIT: {
@@ -723,10 +742,10 @@ define(["jquery",
                     events: {
                         "click"                      : "onSelect",
                         "click .proxy-anchor "       : "stopPropagation",
-                        "click a.collapse"           : "toggleCollapsedState",
-                        "click i.icon-comment-amount": "toggleCommentsState",
-                        "click i.icon-comment"       : "toggleCommentsState",
-                        "click .toggle-edit"         : "toggleEditState",
+                        "click a.collapse"           : "collapse",
+                        "click i.icon-comment-amount": "comment",
+                        "click i.icon-comment"       : "comment",
+                        "click .toggle-edit"         : "edit",
                         "click .freetext textarea"   : "stopPropagation",
                         "click .scaling select"      : "stopPropagation",
                         "click .end-value"           : "stopPropagation",
@@ -740,12 +759,13 @@ define(["jquery",
                         "focusout .start-value"      : "saveStart",
                         "focusout .end-value"        : "saveEnd",
                         "click button[type=submit]"  : "saveFreeText",
-                        "click button[type=button]"  : "toggleEditState",
+                        "click button[type=button]"  : "stopEditing",
                         "focusout .freetext textarea": "saveFreeText",
                         "change .scaling select"     : "saveScaling",
                         "keyup"                      : "handleEsc"
                     }
                 },
+                // TODO Do we even need this state?
                 COMMENTS: {
                     render: TmplExpanded,
                     withComments: true,
@@ -753,12 +773,10 @@ define(["jquery",
                     events: {
                         "click"                      : "onSelect",
                         "click .proxy-anchor "       : "stopPropagation",
-                        "click a.collapse"           : "toggleCollapsedState",
-                        "click i.icon-comment-amount": "toggleCommentsState",
-                        "click i.icon-comment"       : "toggleCommentsState",
-                        "click .toggle-edit"         : "toggleEditState",
-                        "dblclick span.text"         : "toggleEditState",
-                        "dblclick span.category"     : "toggleEditState"
+                        "click a.collapse"           : "collapse",
+                        "click i.icon-comment-amount": "comment",
+                        "click i.icon-comment"       : "comment",
+                        "click .toggle-edit"         : "edit"
                     }
                 }
             }
