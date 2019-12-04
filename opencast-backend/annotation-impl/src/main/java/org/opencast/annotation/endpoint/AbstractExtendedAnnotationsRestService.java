@@ -22,6 +22,14 @@ import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
+import org.opencastproject.mediapackage.MediaPackage;
+
+import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchService;
+
+import org.opencastproject.security.api.AuthorizationService;
+
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
@@ -32,7 +40,6 @@ import org.opencastproject.util.data.functions.Strings;
 
 import org.opencast.annotation.api.Annotation;
 import org.opencast.annotation.api.Category;
-import org.opencast.annotation.api.Comment;
 import org.opencast.annotation.api.ExtendedAnnotationException;
 import org.opencast.annotation.api.ExtendedAnnotationService;
 import org.opencast.annotation.api.Label;
@@ -53,7 +60,6 @@ import org.opencast.annotation.impl.ScaleValueImpl;
 import org.opencast.annotation.impl.TrackImpl;
 import org.opencast.annotation.impl.UserImpl;
 import org.opencast.annotation.impl.VideoImpl;
-
 import org.opencast.annotation.impl.persistence.AbstractResourceDto;
 import org.opencast.annotation.impl.persistence.AnnotationDto;
 import org.opencast.annotation.impl.persistence.CategoryDto;
@@ -66,7 +72,6 @@ import org.opencast.annotation.impl.persistence.UserDto;
 import org.opencast.annotation.impl.persistence.VideoDto;
 
 import au.com.bytecode.opencsv.CSVWriter;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.format.ISODateTimeFormat;
@@ -268,10 +273,23 @@ public abstract class AbstractExtendedAnnotationsRestService {
   // });
   // }
 
+  void throwIfNoAnnotateAccess(final String extId) {
+    SearchResult videoSearchResult = getSearchService().getByQuery(new SearchQuery().withId(extId));
+    if (videoSearchResult.getTotalSize() < 1) {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+    MediaPackage videoMediaPackage = videoSearchResult.getItems()[0].getMediaPackage();
+    // TODO There should probably be constants for the ACL actions
+    if (getAuthorizationService().hasPermission(videoMediaPackage, "annotate")) return;
+    if (getAuthorizationService().hasPermission(videoMediaPackage, "annotate-admin")) return;
+    throw new WebApplicationException(Response.Status.FORBIDDEN);
+  }
+
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/videos")
   public Response postVideos(@FormParam("video_extid") final String videoExtId, @FormParam("tags") final String tags) {
+    throwIfNoAnnotateAccess(videoExtId);
     return run(array(videoExtId), new Function0<Response>() {
       @Override
       public Response apply() {
@@ -295,9 +313,11 @@ public abstract class AbstractExtendedAnnotationsRestService {
   @Path("/videos")
   public Response putVideo(@FormParam("video_extid") final String videoExtId,
           @FormParam("access") final Integer access, @FormParam("tags") final String tags) {
+    throwIfNoAnnotateAccess(videoExtId);
     return run(array(videoExtId), new Function0<Response>() {
       @Override
       public Response apply() {
+
         Option<Option<Map<String, String>>> tagsMap = trimToNone(tags).map(parseToJsonMap);
         if (tagsMap.isSome() && tagsMap.get().isNone())
           return BAD_REQUEST;
