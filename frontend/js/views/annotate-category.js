@@ -155,6 +155,11 @@ define(["jquery",
                 this.addLabels(this.model.get("labels"));
 
                 labels = this.model.get("labels");
+                console.log(labels.length);
+                this.listenTo(labels, "reset", function (labels) {
+                    this.render();
+                    this.addLabels(labels);
+                });
                 this.listenTo(labels, "add", this.addLabel);
                 this.listenTo(labels, "remove", this.removeOne);
                 this.listenTo(labels, "destroy", this.removeOne);
@@ -268,7 +273,7 @@ define(["jquery",
              */
             addLabels: function (labels) {
                 labels.each(function (label) {
-                    this.addLabel(label, false);
+                    this.addLabel(label);
                 }, this);
             },
 
@@ -276,7 +281,6 @@ define(["jquery",
              * Add one label to this view
              * @alias module:views-annotate-category.CategoryView#addLabel
              * @param {Label} label  The label to add
-             * @param {boolean} single Define if this is part of a list insertion (false) or a single insertion (true)
              */
             addLabel: function (label) {
                 var labelView = new LabelView({
