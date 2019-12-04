@@ -15,8 +15,11 @@
  */
 package org.opencast.annotation.impl;
 
+import static org.opencastproject.util.data.Option.none;
+
 import org.opencastproject.util.data.Option;
 
+import org.opencast.annotation.api.ExtendedAnnotationService;
 import org.opencast.annotation.api.Resource;
 
 import java.util.Date;
@@ -113,6 +116,16 @@ public class ResourceImpl implements Resource {
   @Override
   public Option<Date> getDeletedAt() {
     return deletedAt;
+  }
+
+  /**
+   * By default, a resource does not belong to any video. Subclasses are encouraged to override this, though.
+   *
+   * @see org.opencast.annotation.api.Resource#getVideo
+   */
+  @Override
+  public Option<Long> getVideo(ExtendedAnnotationService eas) {
+    return none();
   }
 
   /**

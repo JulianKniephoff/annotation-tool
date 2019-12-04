@@ -15,9 +15,12 @@
  */
 package org.opencast.annotation.impl;
 
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.data.Option;
 
+import org.opencast.annotation.api.ExtendedAnnotationService;
 import org.opencast.annotation.api.Resource;
 import org.opencast.annotation.api.Track;
 
@@ -83,6 +86,15 @@ public final class TrackImpl extends ResourceImpl implements Track {
   @Override
   public Option<String> getSettings() {
     return settings;
+  }
+
+  /**
+   * @see org.opencast.annotation.api.Resource#getVideo
+   * @see org.opencast.annotation.impl.ResourceImpl#getVideo
+   */
+  @Override
+  public Option<Long> getVideo(ExtendedAnnotationService eas) {
+    return some(videoId);
   }
 
   @Override

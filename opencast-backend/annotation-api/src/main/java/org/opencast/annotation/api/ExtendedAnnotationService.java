@@ -15,6 +15,8 @@
  */
 package org.opencast.annotation.api;
 
+import org.opencastproject.mediapackage.MediaPackage;
+
 import org.opencastproject.util.data.Option;
 
 import java.util.Date;
@@ -806,6 +808,24 @@ public interface ExtendedAnnotationService {
   Resource deleteResource(Resource resource);
 
   /**
+   * Find the Opencast media package corresponding to an event id
+   * 
+   * @param id
+   *          an id of an Opencast event
+   * @return the corresponding media package
+   */
+  Option<MediaPackage> findMediaPackage(String id);
+
+  /**
+   * Check which access rights the current user has to an Opencast video in the context of the annotation tool
+   * 
+   * @param mediaPackage
+   *          an Opencast media package
+   * @return the "strongest" ACL action the current user has on the given video, if it could be determined
+   */
+  VideoAccess getVideoAccess(MediaPackage mediaPackage);
+
+  /**
    * Checks if the current user has access to the given resource
    * 
    * @param resource
@@ -813,5 +833,4 @@ public interface ExtendedAnnotationService {
    * @return true if the current user has access to the resource
    */
   boolean hasResourceAccess(Resource resource);
-
 }

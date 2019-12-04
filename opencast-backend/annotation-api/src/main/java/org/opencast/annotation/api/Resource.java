@@ -48,6 +48,13 @@ public interface Resource {
   /** The deletion date */
   Option<Date> getDeletedAt();
 
+  /**
+   * The video this resource belongs to, especially regarding access rights
+   * 
+   * @param eas service to query for additional resources, if needed
+   */
+  Option<Long> getVideo(ExtendedAnnotationService eas);
+
   /** The tags */
   Map<String, String> getTags();
 

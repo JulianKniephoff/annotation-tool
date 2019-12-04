@@ -25,6 +25,7 @@ import static org.opencast.annotation.impl.persistence.TrackDto.toTrack;
 import static org.opencast.annotation.impl.persistence.UserDto.toUser;
 import static org.opencast.annotation.impl.persistence.VideoDto.toVideo;
 
+import static org.opencastproject.util.data.Arrays.head;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
@@ -32,6 +33,10 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.persistence.Queries.named;
 
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Effect;
@@ -60,6 +65,7 @@ import org.opencast.annotation.api.ScaleValue;
 import org.opencast.annotation.api.Track;
 import org.opencast.annotation.api.User;
 import org.opencast.annotation.api.Video;
+import org.opencast.annotation.api.VideoAccess;
 
 import org.opencast.annotation.impl.AnnotationImpl;
 import org.opencast.annotation.impl.CategoryImpl;
@@ -82,6 +88,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.QueryTimeoutException;
 import javax.persistence.RollbackException;
 
 /**
@@ -1142,6 +1149,47 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     );
   }
 
+  private Option<MediaPackage> findMediaPackage(final String id) {
+    return head(
+      getSearchService().getByQuery(
+        new SearchQuery().withId(id)
+      ).getItems()
+    ).map(
+      new Function<SearchResultItem, MediaPackage>() {
+        @Override
+        public MediaPackage apply(SearchResultItem searchResultItem) {
+          return searchResultItem.getMediaPackage();
+        }
+      }
+    );
+  }
+
+  Option<MediaPackage> findMediaPackage(String id) {
+    return head(
+      getSearchService().getByQuery(
+        new SearchQuery().withId(id)
+      ).getItems()
+    ).map(
+      new Function<SearchResultItem, VideoAccess>() {
+        @Override
+        public VideoAccess apply(SearchResultItem searchResultItem) {
+          MediaPackage mediaPackage = searchResultItem.getMediaPackage();
+        }
+      }
+    );
+  }
+
+  /**
+   * @see org.opencast.annotation.api.ExtendedAnnotationService#getVideoAccess
+   */
+  Option<VideoAccess> getVideoAccess(MediaPackage mediaPackage) {
+    if (getAuthorizationService().hasPermission(mediaPackage, ANNOTATE.aclAction))
+      return ANNOTATE;
+    if (getAuthorizationService().hasPermission(mediaPackage, ANNOTATE.aclAction))
+      return ANNOTATE;
+    return NONE;
+  }
+
   /**
    * @see org.opencast.annotation.api.ExtendedAnnotationService#hasResourceAccess(Resource)
    */
@@ -1150,9 +1198,34 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     org.opencastproject.security.api.User currentUser = securityService.getUser();
     Option<Long> currentUserId = annotationToolUserIdForOpencastUser(currentUser);
 
-    if (resource.getAccess() == Resource.PUBLIC
-            || currentUser.hasRole(securityService.getOrganization().getAdminRole())
-            || currentUser.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE))
+    if (currentUser.hasRole(securityService.getOrganization().getAdminRole())
+            || currentUser.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)) {
+      return true;
+    }
+
+    Option<Boolean> videoBasedAccess = resource.getVideo().bind(new Function<Long, Option<Video>() {
+      @Override
+      public Option<Video> apply(Long videoId) {
+        return getVideo(videoId);
+      }
+    }).bind(new Function<Video, Option<VideoAccess>>() {
+      @Override
+      public Option<VideoAccess> apply(Video video) {
+        return getVideoAccess(video.getExtId());
+      }
+    }).bind(new Function<VideoAccess, Option<Boolean>>() {
+      @Override
+      Option<Boolean> apply(VideoAccess videoAccess) {
+        if (videoAccess == NONE)
+          return some(false);
+        if (videoAccess == ANNOTATE_ADMIN && resource.getAccess() == Resource.SHARED_WITH_ADMIN)
+          return some(true);
+        return none();
+      }
+    });
+    if (videoBasedAccess.isSome()) return vidoeBasedAccess.get();
+
+    if (resource.getAccess() == Resource.PUBLIC)
       return true;
 
     if (resource.getCreatedBy().isNone() || currentUserId.isNone())
@@ -1227,8 +1300,19 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     return list;
   }
 
-  private <T extends Resource> List<T> filterByAccess(List<T> originalList) {
-    return mlist(originalList).filter(hasResourceAccess).value();
+  private <T extends Track> List<T> filterByAccess(List<T> originalList) {
+    return mlist(originalList).filter(new Function<T, Boolean>() {
+      @Override
+      Boolean apply(T track) {
+        // TODO Since we need the user here, too, we probably need a version of this function that takes a user
+        if (hasResourceAccess(track)) return true;
+
+        // TODO Otherwise check `SHARED_WITH_ADMIN`
+        // Find the media package
+
+        // TODO Maybe put `SHARED_WITH_ADMIN` into `Track`?
+      }
+    }).value();
   }
 
   private <T extends Annotation> List<T> filterByCategoryAccess(List<T> originalList) {
@@ -1252,5 +1336,9 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
         }
       }).value();
     }
+  }
+
+  public SearchService getSearchService() {
+    return searchService;
   }
 }

@@ -252,24 +252,6 @@ public abstract class AbstractExtendedAnnotationsRestService {
     });
   }
 
-  Option<MediaPackage> findMediaPackage(final String videoExtId) {
-    return head(getSearchService().getByQuery(new SearchQuery().withId(videoExtId)).getItems()).map(
-      new Function<SearchResultItem, MediaPackage>() {
-        @Override
-        public MediaPackage apply(SearchResultItem searchResultItem) {
-          return searchResultItem.getMediaPackage();
-        }
-      }
-    );
-  }
-
-  static final String ANNOTATE_ACTION = "annotate";
-  static final String ANNOTATE_ADMIN_ACTION = "annotate-admin";
-
-  boolean hasVideoAccess(MediaPackage mediaPackage, String action) {
-    return getAuthorizationService().hasPermission(mediaPackage, action);
-  }
-
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/videos")
@@ -277,6 +259,10 @@ public abstract class AbstractExtendedAnnotationsRestService {
     return run(array(videoExtId), new Function0<Response>() {
       @Override
       public Response apply() {
+        // TODO Because of this BAD_REQUEST, we might still need the function to get the MediaPackage
+        //   and determine the access based on that.
+        //   Or we just create a video and use that? What?
+        if (eas.getVideoAccess(videoExtId) != ANNOTATE_ADMIN) return FORBIDDEN;
         final Option<MediaPackage> potentialMediaPackage = findMediaPackage(videoExtId);
         if (potentialMediaPackage.isNone()) return BAD_REQUEST;
         final MediaPackage videoMediaPackage = potentialMediaPackage.get();
