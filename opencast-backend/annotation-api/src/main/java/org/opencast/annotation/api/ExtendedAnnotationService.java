@@ -763,7 +763,7 @@ public interface ExtendedAnnotationService {
    * 
    * @return the base resource
    */
-  Resource createResource(Option<Map<String, String>> tags);
+  Resource createResource(Map<String, String> tags);
 
   /**
    * Create the base {@link Resource} for logging with tags and access
@@ -774,7 +774,7 @@ public interface ExtendedAnnotationService {
    *          the access level from the resource
    * @return the base resource
    */
-  Resource createResource(Option<Map<String, String>> tags, Integer access);
+  Resource createResource(Map<String, String> tags, Integer access);
 
   /**
    * Update the resource update information
@@ -794,7 +794,7 @@ public interface ExtendedAnnotationService {
    *          the tags map
    * @return the updated base resource
    */
-  Resource updateResource(Resource resource, Option<Map<String, String>> tags);
+  Resource updateResource(Resource resource, Map<String, String> tags);
 
   /**
    * Update the resource deletion information
