@@ -137,6 +137,11 @@ define(["jquery",
                                 "setupKeyboardShortcuts",
                                 "tracksSelection",
                                 "setLoadingProgress");
+
+                // TODO Maybe render the main template here?
+                //   Which would be read from `localStorage` with a default.
+                //   You would then have to rip the important parts out of `index.html`.
+
                 annotationsTool.bind(annotationsTool.EVENTS.NOTIFICATION, function (message) {
                     this.setLoadingProgress(this.loadingPercent, message);
                 }, this);
