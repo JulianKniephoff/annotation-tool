@@ -51,13 +51,14 @@ define(["jquery",
         "backbone",
         "handlebars",
         "timeline",
+        "vis",
         "tooltip",
         "popover",
         "jquery.appear"
     ],
 
     function ($, _, PlayerAdapter, Annotation, Track, Annotations, Tracks, GroupTmpl,
-        GroupEmptyTmpl, ItemTmpl, ModalAddGroupTmpl, ModalUpdateGroupTmpl, ACCESS, ROLES, FiltersManager, Backbone, Handlebars, links) {
+        GroupEmptyTmpl, ItemTmpl, ModalAddGroupTmpl, ModalUpdateGroupTmpl, ACCESS, ROLES, FiltersManager, Backbone, Handlebars, links, vis) {
 
         "use strict";
 
@@ -243,7 +244,6 @@ define(["jquery",
                     "zoomOut",
                     "stopZoomScrolling",
                     "timerangeChange",
-                    "repaintCustomTime",
                     "redraw",
                     "reset",
                     "updateHeader");
@@ -276,46 +276,84 @@ define(["jquery",
                 this.typeForDeleteAnnotation = annotationsTool.deleteOperation.targetTypes.ANNOTATION;
                 this.typeForDeleteTrack = annotationsTool.deleteOperation.targetTypes.TRACK;
 
-                this.endDate = this.getFormatedDate(this.playerAdapter.getDuration());
-                this.startDate = new Date(this.endDate.getFullYear(), this.endDate.getMonth(), this.endDate.getDate(), 0, 0, 0);
+                this.startTime = 0;
+                this.endTime = this.playerAdapter.getDuration() * 1000;
 
                 // Options for the links timeline
                 this.options = {
                     width            : "100%",
-                    height           : "auto",
-                    style            : "box",
+                    //height           : "100px",
+                    //style            : "box",
+                    type             : "range",
                     //scale          : links.Timeline.StepDate.SCALE.SECOND,
                     //step           : 30,
-                    showButtonNew    : false,
-                    editable         : true,
-                    start            : this.startDate,
-                    end              : this.endDate,
-                    min              : this.startDate,
-                    max              : this.endDate,
-                    intervalMin      : 5000,
-                    showCustomTime   : true,
-                    showNavigation   : false,
+                    //showButtonNew    : false,
+                    // TODO This does not exist anymore either
+                    start            : this.startTime,
+                    end              : this.endTime,
+                    min              : this.startTime,
+                    max              : this.endTime,
+                    //intervalMin      : 5000,
+                    zoomMin          : 5000,
+                    //showCustomTime   : true,
+                    //showNavigation   : false,
+                    // TODO Where is this option?
                     showMajorLabels  : false,
-                    snapEvents       : false,
-                    stackEvents      : true,
+                    //snapEvents       : false,
+                    snap             : null,
+                    //stackEvents      : true,
+                    stack            : true,
                     minHeight        : "200",
-                    axisOnTop        : true,
-                    groupsWidth      : "150px",
-                    animate          : true,
-                    animateZoom      : true,
-                    // cluster       : true,
-                    eventMarginAxis  : 0,
-                    eventMargin      : 0,
-                    dragAreaWidth    : 5,
-                    groupsChangeable : true
+                    //axisOnTop        : true,
+                    orientation      : {
+                        // TODO Do we want this as well?
+                        //item         : "top",
+                        axis         : "top"
+                    },
+                    //groupsWidth      : "150px",
+                    // TODO This does not seem to exist anymore
+                    //animate          : true,
+                    //animateZoom      : true,
+                    // TODO Animations are now controlled by specific function calls ...
+                    //cluster       : true,
+                    //eventMarginAxis  : 0,
+                    //eventMargin      : 0,
+                    margin           : {
+                        item         : 0,
+                        axis         : 0
+                    },
+                    //dragAreaWidth    : 5,
+                    // TODO Where is this option?!
+                    //editable         : true,
+                    //groupsChangeable : true
+                    editable         : {
+                        add          : true,
+                        updateTime   : true,
+                        remove       : true,
+                        updateGroup  : true,
+                        overrideItems: true
+                    },
+                    // Since we don't really use the times in the timeline as points in time,
+                    // but rather as offsets from some arbitrary start time (of the video),
+                    // we just use UTC dates, to avoid having to deal with timezones at all.
+                    moment: function (date) {
+                        return vis.moment(date).utc();
+                    }
                 };
 
                 this.$navbar = this.$el.find(".navbar");
 
                 // Create the timeline
                 this.$timeline = this.$el.find("#timeline");
-                this.timeline = new links.Timeline(this.$timeline[0]);
-                this.timeline.draw(this.filteredItems, this.options);
+                this.timeline = new vis.Timeline(this.$timeline[0], this.filteredItems, this.options);
+                this.timeline.addCustomTime();
+                this.timeline.setCustomTime(this.startTime);
+                this.timeline.setCustomTimeTitle(function () {
+                    return annotationsTool.getWellFormatedTime(new Date(this).getTime() / 1000);
+                });
+                this.timeline.setGroups([{
+                    content: 'test'
+                }]);
 
                 // Ensure that the timeline is redraw on window resize
                 $(window).bind("resize", this.onWindowResize);
@@ -328,25 +366,22 @@ define(["jquery",
                     }
                 });
 
-                links.events.addListener(this.timeline, "timechanged", this.onTimelineMoved);
-                links.events.addListener(this.timeline, "timechange", this.onTimelineMoved);
+                this.timeline.on("timechange", this.onTimelineMoved);
+                this.timeline.on("timechanged", this.onTimelineMoved);
+                //links.events.addListener(this.timeline, "timechanged", this.onTimelineMoved);
+                //links.events.addListener(this.timeline, "timechange", this.onTimelineMoved);
                 links.events.addListener(this.timeline, "change", this.onTimelineItemChanged);
                 links.events.addListener(this.timeline, "delete", this.onTimelineItemDeleted);
                 links.events.addListener(this.timeline, "add", this.onTimelineItemAdded);
                 links.events.addListener(this.timeline, "rangechange", this.timerangeChange);
 
                 this.tracks = annotationsTool.video.get("tracks");
-                this.listenTo(this.tracks, Tracks.EVENTS.VISIBILITY, this.addTracksList);
+                this.listenTo(this.tracks, Tracks.EVENTS.VISIBILITY, this.setTracks);
                 this.listenTo(this.tracks, "change", this.changeTrack);
                 this.listenTo(annotationsTool, annotationsTool.EVENTS.ANNOTATION_SELECTION, this.onSelectionUpdate);
 
                 this.$el.show();
-                this.addTracksList(this.tracks.getVisibleTracks());
-                this.timeline.setCustomTime(this.startDate);
-
-                // Overwrite the redraw method
-                this.timeline.repaintCustomTime = this.repaintCustomTime;
-                this.timeline.redraw = this.redraw;
+                this.setTracks(this.tracks.getVisibleTracks());
 
                 // Add findGroup method to the timeline if missing
                 if (!this.timeline.findGroup) {
@@ -354,9 +389,11 @@ define(["jquery",
                     _.bindAll(this.timeline, "findGroup");
                 }
 
+                /*
                 this.$el.find(".timeline-frame > div")[0].addEventListener("mousewheel", function (event) {
                     event.stopPropagation();
                 }, true);
+                 */
 
                 this.timerangeChange();
                 this.$timeline.scroll(this.updateHeader);
@@ -387,7 +424,7 @@ define(["jquery",
                     timelineHeight,
                     self = this;
 
-                this.timeline.draw(this.filteredItems, this.option);
+                this.timeline.redraw();
 
                 // If no tracks have been added to the tracks filters (if enable), we search which one are visisble
                 if (!_.isUndefined(visibleTracksFilter) && visibleTracksFilter.active && _.size(visibleTracksFilter.tracks) === 0) {
@@ -448,7 +485,7 @@ define(["jquery",
              * @alias module:views-timeline.TimelineView#timerangeChange
              */
             timerangeChange: function () {
-                var timerange = this.timeline.getVisibleChartRange();
+                var timerange = this.timeline.getWindow();
 
                 this.filtersManager.filters.timerange.start = new Date(timerange.start).getTime();
                 this.filtersManager.filters.timerange.end = new Date(timerange.end).getTime();
@@ -467,15 +504,6 @@ define(["jquery",
                 $("div.timeline-frame > div:first-child > div:first-child").css({
                     "margin-top": self.$timeline.scrollTop() - 2
                 });
-            },
-
-            /**
-             * Repaint the custom playhead
-             * @alias module:views-timeline.TimelineView#repaintCustomTime
-             */
-            repaintCustomTime: function () {
-                links.Timeline.prototype.repaintCustomTime.call(this.timeline);
-                this.changeTitleFromCustomPlayhead();
             },
 
             /**
@@ -517,7 +545,7 @@ define(["jquery",
              * @alias module:views-timeline.TimelineView#moveToCurrentTime
              */
             moveToCurrentTime: function () {
-                var currentChartRange = this.timeline.getVisibleChartRange(),
+                var currentChartRange = this.timeline.getWindow(),
                     start             = this.getTimeInSeconds(currentChartRange.start),
                     end               = this.getTimeInSeconds(currentChartRange.end),
                     size              = end - start,
@@ -553,7 +581,7 @@ define(["jquery",
 
 
                 if (currentChartRange.start.getTime() != start.getTime() || currentChartRange.end.getTime() !== end.getTime()) {
-                    this.timeline.setVisibleChartRange(start, end);
+                    this.timeline.setWindow(start, end);
                 }
             },
 
@@ -696,6 +724,33 @@ define(["jquery",
             },
 
             /**
+             * Set the tracks displayed by this timeline
+             * @alias module:views-timeline.TimelineView#setTracks
+             * @param {Array} tracks The tracks to display
+             */
+            setTracks: function (tracks) {
+                if (tracks.length === 0) {
+                    // TODO What is this for?
+                    this.filterItems();
+                    this.redraw();
+                    return;
+                }
+
+                this.timeline.setGroups(
+                    _.map(tracks, function (track) {
+                        // TODO Is this necessary?
+                        var trackJSON = track.toJSON();
+                        trackJSON.id = track.id;
+                        trackJSON.isSupervisor = (annotationsTool.user.get("role") === ROLES.SUPERVISOR);
+                        return {
+                            id: track.id,
+                            content: this.groupTemplate(track.toJSON())
+                        };
+                    }, this)
+                );
+            },
+
+            /**
              * Add a list of tracks, creating a view for each of them
              * @alias module:views-timeline.TimelineView#addTracksList
              * @param {Array | List} tracks The list of tracks to add
@@ -728,8 +783,8 @@ define(["jquery",
                     isMine: track.get("isMine"),
                     isPublic: track.get("isPublic"),
                     voidItem: true,
-                    start: this.startDate - 5000,
-                    end: this.startDate - 4500,
+                    start: this.startTime - 5000,
+                    end: this.startTime - 4500,
                     content: this.VOID_ITEM_TMPL,
                     group: this.groupTemplate(trackJSON)
                 };
@@ -993,8 +1048,8 @@ define(["jquery",
                         trackId: this.VOID_TRACK.id,
                         isMine: this.VOID_TRACK.isMine,
                         isPublic: true,
-                        start: this.startDate - 5000,
-                        end: this.startDate - 4500,
+                        start: this.startTime - 5000,
+                        end: this.startTime - 4500,
                         content: this.VOID_ITEM_TMPL,
                         group: this.groupEmptyTemplate(this.VOID_TRACK)
                     });
@@ -1067,7 +1122,7 @@ define(["jquery",
                 var currentTime = this.playerAdapter.getCurrentTime(),
                     newDate = this.getFormatedDate(currentTime);
 
-                this.timeline.setCustomTime(newDate);
+                this.timeline.setCustomTime(currentTime * 1000);
 
                 this.$el.find("span.time").html(annotationsTool.getWellFormatedTime(currentTime, true));
 
@@ -1091,7 +1146,8 @@ define(["jquery",
                 if (!this.isAnnotationSelectedonTimeline(selection[0])) {
                     _.each(data, function (item, index) {
                         if (selection[0].get("id") === item.id) {
-                            this.timeline.selectItem(index, false, true);
+                            //this.timeline.selectItem(index, false, true);
+                            this.timeline.setSelection(index);
                         }
                     }, this);
                 }
@@ -1103,7 +1159,7 @@ define(["jquery",
              * @param {Event} event Event object
              */
             onTimelineMoved: function (event) {
-                var newTime = this.getTimeInSeconds(event.time),
+                var newTime = event.time.getTime() / 1000,
                     hasToPlay = (this.playerAdapter.getStatus() === PlayerAdapter.STATUS.PLAYING);
 
 
@@ -1111,7 +1167,13 @@ define(["jquery",
                     this.playerAdapter.pause();
                 }
 
-                this.playerAdapter.setCurrentTime((newTime < 0 || newTime > this.playerAdapter.getDuration()) ? 0 : newTime);
+                this.playerAdapter.setCurrentTime(
+                    newTime < this.tartTime
+                        ? this.startTime
+                        : newTime > this.endTime
+                        ? this.endTime
+                        : newTime
+                );
 
                 if (hasToPlay) {
                     this.playerAdapter.play();
@@ -1307,7 +1369,7 @@ define(["jquery",
              * @alias module:views-timeline.TimelineView#onTimelineResetZoom
              */
             onTimelineResetZoom: function () {
-                this.timeline.setVisibleChartRange(this.startDate, this.endDate);
+                this.timeline.setVisibleChartRange(this.startTime, this.endTime);
             },
 
             /**
@@ -1719,6 +1781,8 @@ define(["jquery",
 
                 // Remove all event listener
                 $(this.playerAdapter).unbind("pa_timeupdate", this.onPlayerTimeUpdate);
+                this.timeline.off("timechange", this.onTimelineMoved);
+                this.timeline.off("timechanged", this.onTimelineMoved);
                 links.events.removeListener(this.timeline, "timechanged", this.onTimelineMoved);
                 links.events.removeListener(this.timeline, "change", this.onTimelineItemChanged);
                 links.events.removeListener(this.timeline, "delete", this.onTimelineItemDeleted);

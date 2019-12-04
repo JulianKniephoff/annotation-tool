@@ -1,0 +1,84 @@
+{
+  "about": {},
+  "alert": {
+    "error": {},
+    "info": {},
+    "warning": {}
+  },
+  "annotate": {
+    "categories": {},
+    "export not supported": {},
+    "items visibility": {},
+    "new": {}
+  },
+  "annotation": {
+    "comments": {
+      "edit": {}
+    },
+    "edit": {
+      "set end to playhead": {},
+      "set start to playhead": {}
+    }
+  },
+  "default track": {},
+  "delete modal": {},
+  "list annotation": {},
+  "login": {},
+  "loop controller": {},
+  "menu": {
+    "view": {
+      "annotate": {},
+      "annotation visibility": {},
+      "views": {}
+    }
+  },
+  "new label defaults": {},
+  "print": {
+    "annotations": {
+      "table": {
+        "annotation and comments": {
+          "free text": {}
+        },
+        "codes": {},
+        "timecode": {},
+        "user and track": {}
+      }
+    },
+    "categories": {
+      "table": {
+        "scales": {}
+      }
+    }
+  },
+  "scale editor": {
+    "description": {},
+    "name": {},
+    "values": {
+      "name": {},
+      "value": {}
+    }
+  },
+  "startup": {},
+  "timeline": {
+    "add track": {
+      "description": {},
+      "name": {}
+    },
+    "change visibility": {},
+    "no track available": {},
+    "other annotations": {},
+    "private only": {},
+    "track": {},
+    "update track": {
+      "description": {},
+      "name": {}
+    }
+  },
+  "track selection": {
+    "search": {}
+  },
+  "user login": {
+    "email": {},
+    "nickname": {}
+  }
+}
