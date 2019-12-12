@@ -168,7 +168,7 @@ define(["jquery",
                                                     30);
 
                     $headerEl.find("input").width(titleWidth);
-                }  else {
+                } else {
                     $headerEl.find("input").width("100%");
                 }
 
