@@ -134,12 +134,15 @@ i.check {
 			display: inline-block !important;
 		}
 
+		.edit {
+			display: inline-block !important;
+		}
+
 		i.edit {
 			background-color: none;
 			border: none;
 			margin-left: 5px;
 			float: right;
-			display: inline-block !important;
 
 			&:hover {
 				.iconHover();
@@ -198,7 +201,7 @@ i.check {
 						display: none;
 					}
 
-					input {
+					.name {
 						min-width: 0;
 						margin: 0 0 3px 0;
 						padding: 1px;
@@ -488,7 +491,7 @@ i.check {
 
 				.category-item {
 
-					.catItem-header input {
+					.catItem-header .name {
 						color: #111111;
 						width: 38%;
 						min-width: 42px;
@@ -556,8 +559,11 @@ i.check {
 			}
 		}
 
-		i.edit {
+		.edit {
 			margin: 2px 0 0 5px;
+		}
+
+		i.edit {
 			padding: 1px;
 			float: right;
 			background-color: transparent;

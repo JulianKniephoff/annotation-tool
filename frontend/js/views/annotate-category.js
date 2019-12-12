@@ -161,7 +161,7 @@ define(["jquery",
                 var $headerEl   = this.$el.find(".catItem-header"),
                     titleWidth;
 
-                var input = $headerEl.find("input").width(
+                var input = $headerEl.find(".name").width(
                     this.editModus
                         ? titleWidth = $headerEl.width() - (
                             $headerEl.find(".colorPicker-picker").outerWidth() +
