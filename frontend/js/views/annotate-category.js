@@ -161,16 +161,16 @@ define(["jquery",
                 var $headerEl   = this.$el.find(".catItem-header"),
                     titleWidth;
 
-                if (this.editModus) {
-                    titleWidth = $headerEl.width() - ($headerEl.find(".colorPicker-picker").outerWidth() +
-                                                    $headerEl.find(".delete").outerWidth() +
-                                                    $headerEl.find(".scale").outerWidth() +
-                                                    30);
-
-                    $headerEl.find("input").width(titleWidth);
-                } else {
-                    $headerEl.find("input").width("100%");
-                }
+                var input = $headerEl.find("input").width(
+                    this.editModus
+                        ? titleWidth = $headerEl.width() - (
+                            $headerEl.find(".colorPicker-picker").outerWidth() +
+                                $headerEl.find(".delete").outerWidth() +
+                                $headerEl.find(".scale").outerWidth() +
+                                30
+                        )
+                        : "100%"
+                );
 
                 _.each(this.labelViews, function (labelView) {
                     labelView.updateInputWidth();
