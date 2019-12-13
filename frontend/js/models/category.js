@@ -51,6 +51,7 @@ define(["underscore",
                 updated_by: null,
                 deleted_at: null,
                 deleted_by: null,
+                syncCollection: false
             },
 
             /**
@@ -90,6 +91,10 @@ define(["underscore",
                 }
 
                 this.attributes.visible = true;
+
+                this.on("change:syncCollection", function () {
+                    alert('foo');
+                });
             },
 
             /**

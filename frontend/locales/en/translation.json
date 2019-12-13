@@ -25,6 +25,7 @@
       "mine": "Mine",
       "public": "Public"
     },
+    "category part of collection": "Does this category belong to the video's collection?",
     "create a label": "Create a label",
     "download categories": "Download categories",
     "edit category scaling": "Edit scaling for this category",

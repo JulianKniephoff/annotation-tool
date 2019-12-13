@@ -86,8 +86,9 @@ define(["jquery",
                 "click .catItem-header i.visibility": "toggleVisibility",
                 "click .catItem-header i.delete": "onDeleteCategory",
                 "click .catItem-header i.scale": "editScale",
-                "focusout .catItem-header input": "onFocusOut",
-                "keydown .catItem-header input": "onKeyDown",
+                "focusout .name": "onFocusOut",
+                "keydown .name": "onKeyDown",
+                "change .collection": "toggleCollection",
                 "click .catItem-add": "onCreateLabel"
             },
 
@@ -149,7 +150,7 @@ define(["jquery",
                 $(window).on("resize.annotate-category", this.updateInputWidth);
 
                 //this.render();
-                this.nameInput = this.$el.find(".catItem-header input");
+                this.nameInput = this.$el.find(".name");
                 return this;
             },
 
@@ -198,10 +199,11 @@ define(["jquery",
             switchEditModus: function (status) {
                 this.editModus = status;
 
+                var name = this.$el.find(".name");
                 if (status) {
-                    this.$el.find("input[disabled=\"disabled\"]").removeAttr("disabled");
+                    name.removeAttr("disabled");
                 } else {
-                    this.$el.find("input").attr("disabled", "disabled");
+                    name.attr("disabled", "disabled");
                 }
 
                 // Wait that style are applied
@@ -339,6 +341,18 @@ define(["jquery",
             },
 
             /**
+             * Toggle whether or not this category should be synced
+             * with a category belonging to the current video's
+             * current collection/series.
+             * @param {Event} event The event triggering the change
+             */
+            toggleCollection: function (event) {
+                this.model.save({ syncCollection: (
+                    !this.model.get("syncCollection")
+                ) });
+            },
+
+            /**
              * Draw the view
              * @alias module:views-annotate-category.CategoryView#render
              * @return {CategoryView} this category view
@@ -363,7 +377,7 @@ define(["jquery",
                     view.updateInputWidth();
                 }, this);
 
-                this.nameInput = this.$el.find(".catItem-header input");
+                this.nameInput = this.$el.find(".name");
 
                 if (_.isString(this.model.attributes.settings)) {
                     this.model.attributes.settings = util.parseJSONString(this.model.attributes.settings);
