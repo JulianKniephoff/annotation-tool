@@ -120,6 +120,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
         // This might have been the first user, which would mean
         // that the resource above has no owner.
         // To fix this, we just recreate it and update the user to persist it.
+        // TODO The way this is done and that this is necessary at all is stupid
         resource = eas().createResource(tags);
         u = new UserImpl(u.getId(), u.getExtId(), u.getNickname(), u.getEmail(), resource);
         eas().updateUser(u);
@@ -212,6 +213,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
           @Override
           public Response some(User u) {
             if (!eas().hasResourceAccess(u))
+              // TODO Should this be 403?!
               return UNAUTHORIZED;
 
             return buildOk(UserDto.toJson.apply(eas(), u));
