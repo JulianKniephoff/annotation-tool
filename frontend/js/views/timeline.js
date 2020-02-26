@@ -112,7 +112,6 @@ define([
         this.listenTo(annotations, "remove", function (annotation) {
             this.items.remove(annotation.id);
         });
->>>>>>> master
 
         var group = groupFromTrack(track);
         return group;
