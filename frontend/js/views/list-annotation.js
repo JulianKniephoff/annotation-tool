@@ -226,6 +226,9 @@ define(["jquery",
                 this.model.save();
             },
 
+            // TODO Refactor the following four methods ... o_O
+            //   I just had to remove a call to `Math.round` from all four of them ...
+
             /**
              * Save the end time
              * @alias module:views-list-annotation.ListAnnotation#saveEnd
