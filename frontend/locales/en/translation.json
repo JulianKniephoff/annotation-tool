@@ -120,10 +120,16 @@
     "invalid loop length": "The given value for the loop length is not valid!"
   },
   "menu": {
-    "about": "About",
-    "export": "Export for statistics",
-    "logout": "Log out {{username}}",
-    "print": "Print",
+    "help": {
+      "head": "Help",
+      "about": "About"
+    },
+    "processing": {
+      "head": "Process",
+      "export": "Export for statistics",
+      "print": "Print"
+    },
+    "logout": "Log out",
     "view": {
       "annotate": {
         "head": "Annotate",
@@ -225,7 +231,6 @@
     "creating views": "Start creating views.",
     "get current user": "Get current user.",
     "get users saved locally": "Get users saved locally.",
-    "importing track": "Importing track {{track}}",
     "initializing the player": "Initializing the player.",
     "loading": "Loading",
     "loading video": "Start loading video.",
@@ -272,11 +277,9 @@
       "long": "No track corresponding with the current filter(s)."
     },
     "track management": "$t(track management.action)",
+    "navigation": "Navigation",
     "hidden items": "One hidden item",
     "hidden items_plural": "{{count}} hidden items",
-    "private only": {
-      "no public tracks allowed": "Public tracks have been disallowed for this video."
-    },
     "reset zoom": "Reset zoom",
     "scripts not allowed": "Scripts are not allowed!",
     "track": {

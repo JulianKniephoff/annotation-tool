@@ -141,7 +141,7 @@ define(["underscore",
              * @param {Integer} index The index of the track in the list
              */
             addTrack: function (track, index) {
-                var ann = track.get("annotations"),
+                var ann = track.annotations,
                     annotationTrack = track;
 
                 this.stopListening(ann);
@@ -425,7 +425,7 @@ define(["underscore",
 
             clearList: function () {
                 this.tracks.each(function (track) {
-                    track.get("annotations").each(function (annotations) {
+                    track.annotations.each(function (annotations) {
                         this.stopListening(annotations);
                         annotations.stopListening();
                     }, this);
@@ -451,7 +451,7 @@ define(["underscore",
                 _.each(this.annotationViews, function (annotationView) {
                     annotationView.remove();
                 });
-                Backbone.View.prototype.remove.call(this);
+                Backbone.View.prototype.remove.apply(this, arguments);
             }
         });
 

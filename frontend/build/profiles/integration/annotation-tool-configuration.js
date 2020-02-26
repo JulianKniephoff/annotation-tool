@@ -185,8 +185,6 @@ define(["jquery",
                     parameters;
             },
 
-            tracksToImport: undefined,
-
             /**
              * Define if the structured annotations are or not enabled
              * @alias module:annotation-tool-configuration.Configuration.isStructuredAnnotationEnabled
@@ -195,13 +193,6 @@ define(["jquery",
             isStructuredAnnotationEnabled: function () {
                 return true;
             },
-
-            /**
-             * Define if the private-only mode is enabled
-             * @alias module:annotation-tool-configuration.Configuration.isPrivateOnly
-             * @type {boolean}
-             */
-            isPrivateOnly: false,
 
             /**
              * Define if the free text annotations are or not enabled
@@ -232,13 +223,6 @@ define(["jquery",
                 return Math.max(500, this.getAnnotations().length * 3);
 
             },
-
-            /**
-             * Sets the behavior of the timeline. Enable it to follow the playhead.
-             * @alias module:annotation-tool-configuration.Configuration.timelineFollowPlayhead
-             * @type {Boolean}
-             */
-            timelineFollowPlayhead: true,
 
             /**
              * Get the external parameters related to video. The supported parameters are now the following:

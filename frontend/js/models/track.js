@@ -18,26 +18,30 @@
  * A module representing the track model
  * @module models-track
  */
-define(["underscore",
-        "collections/annotations",
-        "access",
-        "models/resource"],
+define([
+    "underscore",
+    "collections/annotations",
+    "access",
+    "models/resource"
+], function (
+    _,
+    Annotations,
+    ACCESS,
+    Resource
+) {
 
-    function (_, Annotations, ACCESS, Resource) {
+    "use strict";
 
-        "use strict";
-
-        /**
-         * @constructor
-         * @see {@link http://www.backbonejs.org/#Model}
-         * @augments module:Backbone.Model
-         * @memberOf module:models-track
-         * @alias module:models-track.Track
-         */
-        var Track = Resource.extend(
-            /** @lends module:models-track~Track.prototype */
-            {
-
+    /**
+     * @constructor
+     * @see {@link http://www.backbonejs.org/#Model}
+     * @augments module:Backbone.Model
+     * @memberOf module:models-track
+     * @alias module:models-track.Track
+     */
+    var Track = Resource.extend(
+        /** @lends module:models-track~Track.prototype */
+        {
             /**
              * Default models value
              * @alias module:models-scalevalue.Scalevalue#defaults
@@ -45,7 +49,8 @@ define(["underscore",
              * @static
              */
             defaults: {
-                access: ACCESS.PRIVATE
+                access: ACCESS.PRIVATE,
+                visible: false
             },
 
             /**
@@ -54,32 +59,13 @@ define(["underscore",
              * @param {Object} attr Object literal containing the model initialion attributes.
              */
             initialize: function (attr) {
-                _.bindAll(this,
-                        "getAnnotation",
-                        "fetchAnnotations");
-
-                if (!attr || _.isUndefined(attr.name)) {
-                    throw "'name' attribute is required";
-                }
+                _.bindAll(this, "fetchAnnotations");
 
                 Resource.prototype.initialize.apply(this, arguments);
 
-                // the tack is not visible at initialisation
-                this.set({
-                    visible: false,
-                    annotationsLoaded: false
-                });
-
                 // TODO Do this everywhere ...
-                //   Do we need this check at all?!
-                // TODO Why even differentiate here?!
-                //   This pattern is in many other places as well ...
                 // TODO Is this even the right place to do it and do we have to do it ...?
-                if (attr.annotations && _.isArray(attr.annotations)) {
-                    this.set({ annotations: new Annotations(attr.annotations, { track: this }) });
-                } else {
-                    this.set({ annotations: new Annotations([], { track: this }) });
-                }
+                this.annotations = new Annotations(null, { track: this });
             },
 
             /**
@@ -108,36 +94,20 @@ define(["underscore",
              * Method to fetch the annotations
              * @alias module:models-track.Track#fetchAnnotations
              */
-            fetchAnnotations: function (optSuccess) {
-                var self = this,
-                    annotations = this.get("annotations"),
-                    success = function () {
-                        if (!_.isUndefined(optSuccess)) {
-                            optSuccess();
-                        }
+            fetchAnnotations: function () {
 
-                        self.set("annotationsLoaded", true);
-                    };
+                if (this.annotationsLoaded) return;
 
                 if (!this.get("ready")) {
                     this.once("ready", this.fetchAnnotations);
                 }
 
-                if (annotations && (annotations.length) === 0) {
-                    annotations.fetch({async: false,
-                                       add: true,
-                                       success: success});
-                }
-            },
-
-            /**
-             * Get the annotation with the given id
-             * @alias module:models-track.Track#getAnnotation
-             * @param  {Integer} annotationId The id from the wanted annotation
-             * @return {Annotation}           The annotation with the given id
-             */
-            getAnnotation: function (annotationId) {
-                return this.get("annotations").get(annotationId);
+                this.annotations.fetch({
+                    async: false,
+                    success: _.bind(function () {
+                        this.annotationsLoaded = true;
+                    }, this)
+                });
             },
 
             /**
@@ -146,10 +116,10 @@ define(["underscore",
              * @return {JSON} JSON representation of the instane
              */
             toJSON: function () {
-                var json = Resource.prototype.toJSON.call(this);
-                delete json.annotations;
-
-                return json;
+                return _.omit(
+                    Resource.prototype.toJSON.apply(this, arguments),
+                    ["visible"]
+                );
             }
         }, {
             FIELDS: {
@@ -157,11 +127,11 @@ define(["underscore",
                 CREATED_BY          : "created_by",
                 CREATED_BY_NICKNAME : "created_by_nickname"
             }
-        });
+        }
+    );
 
-        /**
-         * @exports Track
-         */
-        return Track;
-    }
-);
+    /**
+     * @exports Track
+     */
+    return Track;
+});

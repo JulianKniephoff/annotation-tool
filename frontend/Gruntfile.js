@@ -19,11 +19,9 @@ module.exports = function (grunt) {
         /** Paths for the different types of ressource */
         srcPath: {
             js      : 'js/**/*.js',
-            test_js : 'tests/js/**/*.js',
             less    : 'style/**/*.less',
             html    : '**/*.html',
             tmpl    : 'templates/*.tmpl',
-            tests   : 'tests/',
             www     : '<%= webServerDir %>/**/*',
             locales : 'locales/**/*.json'
         },
@@ -70,7 +68,7 @@ module.exports = function (grunt) {
             },
             // Watch Javascript files
             js: {
-                files: ['<%= srcPath.js %>', '<%= srcPath.test_js %>'],
+                files: ['<%= srcPath.js %>'],
                 tasks: ['copy:target']
             },
             // Watch configuration files
@@ -86,7 +84,7 @@ module.exports = function (grunt) {
             // Watch HTML files
             html: {
                 files: ['<%= srcPath.html %>'],
-                tasks: ['processhtml:dev']
+                tasks: ['processhtml:index']
             },
             // Watch LESS files
             less: {
@@ -204,7 +202,7 @@ module.exports = function (grunt) {
                 files: [{
                     flatten : false,
                     expand  : true,
-                    src     : ['js/**/*', 'img/**/*', 'style/**/.svg', 'style/**/*.png', 'style/**/*.css', 'tests/**/*'],
+                    src     : ['js/**/*', 'img/**/*', 'style/**/.svg', 'style/**/*.png', 'style/**/*.css'],
                     dest    : '<%= currentProfile.target %>'
                 }]
             },
@@ -218,7 +216,7 @@ module.exports = function (grunt) {
                 files: [{
                     flatten: false,
                     expand: true,
-                    src: ['js/**/*', 'img/**/*', 'style/**/*.svg', 'style/**/*.png', 'style/**/*.css', 'tests/**/*'],
+                    src: ['js/**/*', 'img/**/*', 'style/**/*.svg', 'style/**/*.png', 'style/**/*.css'],
                     dest: '<%= currentProfile.target %>'
                 }]
             },
@@ -237,7 +235,7 @@ module.exports = function (grunt) {
                 files: [{
                     flatten: false,
                     expand: true,
-                    src: ['js/**/*', 'img/**/*', 'style/**/*.svg', 'style/**/*.png', 'style/**/*.css', 'tests/**/*'],
+                    src: ['js/**/*', 'img/**/*', 'style/**/*.svg', 'style/**/*.png', 'style/**/*.css'],
                     dest: '<%= currentProfile.target %>'
                 }]
             },
@@ -245,7 +243,7 @@ module.exports = function (grunt) {
                 files: [{
                     flatten: false,
                     expand: true,
-                    src: ['js/**/*', 'img/**/*', 'style/**/*.svg', 'style/**/*.png', 'style/**/*.css', 'tests/**/*'],
+                    src: ['js/**/*', 'img/**/*', 'style/**/*.svg', 'style/**/*.png', 'style/**/*.css'],
                     dest: '<%= currentProfile.target %>'
                 }]
             },
@@ -344,12 +342,7 @@ module.exports = function (grunt) {
                 },
                 process: true
             },
-            dev: {
-                files: {
-                    '<%= currentProfile.target %>/index.html': ['index.html']
-                }
-            },
-            build: {
+            index: {
                 files: {
                     '<%= currentProfile.target %>/index.html': ['index.html']
                 }
@@ -443,11 +436,11 @@ module.exports = function (grunt) {
     // TODO `amdcheck` should come from some kind of base task to all of these tasks ...
     // Default task
     grunt.registerTask('default', ['amdcheck', 'jshint:all', 'less', 'copy:local-all', 'copy:local-index']);
-    grunt.registerTask('baseDEV', ['handlebars:all', 'less', 'copy:all', 'processhtml:dev', 'copy:less', 'copy:config', 'copy:locales', 'concurrent:dev']);
-    grunt.registerTask('baseDEMO', ['amdcheck', 'mkdir:demo', 'handlebars:all', 'less', 'copy:demo', 'processhtml:dev', 'copy:config', 'copy:locales']);
-    grunt.registerTask('baseBUILD', ['amdcheck', 'jsdoc', 'handlebars:temp', 'less', 'copy:build', 'processhtml:build', 'copy:config-build', 'copy:locales', 'copy:temp', 'requirejs', 'uglify']);
-    grunt.registerTask('baseINTEGRATION', ['amdcheck', 'handlebars:all', 'less', 'copy:integration', 'processhtml:dev', 'copy:config', 'copy:locales']);
-    grunt.registerTask('baseINTEGRATIONMINIFIED', ['amdcheck', 'handlebars:temp', 'less', 'copy:integration', 'processhtml:build', 'copy:config-build', 'copy:locales', 'copy:temp', 'requirejs', 'uglify']);
+    grunt.registerTask('baseDEV', ['handlebars:all', 'less', 'copy:all', 'processhtml:index', 'copy:less', 'copy:config', 'copy:locales', 'concurrent:dev']);
+    grunt.registerTask('baseDEMO', ['amdcheck', 'mkdir:demo', 'handlebars:all', 'less', 'copy:demo', 'processhtml:index', 'copy:config', 'copy:locales']);
+    grunt.registerTask('baseBUILD', ['amdcheck', 'jsdoc', 'handlebars:temp', 'less', 'copy:build', 'processhtml:index', 'copy:config-build', 'copy:locales', 'copy:temp', 'requirejs', 'uglify']);
+    grunt.registerTask('baseINTEGRATION', ['amdcheck', 'handlebars:all', 'less', 'copy:integration', 'processhtml:index', 'copy:config', 'copy:locales']);
+    grunt.registerTask('baseINTEGRATIONMINIFIED', ['amdcheck', 'handlebars:temp', 'less', 'copy:integration', 'processhtml:index', 'copy:config-build', 'copy:locales', 'copy:temp', 'requirejs', 'uglify']);
 
     grunt.registerTaskWithProfile = function (name, description, profile) {
         grunt.registerTask(name, description, function () {

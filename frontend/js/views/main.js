@@ -134,8 +134,6 @@ define(["jquery",
 
                 annotationTool.scaleEditor = new ScaleEditorView();
 
-                this.listenTo(annotationTool, "deleteAnnotation", annotationTool.deleteAnnotation);
-
                 $(window).on("keydown", _.bind(this.onDeletePressed, this));
 
                 this.once(MainView.EVENTS.READY, function () {
@@ -403,9 +401,11 @@ define(["jquery",
                     // in order to prevent the play-pause shortcut (space)
                     // to be handled twice.
                     self.playerContainer = container.getElement()[0];
+                    var view = $("<div class='window'></div>")
+                        .appendTo(self.playerContainer);
 
                     container.on("open", function () {
-                        annotationTool.loadVideo(container.getElement()[0]);
+                        annotationTool.loadVideo(view[0]);
                     });
 
                     function videoLoaded() {
@@ -427,9 +427,6 @@ define(["jquery",
                         var timeline = new TimelineView({
                             el: container.getElement(),
                             playerAdapter: player
-                        });
-                        container.on("resize", function () {
-                            timeline.onWindowResize();
                         });
                         resolveView("timeline", timeline);
                     });
@@ -546,9 +543,6 @@ define(["jquery",
 
                 this.setupKeyboardShortcuts();
 
-                // Show logout button
-                $("#logout").css("display", "block");
-
                 this.trigger(MainView.EVENTS.READY);
             },
 
@@ -624,11 +618,12 @@ define(["jquery",
              * @alias module:views-main.MainView#handleAnnotationShortcut
              */
             handleAnnotationShortcut: function (event) {
-                if (
+                // TODO What else should interrupt?!
+                if ((
                     ["input", "textarea"].includes(event.target.tagName.toLowerCase())
-                        || !event.key.match(/^[1-9]$/)
-                    // TODO What else should interrupt?!
-                ) {
+                ) || (
+                    !event.key.match(/^[1-9]$/)
+                )) {
                     this.interruptAnnotationShortcut();
                     return;
                 }
@@ -846,34 +841,11 @@ define(["jquery",
 
                     annotation = annotationTool.getSelection()[0];
                     if (annotation) {
-                        annotationTool.trigger("deleteAnnotation", annotation.get("id"), annotation.trackId);
+                        annotationTool.deleteOperation.start(
+                            annotation,
+                            annotationTool.deleteOperation.targetTypes.ANNOTATION
+                        );
                     }
-                }
-            },
-
-            /**
-             * Delete the annotation with the given id with the track with the given track id
-             * @alias module:views-main.MainView#deleteAnnotation
-             * @param {integer} annotationId The id of the annotation to delete
-             * @param {integer} trackId Id of the track containing the annotation
-             */
-            deleteAnnotation: function (annotationId, trackId) {
-                var annotation;
-
-                if (typeof trackId === "undefined") {
-                    annotationTool.video.get("tracks").each(function (track) {
-                        if (track.get("annotations").get(annotationId)) {
-                            trackId = track.get("id");
-                        }
-                    });
-                }
-
-                annotation = annotationTool.video.getAnnotation(annotationId, trackId);
-
-                if (annotation) {
-                    annotationTool.deleteOperation.start(annotation, annotationTool.deleteOperation.targetTypes.ANNOTATION);
-                } else {
-                    console.warn("Not able to find annotation %i on track %i", annotationId, trackId);
                 }
             },
 
@@ -882,6 +854,8 @@ define(["jquery",
              * @alias module:views-main.MainView#onWindowResize
              */
             onWindowResize: function () {
+                var mainContainer = this.$el.find("#main-container");
+                mainContainer.height($(window).height() - mainContainer.position().top);
                 goldenLayout.updateSize();
             },
 
