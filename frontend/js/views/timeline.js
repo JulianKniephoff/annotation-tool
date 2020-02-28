@@ -551,10 +551,13 @@ define([
             });
 
             // Maintain a stylesheet for structured annotations
+            // TODO Should this just be another Backbone view?
+            // TODO Make this more performant?
             function createCategoryStylesheet() {
                 var stylesheet = annotationTool.video.get("categories")
                     .map(function (category) {
                         var color = category.get("settings").color;
+                        // TODO I would like to use `less` here as well ...
                         return ".vis-item.category-" + category.id + "," +
                             ".vis-item.vis-selected.category-" + category.id + "{" +
                             "background-color:" + color + ";" +
@@ -571,6 +574,7 @@ define([
             this.categoryStylesheet = createCategoryStylesheet();
             this.listenTo(
                 annotationTool.video.get("categories"),
+                // TODO Are these the correct events?!
                 "change add remove",
                 function () {
                     this.categoryStylesheet.remove();
