@@ -109,6 +109,7 @@ define(["underscore",
                 this.autoExpand = options.autoExpand;
 
                 this.$el.html(template());
+                // TODO Do we even need this element ...?
                 this.scrollableArea = this.$el.find("#content-list-scroll");
                 this.$list = this.scrollableArea.find("#content-list");
 
@@ -244,7 +245,12 @@ define(["underscore",
              * @param {Annotation?} selection the currently selected annotation
              * @param {Annotation?} previousSelection the previously selected annotation
              */
+            // TODO This leads to scrolling every time you select something.
+            //   You might want that when you click in the timeline,
+            //   but maybe not when you click in the list itself.
+            //   Although even the former is debatable I guess.
             renderSelection: function (selection, previousSelection) {
+                // TODO There is some duplication here ...
                 if (previousSelection) {
                     this.getViewFromAnnotation(previousSelection.id)
                         .$el.removeClass("selected");
@@ -263,7 +269,13 @@ define(["underscore",
              * @param {Array<Annotation>} selection the currently active annotations
              * @param {Array<Annotation>} previousSelection the previously active annotations
              */
+            // TODO Deduplicate?
             renderActive: function (currentAnnotations, previousAnnotations) {
+                // TODO Should activating auto-expanding auto-expand the current annotations?
+                // If we have a selection and we auto-expand views,
+                //   we want to scroll back to the selection in the end.
+                // TODO Note that the selection itself might be auto-expanded ...
+                //   this is something that you still need to think about
                 var selection = annotationTool.getSelection();
                 var refocusSelection = selection && this.autoExpand;
                 if (refocusSelection) {
@@ -271,6 +283,7 @@ define(["underscore",
                     var selectionOffset = this.getOffset(selectionView);
                 }
 
+                // TODO There is probably some duplication in here
                 _.each(previousAnnotations, function (annotation) {
                     var view = this.getViewFromAnnotation(annotation.id);
                     view.$el.removeClass("active");
@@ -282,6 +295,7 @@ define(["underscore",
                 _.each(currentAnnotations, function (annotation, index) {
                     var view = this.getViewFromAnnotation(annotation.id);
 
+                    // TODO This will move stuff around so you will again have to move stuff into view?
                     if (this.autoExpand) {
                         view.expand(true);
                     }
@@ -302,13 +316,18 @@ define(["underscore",
                     return view;
                 }, this);
 
+                // TODO Should more stuff select the annotation,
+                //   so that you don't accidentally lose your place?
                 if (refocusSelection) {
                     this.scrollableArea.scrollTop(
                         this.getOffset(selectionView) -
                             selectionOffset +
                             this.scrollableArea.scrollTop()
                     );
+                    // TODO These conditions are probably suboptimal now
                 } else if (!selection && firstView) {
+                    // TODO You don't even need to collect
+                    //   the views when you know you have a selection ...
                     this.scrollIntoView(firstView, lastView);
                 }
             },

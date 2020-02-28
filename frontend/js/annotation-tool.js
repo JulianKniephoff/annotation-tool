@@ -378,9 +378,14 @@ define(["jquery",
              * @alias   annotationTool.updateSelectionOnTimeUpdate
              */
             updateSelectionOnTimeUpdate: function () {
+                // TODO Should we set these initially?
+                //   We also need to set them when we seek, no?!
                 var previousAnnotations = this.currentAnnotations || [];
+                // TODO Should other places ever call this or just access the field?
                 this.currentAnnotations = this.getCurrentAnnotations();
 
+                // TODO We can probably speed this up ...
+                //   and also this is a hack ...
                 if ((
                     this.currentAnnotations.length === previousAnnotations.length
                 ) && (
