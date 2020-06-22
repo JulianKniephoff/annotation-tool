@@ -78,9 +78,9 @@ define([
         if (label) {
             item.className = "category-" + label.category.id;
         }
-        if (item.duration) {
-            item.type = "range";
-        }
+        item.type = item.duration
+            ? "range"
+            : "box";
         item.model = annotation;
         return item;
     }
@@ -182,7 +182,7 @@ define([
                 //groupEditable: {
                 //    order: true
                 //},
-                zoomMin: 5000,
+                zoomMin: Math.min(5000, this.endDate - this.startDate),
                 start: this.startDate,
                 end: this.endDate,
                 min: this.startDate,
