@@ -196,6 +196,8 @@ define(["underscore",
              *     <code>null</code> means free text annotations.
              *     <code>undefined</code> means all annotations.
              */
+            // TODO Oh my gosh this function ...
+            //   `handleAnnotations`? Really?
             getAnnotations: function (category) {
                 var result = [];
                 var handleAnnotation;
