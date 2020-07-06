@@ -1072,6 +1072,8 @@ public class VideoEndpoint {
     }
   }
 
+  // TODO "Bind" these methods closer together, like have a map somewhere that both are fed from
+
   private void addResourceHeaders(List<String> header, Option<String> optionalResource) {
     String prefix = "";
     String suffix = "";

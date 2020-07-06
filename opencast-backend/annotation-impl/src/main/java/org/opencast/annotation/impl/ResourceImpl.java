@@ -55,6 +55,10 @@ public class ResourceImpl implements Resource {
     this.updatedAt = updatedAt;
     this.deletedAt = deletedAt;
 
+    // TODO Why is `tags` not passed as `Option`?
+    //   Does this condition ever match?
+    //   And is this guard even important?!
+    // TODO Maybe you could also just pull the initializer in here ...
     if (tags != null)
       this.tags = tags;
   }
