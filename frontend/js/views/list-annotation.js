@@ -443,6 +443,7 @@ define(["jquery",
              * @alias module:views-list-annotation.ListAnnotation#onSelect
              * @param {Event} event the click event
              */
+            // TODO Why is this debounced?!
             onSelect: _.debounce(function (event) {
                 if (event.originalEvent.detail > 1) return;
                 annotationTool.setSelection(this.model);
