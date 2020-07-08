@@ -192,5 +192,12 @@ input, textarea, select, .uneditable-input {
         }
     }
 }
-// TODO The name is terrible
-//   However, `icon-button` conflicts with Bootstrap's sprites
+
+.active-annotation {
+    --annotation-highlight-color: orange;
+    box-shadow: inset 0px 0px 2px 1px var(--annotation-highlight-color);
+}
+.selected-annotation {
+    .active-annotation();
+    --annotation-highlight-color: red;
+}

@@ -26,12 +26,11 @@ define(["jquery",
         "views/main",
         "alerts",
         "templates/delete-modal",
-        "templates/delete-warning-content",
         "player-adapter",
         "colors",
         "handlebarsHelpers"],
 
-    function ($, _, Backbone, i18next, Videos, MainView, alerts, DeleteModalTmpl, DeleteContentTmpl, PlayerAdapter, ColorsManager) {
+    function ($, _, Backbone, i18next, Videos, MainView, alerts, DeleteModalTmpl, PlayerAdapter, ColorsManager) {
 
         "use strict";
 
@@ -43,6 +42,7 @@ define(["jquery",
 
             EVENTS: {
                 ANNOTATION_SELECTION: "at:annotation-selection",
+                ACTIVE_ANNOTATIONS: "at:active-annotations",
                 ANNOTATE_TOGGLE_EDIT: "at:annotate-switch-edit-modus",
                 MODELS_INITIALIZED: "at:models-initialized",
                 TIMEUPDATE: "at:timeupdate",
@@ -56,10 +56,6 @@ define(["jquery",
 
             modelsInitialized: false,
 
-            deleteModalTmpl: DeleteModalTmpl,
-
-            deleteContentTmpl: DeleteContentTmpl,
-
             deleteOperation: {
                 /**
                  * Function to delete element with warning
@@ -69,47 +65,40 @@ define(["jquery",
                  */
                 start: function (target, type, callback) {
 
-                    var confirm = function () {
-                        type.destroy(target, callback);
-                        this.deleteModal.modal("toggle");
-                    },
-                        confirmWithEnter = function (event) {
-                            if (event.keyCode === 13) {
-                                confirm();
-                            }
-                        };
-
                     if (!target.isEditable()) {
                         alerts.warning("You are not authorized to deleted this " + type.name + "!");
                         return;
                     }
 
-                    confirmWithEnter = _.bind(confirmWithEnter, this);
-                    confirm = _.bind(confirm, this);
-
-                    // Change modal title
-                    this.deleteModalHeader.text("Delete " + type.name);
-
-                    // Change warning content
-                    this.deleteModalContent.html(this.deleteContentTmpl({
-                        type: type.name,
+                    var deleteModal = $(DeleteModalTmpl({
+                        context: type.name,
                         content: type.getContent(target)
                     }));
 
+                    function confirm() {
+                        type.destroy(target, callback);
+                        deleteModal.modal("toggle");
+                    }
+                    function confirmWithEnter(event) {
+                        if (event.keyCode === 13) {
+                            confirm();
+                        }
+                    };
+
                     // Listener for delete confirmation
-                    this.deleteModal.find("#confirm-delete").one("click", confirm);
+                    deleteModal.find("#confirm-delete").one("click", confirm);
 
                     // Add possiblity to confirm with return key
                     $(window).on("keypress", confirmWithEnter);
 
                     // Unbind the listeners when the modal is hidden
-                    this.deleteModal.one("hide", function () {
-                        $("#confirm-delete").off("click");
+                    deleteModal.one("hide", function () {
                         $(window).off("keypress", confirmWithEnter);
+                        deleteModal.remove();
                     });
 
                     // Show the modal
-                    this.deleteModal.modal("show");
+                    deleteModal.modal("show");
                 }
             },
 
@@ -134,7 +123,6 @@ define(["jquery",
                           "onTimeUpdate",
                           "selectTrack",
                           "setSelection",
-                          "setSelectionById",
                           "addTimeupdateListener",
                           "removeTimeupdateListener",
                           "updateSelectionOnTimeUpdate");
@@ -142,13 +130,10 @@ define(["jquery",
                 _.extend(this, config);
 
                 this.deleteOperation.start = _.bind(this.deleteOperation.start, this);
-                this.initDeleteModal();
 
                 this.addTimeupdateListener(this.updateSelectionOnTimeUpdate, 900);
 
                 // TODO Should these not be documented properties?
-
-                this.currentSelection = [];
 
                 this.tracksOrder = [];
 
@@ -192,18 +177,6 @@ define(["jquery",
                 //   since it is actually the first step
                 //   in the "initialization chain."
                 this.authenticate();
-            },
-
-            /**
-             * Function to init the delete warning modal
-             * @alias   annotationTool.initDeleteModal
-             */
-            initDeleteModal: function () {
-                $("#dialogs").append(this.deleteModalTmpl({ type: "annotation" }));
-                this.deleteModal = $("#modal-delete").modal({ show: true, backdrop: false, keyboard: true });
-                this.deleteModal.modal("toggle");
-                this.deleteModalHeader  = this.deleteModal.find(".modal-header h3");
-                this.deleteModalContent = this.deleteModal.find(".modal-body");
             },
 
             /**
@@ -282,137 +255,39 @@ define(["jquery",
 
             /**
              * Listener for destroy event on selected annotation to update the selection
-             * @alias   annotationTool.onDestroyRemoveSelection
-             * @param  {Object} annotation The destroyed annotation
+             * @alias annotationTool.onDestroyRemoveSelection
+             * @param {Object} annotation The destroyed annotation
              */
             onDestroyRemoveSelection: function (annotation) {
-                var currentSelection = this.currentSelection,
-                    item,
-                    i;
-
-                for (i = 0; i < currentSelection.length; i++) {
-                    item = currentSelection[i];
-                    if (item.get("id") == annotation.get("id")) {
-                        currentSelection.splice(i, 1);
-                        this.trigger(this.EVENTS.ANNOTATION_SELECTION, currentSelection);
-                        return;
-                    }
-                }
+                this.setSelection(null);
             },
 
             /**
              * Set the given annotation(s) as current selection
-             * @alias   annotationTool.setSelectionById
-             * @param {Array} selection The new selection. This is an array of object containing the id of the annotation and optionnaly the track id. See example below.
-             * @example
-             * {
-             *     id: "a123", // The id of the annotations
-             *     trackId: "b23", // The track id (optional)
-             * }
-             * @param {Boolean} moveTo define if the video should be move to the start point of the selection
-             * @param {Boolean} isManuallySelected define if the selection has been done manually or through a video timeupdate
-             */
-            setSelectionById: function (selectedIds, moveTo, isManuallySelected) {
-                var selectionAsArray = [],
-                    tmpAnnotation;
-
-                if (_.isArray(selectedIds) && selectedIds.length > 0) {
-                    _.each(selectedIds, function (selection) {
-                        tmpAnnotation = this.getAnnotation(selection.id, selection.trackId);
-                        if (!_.isUndefined(tmpAnnotation)) {
-                            selectionAsArray.push(tmpAnnotation);
-                        }
-                    }, this);
-                } else {
-                    console.warn("Invalid selection: " + selectedIds);
-                }
-
-                this.setSelection(selectionAsArray, moveTo, isManuallySelected);
-            },
-
-            /**
-             * Set the given annotation(s) as current selection
-             * @alias   annotationTool.setSelection
+             * @alias annotationTool.setSelection
              * @param {Array} selection The new selection
-             * @param {Boolean} moveTo define if the video should be move to the start point of the selection
-             * @param {Boolean} isManuallySelected define if the selection has been done manually or through a video timeupdate
              */
-            setSelection: function (selection, moveTo, isManuallySelected) {
+            setSelection: function (selection) {
+                if (this.selection) {
+                    this.stopListening(this.selection, "destroy", this.onDestroyRemoveSelection);
 
-                var currentSelection = this.currentSelection,
-                    isEqual =   function (newSelection) {
-                        var equal = true,
-                            annotation,
-                            findAnnotation = function (newAnnotation) {
-                                return newAnnotation.get("id") === annotation.get("id");
-                            },
-                            i;
-
-                        if (currentSelection.length !== newSelection.length) {
-                            return false;
-                        }
-
-                        for (i = 0; i < currentSelection.length; i++) {
-                            annotation = currentSelection[i];
-                            if (!_.find(newSelection, findAnnotation)) {
-                                equal = false;
-                                return equal;
-                            }
-                        }
-
-                        return equal;
-                    },
-                    item,
-                    i;
-
-                this.isManuallySelected = isManuallySelected;
-                if (isManuallySelected) {
-                    this.activeAnnotation = selection[0];
-                }
-
-                if (_.isArray(selection) && selection.length > 0) {
-                    if (isEqual(selection)) {
-                        if (isManuallySelected) {
-                            // If the selection is the same, we unselect it if this is a manual selection
-                            // Remove listener for destroy event (unselect);
-                            for (i = 0; i < currentSelection.length; i++) {
-                                item = currentSelection[i];
-                                this.stopListening(item, "destroy", this.onDestroyRemoveSelection);
-                            }
-                            currentSelection = [];
-                            this.isManuallySelected = false;
-                        } else {
-                            // If the selection is not done manually we don't need to reselect it
-                            return;
-                        }
-                    } else {
-                        // else we set the new selection
-                        currentSelection = selection;
+                    if (selection && this.selection.id === selection.id) {
+                        selection = null;
                     }
-                } else {
-                    // If there is already no selection, no more work to do
-                    if (!this.hasSelection()) {
-                        return;
-                    }
+                } else if (!selection) return;  // Both selections are `null`, nothing to do
 
-                    currentSelection = [];
+                var previousSelection = this.selection;
+                this.selection = selection;
+
+                if (this.selection) {
+                    this.listenTo(this.selection, "destroy", this.onDestroyRemoveSelection);
                 }
 
-                // Add listener for destroy event (unselect);
-                for (i = 0; i < currentSelection.length; i++) {
-                    item = currentSelection[i];
-                    this.listenTo(item, "destroy", this.onDestroyRemoveSelection);
-                }
-
-                this.currentSelection = currentSelection;
-
-                // if the selection is not empty, we move the playhead to it
-                if (currentSelection.length > 0 && moveTo) {
-                    this.playerAdapter.setCurrentTime(selection[0].get("start"));
-                }
-
-                // Trigger the selection event
-                this.trigger(this.EVENTS.ANNOTATION_SELECTION, currentSelection);
+                this.trigger(
+                    this.EVENTS.ANNOTATION_SELECTION,
+                    selection,
+                    previousSelection
+                );
             },
 
             /**
@@ -421,7 +296,7 @@ define(["jquery",
              * @return {Annotation} The current selection or undefined if no selection.
              */
             getSelection: function () {
-                return this.currentSelection;
+                return this.selection;
             },
 
             /**
@@ -430,7 +305,7 @@ define(["jquery",
              * @return {Boolean} true if an annotation is selected or false.
              */
             hasSelection: function () {
-                return (typeof this.currentSelection !== "undefined" && (_.isArray(this.currentSelection) && this.currentSelection.length > 0));
+                return !!this.selection;
             },
 
             /**
@@ -467,17 +342,16 @@ define(["jquery",
             /**
              * Get all annotations that cover a given point in time.
              * @alias   annotationTool.getCurrentAnnotations
-             * @param {Number} [time] The time you are interested in or the current player time if omitted
              */
-            getCurrentAnnotations: function (time) {
-                if (!time) {
-                    time = this.playerAdapter.getCurrentTime();
-                }
+            getCurrentAnnotations: function () {
                 return this.video.get("tracks")
                     .chain()
                     .map(function (track) { return track.annotations.models; })
                     .flatten()
-                    .filter(function (annotation) { return annotation.covers(time, this.MINIMAL_DURATION); }, this)
+                    .filter(function (annotation) { return annotation.covers(
+                        this.playerAdapter.getCurrentTime(),
+                        this.MINIMAL_DURATION
+                    ); }, this)
                     .value();
             },
 
@@ -486,20 +360,20 @@ define(["jquery",
              * @alias   annotationTool.updateSelectionOnTimeUpdate
              */
             updateSelectionOnTimeUpdate: function () {
-                var currentTime = this.playerAdapter.getCurrentTime(),
-                    selection = [],
-                    annotations = [],
-                    annotation,
-                    start,
-                    duration,
-                    end,
-                    i;
+                var previousAnnotations = this.currentAnnotations || [];
+                this.currentAnnotations = this.getCurrentAnnotations();
 
-                if (typeof this.video === "undefined" || (this.isManuallySelected && this.hasSelection())) {
-                    return;
-                }
+                if ((
+                    this.currentAnnotations.length === previousAnnotations.length
+                ) && (
+                    !_.difference(this.currentAnnotations, previousAnnotations).length
+                )) return;
 
-                this.setSelection(this.getCurrentAnnotations(), false);
+                this.trigger(
+                    this.EVENTS.ACTIVE_ANNOTATIONS,
+                    this.currentAnnotations,
+                    previousAnnotations
+                );
             },
 
             //////////////
@@ -525,8 +399,12 @@ define(["jquery",
                         // to the current loop using this.
                         // @see module:views-loop.Loop#toggleConstrainAnnotations
                         this.annotationConstraints
-                    ), { wait: true });
-                this.activeAnnotation = annotation;
+                    ), {
+                        wait: true,
+                        success: _.bind(function () {
+                            this.setSelection(annotation, true);
+                        }, this)
+                    });
                 return annotation;
             },
 
