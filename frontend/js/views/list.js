@@ -123,6 +123,7 @@ define(["underscore",
                 });
 
                 this.listenTo(annotations, "change:start", function (annotation) {
+                    // TODO Duplication!!
                     var index = this.getViewIndexFromAnnotation(annotation.id);
                     var view = this.annotationViews[index];
                     this.annotationViews.splice(index, 1);
