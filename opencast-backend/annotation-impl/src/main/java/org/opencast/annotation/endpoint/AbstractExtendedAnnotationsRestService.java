@@ -772,6 +772,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
     });
   }
 
+  // TODO Can we just get rid of this?
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/categories")

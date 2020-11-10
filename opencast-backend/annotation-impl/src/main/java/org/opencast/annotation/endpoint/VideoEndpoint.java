@@ -255,6 +255,7 @@ public class VideoEndpoint {
   @Path("tracks/{trackId}")
   public Response deleteTrack(@PathParam("trackId") final long trackId) {
     // TODO optimize querying for the existence of video and track
+    // TODO Why is this not in the `run` call?
     if (videoData.isSome()) {
       return run(nil, new Function0<Response>() {
         @Override
