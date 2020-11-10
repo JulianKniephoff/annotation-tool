@@ -778,6 +778,8 @@ define(["jquery",
                 // Export workbook
                 var wbout = XLSX.write(wb, { bookType:'xlsx',  type: 'binary' });
 
+                // TODO We should get this from somewhere ...
+                // TODO We should put this somewhere ... maybe.
                 function s2ab(s) {
                     var buf = new ArrayBuffer(s.length); // convert s to arrayBuffer
                     var view = new Uint8Array(buf);  // create uint8array as viewer
@@ -790,6 +792,8 @@ define(["jquery",
                 saveAs(new Blob([s2ab(wbout)], { type:"application/octet-stream" }), 'export.xlsx');
             },
 
+            // TODO This is a pretty 1:1 translation of the old Java code,
+            //   which is not ideal IMO, but it'll do for now, I guess ...
             gatherExportData: function (tracks, categories, freeText) {
                 var bookData = [];
                 var header = [];
@@ -921,6 +925,7 @@ define(["jquery",
                     });
                 }
 
+                // TODO Holy shit what is this monstrosity o_o
                 function getScaleNameByScaleValueId(scaleValueId) {
                     for (let i = 0; i < annotationTool.video.attributes.scales.models.length; i++) {
                         for (let j = 0; j < annotationTool.video.attributes.scales.models[i].attributes.scaleValues.models.length; j++) {

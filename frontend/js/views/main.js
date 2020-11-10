@@ -725,6 +725,7 @@ define(["jquery",
              */
             aboutDialog: new AboutDialog(),
 
+            // TODO Maybe simplify this ...
             /**
              * Offer the user a spreadsheet version of the annotations for download.
              */

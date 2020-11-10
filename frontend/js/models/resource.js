@@ -67,6 +67,8 @@ var Resource = Backbone.Model.extend({
             if (!attr.created_at) {
                 this.set("created_at", new Date());
             }
+            // TODO We need to make sure that this is kept updated.
+            //   On the other hand, it might even be gone, soon
             if (!attr.updated_at) {
                 this.set("updated_at", new Date());
             }
