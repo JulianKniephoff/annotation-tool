@@ -92,7 +92,8 @@ define(["jquery",
              * @type {Map}
              */
             events: {
-                "click #export": "export",
+                "click #export-csv": "exportCSV",
+                "click #export-xlsx": "exportXLSX",
                 "click #about": "about",
                 "click #logout": "onLogout",
                 "click #print": "print",
@@ -125,12 +126,6 @@ define(["jquery",
                 this.setLoadingProgress(10, i18next.t("startup.starting"));
 
                 this.setLoadingProgress(20, i18next.t("startup.get users saved locally"));
-
-                if (annotationTool.localStorage) {
-                    // TODO Whyyyy? Why can't we provide a strategy for this in the configuration?
-                    // Remove link for statistics exports, work only with backend implementation
-                    this.$el.find("#export").parent().remove();
-                }
 
                 annotationTool.scaleEditor = new ScaleEditorView();
 
@@ -732,9 +727,19 @@ define(["jquery",
 
             /**
              * Offer the user a spreadsheet version of the annotations for download.
-             * @alias module:views-main.Main#export
              */
-            export: function () {
+            exportCSV: function () {
+                this.exportAs("csv");
+            },
+
+            /**
+             * Offer the user an excel version of the annotations for download.
+             */
+            exportXLSX: function () {
+                this.exportAs("xlsx");
+            },
+
+            exportAs: function (format) {
                 // TODO Respect order?
                 // TODO Put the logic in `annotationTool`?
                 var tracksToExport = annotationTool.video
@@ -743,12 +748,22 @@ define(["jquery",
                     .get("categories").filter(function (category) {
                         return category.get("visible");
                     });
-                annotationTool.export(
-                    annotationTool.video,
-                    tracksToExport,
-                    categoriesToExport,
-                    annotationTool.freeTextVisible
-                );
+                switch (format) {
+                    case "csv":
+                        annotationTool.exportCSV(
+                            tracksToExport,
+                            categoriesToExport,
+                            annotationTool.freeTextVisible
+                        );
+                        break;
+                    case "xlsx":
+                        annotationTool.exportXLSX(
+                            tracksToExport,
+                            categoriesToExport,
+                            annotationTool.freeTextVisible
+                        );
+                        break;
+                }
             },
 
             /**

@@ -71,21 +71,7 @@ define(["underscore", "backbone", "templates/print", "handlebarsHelpers"], funct
                 .invoke('get', 'annotations')
                 .pluck("models")
                 .flatten()
-                .filter(function (annotation) {
-                    var category = annotation.category();
-                    // TODO Factor at least this visibility logic in a function ...
-                    //   A function that just gives you the visible annotations
-                    //   would probably be a good idea as well.
-                    if (!category) return annotationTool.freeTextVisible;
-                    return category.get("visible");
-                });
-
-            var users = annotations
-                .invoke("get", "created_by_nickname")
-                .uniq()
-                .map(function (name) {
-                    return { name: name };
-                }).value();
+                .filter(annotationTool.isVisible);
 
             // Get all used categories and and their scales
             var labels = annotations

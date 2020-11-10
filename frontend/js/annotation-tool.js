@@ -21,6 +21,7 @@
 define(["jquery",
         "underscore",
         "backbone",
+        "util",
         "i18next",
         "collections/videos",
         "views/main",
@@ -28,9 +29,12 @@ define(["jquery",
         "templates/delete-modal",
         "player-adapter",
         "colors",
+        "xlsx",
+        "papaparse",
+        "filesaver",
         "handlebarsHelpers"],
 
-    function ($, _, Backbone, i18next, Videos, MainView, alerts, DeleteModalTmpl, PlayerAdapter, ColorsManager) {
+    function ($, _, Backbone, util, i18next, Videos, MainView, alerts, DeleteModalTmpl, PlayerAdapter, ColorsManager, XLSX, PapaParse) {
 
         "use strict";
 
@@ -104,10 +108,10 @@ define(["jquery",
 
             /**
              * Initialize the tool
-             * @alias   annotationTool.start
-             * @param  {module:annotation-tool-configuration.Configuration} config The tool configuration
+             * @alias annotationTool.start
+             * @param {module:annotation-tool-configuration.Configuration} config The tool configuration
              */
-            start: function (config) {
+            start: function (config, integration) {
                 _.bindAll(this,
                           "updateSelectionOnTimeUpdate",
                           "createAnnotation",
@@ -127,7 +131,7 @@ define(["jquery",
                           "removeTimeupdateListener",
                           "updateSelectionOnTimeUpdate");
 
-                _.extend(this, config);
+                _.extend(this, config, integration);
 
                 this.deleteOperation.start = _.bind(this.deleteOperation.start, this);
 
@@ -181,7 +185,7 @@ define(["jquery",
 
             /**
              * Listen and retrigger timeupdate event from player adapter events with added intervals
-             * @alias   annotationTool.onTimeUpdate
+             * @alias annotationTool.onTimeUpdate
              */
             onTimeUpdate: function () {
                 var currentPlayerTime = this.playerAdapter.getCurrentTime();
@@ -211,7 +215,7 @@ define(["jquery",
 
             /**
              * Add a timeupdate listener with the given interval
-             * @alias   annotationTool.addTimeupdateListener
+             * @alias annotationTool.addTimeupdateListener
              * @param {Object} callback the listener callback
              * @param {Number} interval the interval between each timeupdate event
              */
@@ -239,9 +243,9 @@ define(["jquery",
 
             /**
              * Remove the given timepudate listener
-             * @alias   annotationTool.removeTimeupdateListener
+             * @alias annotationTool.removeTimeupdateListener
              * @param {Object} callback the listener callback
-             * @param {Number} (interval) the interval between each timeupdate event
+             * @param {Number} interval the interval between each timeupdate event
              */
             removeTimeupdateListener: function (callback, interval) {
                 var timeupdateEvent = this.EVENTS.TIMEUPDATE;
@@ -266,12 +270,15 @@ define(["jquery",
              * Set the given annotation(s) as current selection
              * @alias annotationTool.setSelection
              * @param {Array} selection The new selection
+             * @param {Boolean} noToggle don't toggle already selected annotations
+             * @param {any} hint Arbitrary data to pass along the selection event
              */
-            setSelection: function (selection) {
+            setSelection: function (selection, noToggle, hint) {
                 if (this.selection) {
                     this.stopListening(this.selection, "destroy", this.onDestroyRemoveSelection);
 
                     if (selection && this.selection.id === selection.id) {
+                        if (noToggle) return;
                         selection = null;
                     }
                 } else if (!selection) return;  // Both selections are `null`, nothing to do
@@ -286,13 +293,14 @@ define(["jquery",
                 this.trigger(
                     this.EVENTS.ANNOTATION_SELECTION,
                     selection,
-                    previousSelection
+                    previousSelection,
+                    hint
                 );
             },
 
             /**
              * Returns the current selection of the tool
-             * @alias   annotationTool.getSelection
+             * @alias annotationTool.getSelection
              * @return {Annotation} The current selection or undefined if no selection.
              */
             getSelection: function () {
@@ -301,7 +309,7 @@ define(["jquery",
 
             /**
              * Informs if there is or not some items selected
-             * @alias   annotationTool.hasSelection
+             * @alias annotationTool.hasSelection
              * @return {Boolean} true if an annotation is selected or false.
              */
             hasSelection: function () {
@@ -310,7 +318,7 @@ define(["jquery",
 
             /**
              * Update the ordering of the tracks and alert everyone who is interested.
-             * @alias  annotationTool.orderTracks
+             * @alias annotationTool.orderTracks
              * @param {Array} order The new track order
              */
             orderTracks: function (order) {
@@ -341,11 +349,10 @@ define(["jquery",
 
             /**
              * Get all annotations that cover a given point in time.
-             * @alias   annotationTool.getCurrentAnnotations
+             * @alias annotationTool.getCurrentAnnotations
              */
             getCurrentAnnotations: function () {
-                return this.video.get("tracks")
-                    .chain()
+                return _.chain(this.video.get("tracks").getVisibleTracks())
                     .map(function (track) { return track.annotations.models; })
                     .flatten()
                     .filter(function (annotation) { return annotation.covers(
@@ -357,7 +364,7 @@ define(["jquery",
 
             /**
              * Listener for player "timeupdate" event to highlight the current annotations
-             * @alias   annotationTool.updateSelectionOnTimeUpdate
+             * @alias annotationTool.updateSelectionOnTimeUpdate
              */
             updateSelectionOnTimeUpdate: function () {
                 // TODO Should we set these initially?
@@ -379,6 +386,19 @@ define(["jquery",
                     this.currentAnnotations,
                     previousAnnotations
                 );
+            },
+
+            /**
+             * Check whether an annotation should be visible in the current configuration
+             * @alias annotationTool.isVisible
+             */
+            // TODO Do we want a function that just gives us the visible annotations as well?
+            isVisible: function (annotation) {
+                if (!annotation.collection.track.get("visible")) return false;
+                var category = annotation.category();
+                if (category && !category.get("visible")) return false;
+                if (!category && !annotationTool.freeTextVisible) return false;
+                return true;
             },
 
             //////////////
@@ -407,7 +427,7 @@ define(["jquery",
                     ), {
                         wait: true,
                         success: _.bind(function () {
-                            this.setSelection(annotation, true);
+                            this.setSelection(annotation);
                         }, this)
                     });
                 return annotation;
@@ -419,9 +439,9 @@ define(["jquery",
 
             /**
              * Get the track with the given Id
-             * @alias   annotationTool.getTrack
+             * @alias annotationTool.getTrack
              * @param  {String} id The track Id
-             * @return {Object}    The track object or undefined if not found
+             * @return {Object} The track object or undefined if not found
              */
             getTrack: function (id) {
                 if (_.isUndefined(this.video)) {
@@ -434,8 +454,8 @@ define(["jquery",
 
             /**
              * Get all the tracks
-             * @alias   annotationTool.getTracks
-             * @return {Object}    The list of the tracks
+             * @alias annotationTool.getTracks
+             * @return {Object} The list of the tracks
              */
             getTracks: function () {
                 if (_.isUndefined(this.video)) {
@@ -448,9 +468,9 @@ define(["jquery",
 
             /**
              * Get the track with the given Id
-             * @alias   annotationTool.getTrack
-             * @param  {String} id The track Id
-             * @return {Object}    The track object or undefined if not found
+             * @alias annotationTool.getTrack
+             * @param {String} id The track Id
+             * @return {Object} The track object or undefined if not found
              */
             getSelectedTrack: function () {
                 return this.selectedTrack;
@@ -458,8 +478,8 @@ define(["jquery",
 
             /**
              * Select the given track
-             * @alias   annotationTool.selectTrack
-             * @param  {Object} track the track to select
+             * @alias annotationTool.selectTrack
+             * @param {Object} track the track to select
              */
             selectTrack: function (track) {
                 if (track === this.selectedTrack) return;
@@ -471,10 +491,10 @@ define(["jquery",
 
             /**
              * Get the annotation with the given Id
-             * @alias   annotationTool.getAnnotation
-             * @param  {String} annotationId The annotation
-             * @param  {String} (trackId)      The track Id (Optional)
-             * @return {Object}   The annotation object or undefined if not found
+             * @alias annotationTool.getAnnotation
+             * @param {String} annotationId The annotation
+             * @param {String} trackId The track Id (Optional)
+             * @return {Object} The annotation object or undefined if not found
              */
             getAnnotation: function (annotationId, trackId) {
                 var track,
@@ -511,9 +531,9 @@ define(["jquery",
 
             /**
              * Get an array containning all the annotations or only the ones from the given track
-             * @alias   annotationTool.getAnnotations
-             * @param  {String} (trackId)      The track Id (Optional)
-             * @return {Array}   The annotations
+             * @alias annotationTool.getAnnotations
+             * @param {String} trackId The track Id (Optional)
+             * @return {Array} The annotations
              */
             getAnnotations: function (trackId) {
                 var track,
@@ -701,6 +721,215 @@ define(["jquery",
                         }
                     }, this)
                 );
+            },
+
+            ////////////////
+            // Exporters  //
+            ////////////////
+
+            /**
+             * Offer the user a spreadsheet version of the annotations for download.
+             * @param {Track[]} tracks The tracks to include in the export
+             * @param {Category[]} categories The tracks to include in the export
+             * @param {Boolean} freeText Should free-text annotations be exported?
+             */
+            exportCSV: function (tracks, categories, freeText) {
+                let bookData = this.gatherExportData(tracks, categories, freeText);
+                var csv = PapaParse.unparse(JSON.stringify(bookData));
+                saveAs(new Blob([csv], {type:"text/csv;charset=utf-8;"}), 'export.csv');
+            },
+
+            /**
+             * Offer the user an excel version of the annotations for download.
+             * @param {Track[]} tracks The tracks to include in the export
+             * @param {Category[]} categories The tracks to include in the export
+             * @param {Boolean} freeText Should free-text annotations be exported?
+             */
+            exportXLSX: function (tracks, categories, freeText) {
+                let bookData = this.gatherExportData(tracks, categories, freeText);
+
+                // Generate workbook
+                var wb = XLSX.utils.book_new();
+                wb.SheetNames.push("Sheet 1");
+
+                // Generate worksheet
+                var ws = XLSX.utils.aoa_to_sheet(bookData);
+
+                // Scale column width to content (which is apparently non built-in in SheetJS)
+                var objectMaxLength = [];
+
+                bookData.forEach(function (arr) {
+                    Object.keys(arr).forEach(function (key) {
+                        var value = arr[key] === null ? '' : arr[key];
+
+                        objectMaxLength[key] = Math.max(objectMaxLength[key], value.length);
+                    });
+                });
+
+                var worksheetCols = objectMaxLength.map(function (width) {
+                    return { width: width };
+                });
+
+                ws["!cols"] = worksheetCols;
+
+                // Put worksheet
+                wb.Sheets["Sheet 1"] = ws;
+
+                // Export workbook
+                var wbout = XLSX.write(wb, { bookType:'xlsx',  type: 'binary' });
+
+                function s2ab(s) {
+                    var buf = new ArrayBuffer(s.length); // convert s to arrayBuffer
+                    var view = new Uint8Array(buf);  // create uint8array as viewer
+                    for (var i = 0; i < s.length; i++) {
+                        view[i] = s.charCodeAt(i) & 0xFF; // convert to octet
+                    }
+                    return buf;
+                }
+
+                saveAs(new Blob([s2ab(wbout)], { type:"application/octet-stream" }), 'export.xlsx');
+            },
+
+            gatherExportData: function (tracks, categories, freeText) {
+                var bookData = [];
+                var header = [];
+                addResourceHeaders(header);
+                header.push("Track name");
+                header.push("Leadin");
+                header.push("Leadout");
+                header.push("Duration");
+                header.push("Text");
+                header.push("Category name");
+                header.push("Label name");
+                header.push("Label abbreviation");
+                header.push("Scale name");
+                header.push("Scale value name");
+                header.push("Scale value value");
+                addResourceHeaders(header, "comment");
+                header.push("Comment text");
+                header.push("Comment replies to");
+                bookData.push(header);
+
+                _.each(tracks, function (track) {
+                    _.each(annotationTool.getAnnotations(track.id), function (annotation) {
+                        var line = [];
+
+                        var label = annotation.attributes.label;
+                        // Exclude annotations that are currently not visible
+                        if (label) {
+                            if (categories && !categories.map(category => category.id).includes(label.category.id)) return;
+                        } else {
+                            if (!freeText) return;
+                        }
+
+                        addResource(line, annotation);
+                        line.push(track.attributes.name);
+
+                        line.push(util.formatTime(annotation.attributes.start));
+                        line.push(util.formatTime(annotation.attributes.start + annotation.attributes.duration));
+                        line.push(util.formatTime(annotation.attributes.duration));
+                        line.push(annotation.attributes.text);
+
+                        if (label) {
+                            line.push(label.category.name);
+                            line.push(label.value);
+                            line.push(label.abbreviation);
+                        } else {
+                            line.push("");
+                            line.push("");
+                            line.push("");
+                        }
+
+                        if (annotation.attributes.scalevalue) {
+                            if (annotationTool.localStorage) {
+                                line.push(getScaleNameByScaleValueId(annotation.attributes.scalevalue.id));
+                            } else {
+                                line.push(annotation.attributes.scalevalue.scale.name);
+                            }
+                            line.push(annotation.attributes.scalevalue.name);
+                            line.push(annotation.attributes.scalevalue.value);
+                        } else {
+                            line.push("");
+                            line.push("");
+                            line.push("");
+                        }
+
+                        bookData.push(line);
+
+                        // Get comments by user
+                        if (!annotation.areCommentsLoaded()) {
+                            annotation.fetchComments();
+                        }
+
+                        _.each(annotation.attributes.comments.models, function (comment) {
+                            addCommentLine(line, comment);
+
+                            if (comment.replies.length > 0) {
+                                commentReplies(line, comment.replies.models);
+                            }
+                        });
+
+                    });
+                });
+
+                return bookData;
+
+                function addResourceHeaders(header, presuffix) {
+                    if (presuffix == null) presuffix = "";
+                    let prefix = "";
+                    let suffix = "";
+                    if (presuffix) {
+                        prefix = presuffix + " ";
+                        suffix = " of " + presuffix;
+                    }
+                    header.push(util.capitalize(prefix + "ID"));
+                    header.push(util.capitalize(prefix + "Creation date"));
+                    header.push(util.capitalize("Last update" + suffix));
+                    header.push(util.capitalize(prefix + "Author nickname"));
+                    header.push(util.capitalize(prefix + "Author mail"));
+                }
+
+                function addResource(line, resource) {
+                    line.push(resource.id);
+                    line.push(resource.attributes.created_at.toISOString());
+                    line.push(resource.attributes.updated_at.toISOString());
+                    line.push(resource.attributes.created_by_nickname);
+                    line.push(resource.attributes.created_by_email);
+                }
+
+                function addCommentLine(line, comment) {
+                    let commentLine = [];
+                    Array.prototype.push.apply(commentLine, line);
+
+                    addResource(commentLine, comment);
+
+                    commentLine.push(comment.attributes.text);
+                    if (comment.collection.replyTo) {
+                        commentLine.push(comment.collection.replyTo.id);
+                    } else {
+                        commentLine.push("");
+                    }
+
+                    bookData.push(commentLine);
+                }
+
+                function commentReplies(line, replies) {
+                    _.each(replies, function (comment) {
+                        addCommentLine(line, comment);
+
+                        commentReplies(line, comment.attributes.replies);
+                    });
+                }
+
+                function getScaleNameByScaleValueId(scaleValueId) {
+                    for (let i = 0; i < annotationTool.video.attributes.scales.models.length; i++) {
+                        for (let j = 0; j < annotationTool.video.attributes.scales.models[i].attributes.scaleValues.models.length; j++) {
+                            if (annotationTool.video.attributes.scales.models[i].attributes.scaleValues.models[j].attributes.id == scaleValueId) {
+                                return annotationTool.video.attributes.scales.models[i].attributes.name;
+                            }
+                        }
+                    }
+                }
             }
         });
 

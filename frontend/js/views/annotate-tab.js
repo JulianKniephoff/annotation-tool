@@ -20,7 +20,6 @@
 // TODO Why is the loading performance so slow now?
 
 /*jshint multistr: true */
-/*global saveAs */
 
 /**
  * A module representing the view for the categories tab
@@ -34,11 +33,7 @@ define(["jquery",
         "backbone",
         "handlebars",
         "handlebarsHelpers",
-        "libs/Blob",
-        "libs/BlobBuilder",
-        "libs/swfobject",
-        "libs/FileSaver",
-        "jquery.FileReader"],
+        "filesaver"],
 
     function (
         $,
@@ -225,17 +220,6 @@ define(["jquery",
                 this.titleLink.find("i.add").on("click", this.onAddCategory);
                 this.titleLink.find("i.export").on("click", this.onExport);
                 this.titleLink.find("i.import").on("click", this.chooseFile);
-
-                this.titleLink.find(".file").fileReader({
-                    id            : "fileReaderSWFObject",
-                    filereader    : "js/libs/filereader.swf",
-                    expressInstall: "js/libs/expressInstall.swf",
-                    debugMode     : false,
-                    callback      : function () {},
-                    multiple      : false,
-                    label         : "JSON files",
-                    extensions    : "*.json"
-                });
 
                 // TODO Unbind these
                 this.titleLink.find(".file").on("click", function (event) {
