@@ -393,6 +393,7 @@ define(["jquery",
              * @alias annotationTool.isVisible
              */
             // TODO Do we want a function that just gives us the visible annotations as well?
+            // TODO Can and should you use this in the timeline as well?
             isVisible: function (annotation) {
                 if (!annotation.collection.track.get("visible")) return false;
                 var category = annotation.category();
