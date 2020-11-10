@@ -490,6 +490,7 @@ public class VideoEndpoint {
       @Override
       public Response apply() {
         if (videoData.isSome()) {
+          // TODO Are these not checked?
           final Option<Double> startm = start > 0 ? some(start) : none();
           final Option<Double> endm = end > 0 ? some(end) : none();
           final Option<Integer> offsetm = offset > 0 ? some(offset) : none();
