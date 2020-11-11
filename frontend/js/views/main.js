@@ -396,6 +396,10 @@ define(["jquery",
                     // in order to prevent the play-pause shortcut (space)
                     // to be handled twice.
                     self.playerContainer = container.getElement()[0];
+                    // TODO This container should come from some kind
+                    //   of template or view, right?
+                    //   Also it is just weird that we have to deal
+                    //   with the fact here that we don't know the player.
                     var view = $("<div class='window'></div>")
                         .appendTo(self.playerContainer);
 
@@ -405,6 +409,8 @@ define(["jquery",
 
                     function videoLoaded() {
                         self.setLoadingProgress(60, i18next.t("startup.creating views"));
+                        // TODO I find it weird that we resolve with the adapter here,
+                        //   instead of with the view
                         resolveView("player", annotationTool.playerAdapter);
                     }
                     annotationTool.once(annotationTool.EVENTS.VIDEO_LOADED, function () {
