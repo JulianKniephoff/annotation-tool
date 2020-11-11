@@ -112,6 +112,8 @@ define(["underscore",
                 var annotations = track.annotations;
 
                 this.listenTo(annotations, "add", function (newAnnotation) {
+                    // TODO Shit, here we need something like `insertAnnotation` as well
+                    // TODO Also refactor the whole `addAnnotation` business ...
                     this.addAnnotation(newAnnotation);
                 });
 
@@ -131,6 +133,7 @@ define(["underscore",
                 });
 
                 annotations.each(function (annotation) {
+                    // TODO There should be a faster way?
                     this.addAnnotation(annotation, true);
                 }, this);
             },
@@ -143,6 +146,8 @@ define(["underscore",
              */
             addAnnotation: function (annotation, isPartofList) {
                 var view = new AnnotationView({ model: annotation });
+                // TODO Use a dumber function for this
+                //   Welp, you can't, because you don't know in what order they arrive ...
                 this.insertView(view);
 
                 if (!isPartofList) {
