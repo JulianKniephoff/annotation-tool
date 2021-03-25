@@ -164,6 +164,9 @@ define(["jquery",
                     );
                     this.orderTracks(this.tracksOrder);
 
+                    // TODO I don't think that `this.views` contains any other views,
+                    //   however, `MainView.views` does.
+                    //   This leads to abominations like `annotationTool.views.main.views.annotate`
                     this.views.main = new MainView();
                 }, this);
 
