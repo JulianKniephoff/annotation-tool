@@ -22,6 +22,7 @@ define(["jquery",
         "underscore",
         "mousetrap",
         "i18next",
+        "alerts",
         "player-adapter",
         "views/about",
         "views/annotate",
@@ -41,6 +42,7 @@ define(["jquery",
         _,
         Mousetrap,
         i18next,
+        alerts,
         PlayerAdapter,
         AboutDialog,
         AnnotateView,
@@ -389,7 +391,7 @@ define(["jquery",
                 }
 
                 goldenLayout.registerComponent("player", function (container) {
-                    self.setLoadingProgress(50, i18next.t("startup.loading video"));
+                    self.setLoadingProgress(50, i18next.t("startup.video.loading"));
 
                     // Remember the element the player is rooted in.
                     // We need it later to check whether it has the focus,
@@ -413,12 +415,18 @@ define(["jquery",
                         //   instead of with the view
                         resolveView("player", annotationTool.playerAdapter);
                     }
+                    function failed() {
+                        alerts.fatal(i18next.t("startup.video.failed"));
+                    }
                     annotationTool.once(annotationTool.EVENTS.VIDEO_LOADED, function () {
                         // TODO Is this still the way to go now?
                         if (annotationTool.playerAdapter.getStatus() === PlayerAdapter.STATUS.PAUSED) {
                             videoLoaded();
+                        } else if (annotationTool.playerAdapter.failed()) {
+                            failed();
                         } else {
                             $(annotationTool.playerAdapter).one(PlayerAdapter.EVENTS.READY, videoLoaded);
+                            $(annotationTool.playerAdapter).one(PlayerAdapter.EVENTS.ERROR, failed);
                         }
                     });
                 });

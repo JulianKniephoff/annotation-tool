@@ -76,7 +76,14 @@ define([
         item.end = util.dateFromSeconds(item.end);
         var label = item.label;
         if (label) {
-            item.className = "category-" + label.category.id;
+            var color = annotation.color();
+            item.style = "background-color:" + color + ";" +
+                "color:" + (
+                    chroma(color).luminance() < 0.5
+                        ? "white"
+                        : "black"
+                ) +
+                ";";
         }
         item.type = item.duration
             ? "range"
@@ -523,9 +530,10 @@ define([
             }, this));
 
 
-            function toggleAnnotations(category, visible) {
+            function updateCategoryAnnotations(category, visible) {
                 var relevantAnnotations = annotationTool.video
                     .getAnnotations(category);
+                if (visible == null) visible = category.get("visible");
                 if (visible) {
                     this.items.update(
                         _.map(relevantAnnotations, itemFromAnnotation)
@@ -536,23 +544,30 @@ define([
                     );
                 }
             }
+
             // TODO Should these two cases be covered by **one** event?
             //   The tool would have to listen to the categories, then,
             //   and relay changes appropriately.
             this.listenTo(
                 annotationTool.video.get("categories"),
                 "change:visible",
-                toggleAnnotations
+                updateCategoryAnnotations
             );
             this.listenTo(
                 annotationTool,
                 "togglefreetext",
                 function (visible) {
-                    toggleAnnotations.call(this, null, visible);
+                    updateCategoryAnnotations.call(this, null, visible);
                 }
             );
 
-            //this.listenTo(annotationTool, "order", this.update);
+            this.listenTo(
+                annotationTool.video.get("categories"),
+                "change",
+                function (category) {
+                    updateCategoryAnnotations.call(this, category);
+                }
+            );
 
             this.$el.popover({
                 selector: ".track-details",
@@ -575,38 +590,6 @@ define([
                 html: true,
                 container: "body"
             });
-
-            // Maintain a stylesheet for structured annotations
-            // TODO Should this just be another Backbone view?
-            // TODO Make this more performant?
-            function createCategoryStylesheet() {
-                var stylesheet = annotationTool.video.get("categories")
-                    .map(function (category) {
-                        var color = category.get("settings").color;
-                        // TODO I would like to use `less` here as well ...
-                        return ".vis-item.category-" + category.id + "," +
-                            ".vis-item.vis-selected.category-" + category.id + "{" +
-                            "background-color:" + color + ";" +
-                            "color:" + (
-                                chroma(color).luminance() < 0.5
-                                    ? "white"
-                                    : "black"
-                            ) +
-                            ";}";
-                    }).join("");
-                return $("<style>" + stylesheet + "</style>")
-                    .appendTo('html > head');
-            }
-            this.categoryStylesheet = createCategoryStylesheet();
-            this.listenTo(
-                annotationTool.video.get("categories"),
-                // TODO Are these the correct events?!
-                "change add remove",
-                function () {
-                    this.categoryStylesheet.remove();
-                    this.categoryStylesheet = createCategoryStylesheet();
-                }
-            );
         },
 
         /** @override */
@@ -616,7 +599,6 @@ define([
             });
             this.timeline.destroy();
             this.$el.popover("destroy");
-            this.categoryStylesheet.remove();
             return Backbone.View.prototype.remove.apply(this, arguments);
         },
 

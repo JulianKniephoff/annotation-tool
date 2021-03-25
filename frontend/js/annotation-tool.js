@@ -67,7 +67,7 @@ define(["jquery",
                  * @param {Object} target Element to be delete
                  * @param {TargetsType} type Type of the target to be deleted
                  */
-                start: function (target, type, callback) {
+                start: function (target, type, confirmCallback, closeCallback) {
 
                     if (!target.isEditable()) {
                         alerts.warning("You are not authorized to deleted this " + type.name + "!");
@@ -80,8 +80,8 @@ define(["jquery",
                     }));
 
                     function confirm() {
-                        type.destroy(target, callback);
                         deleteModal.modal("toggle");
+                        type.destroy(target, confirmCallback);
                     }
                     function confirmWithEnter(event) {
                         if (event.keyCode === 13) {
@@ -99,6 +99,7 @@ define(["jquery",
                     deleteModal.one("hide", function () {
                         $(window).off("keypress", confirmWithEnter);
                         deleteModal.remove();
+                        if (closeCallback) closeCallback();
                     });
 
                     // Show the modal
@@ -763,7 +764,11 @@ define(["jquery",
                     Object.keys(arr).forEach(function (key) {
                         var value = arr[key] === null ? '' : arr[key];
 
-                        objectMaxLength[key] = Math.max(objectMaxLength[key], value.length);
+                        // Arbitrarily increase len by one to avoid cases where just len would
+                        // lead to too small columns
+                        var len = value.toString().length + 1
+
+                        objectMaxLength[key] = Math.max(objectMaxLength[key] || 0, len);
                     });
                 });
 
@@ -1138,7 +1143,7 @@ define(["jquery",
                 },
                 destroy: function (scale, callback) {
                     _.invoke(
-                        _.clone(scale.get("scalevalues").models),
+                        _.clone(scale.get("scaleValues").models),
                         "destroy",
                         { error: function () { throw "cannot delete scale value"; } }
                     );
