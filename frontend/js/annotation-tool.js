@@ -658,7 +658,7 @@ define(["jquery",
                     concludeInitialization = _.bind(function () {
 
                         // At least one private track should exist, we select the first one
-                        var selectedTrack = tracks.where({ isMine: true })[0];
+                        var selectedTrack = tracks.filter(util.caller("isMine"))[0];
 
                         if (!selectedTrack.get("id")) {
                             selectedTrack.on("ready", concludeInitialization, this);
@@ -677,7 +677,7 @@ define(["jquery",
 
                         tracks = this.video.get("tracks");
 
-                        if (!tracks.where({ isMine: true }).length) {
+                        if (!tracks.filter(util.caller("isMine")).length) {
                             tracks.create({
                                 name: i18next.t("default track.name", {
                                     nickname: this.user.get("nickname")
@@ -691,7 +691,7 @@ define(["jquery",
                             });
                         } else {
                             tracks.showTracks(
-                                tracks.where({ isMine: true })
+                                tracks.filter(util.caller("isMine"))
                             );
                             concludeInitialization();
                         }

@@ -41,31 +41,31 @@ define(["jquery",
          */
         var DEFAULT_TABS = {
             ALL: {
-                id    : "all",
-                name  : i18next.t("annotate.categories.all"),
+                id: "all",
+                name: i18next.t("annotate.categories.all"),
                 filter: function (category) {
-                    return !category.get("settings").createdAsMine || (category.get("settings").createdAsMine && category.get("created_by") === annotationTool.user.get("id"));
+                    return !category.get("settings").createdAsMine || (category.get("settings").createdAsMine && category.isMine());
                 },
-                roles : []
+                roles: []
             },
             PUBLIC: {
-                id        : "public",
-                name      : i18next.t("annotate.categories.public"),
-                filter    : function (category) {
+                id: "public",
+                name: i18next.t("annotate.categories.public"),
+                filter: function (category) {
                     return !category.get("settings").createdAsMine;
-                    //return category.get("isPublic");
+                    //return category.isPublic();
                 },
-                roles     : [ROLES.ADMINISTRATOR],
+                roles: [ROLES.ADMINISTRATOR],
                 attributes: { access: ACCESS.PUBLIC }
             },
             MINE: {
-                id        : "mine",
-                name      : i18next.t("annotate.categories.mine"),
-                filter    : function (category) {
-                    return category.get("settings").createdAsMine && category.get("created_by") === annotationTool.user.get("id");
-                    //return category.get("isMine") && !category.get("isPublic");
+                id: "mine",
+                name: i18next.t("annotate.categories.mine"),
+                filter: function (category) {
+                    return category.get("settings").createdAsMine && category.isMine();
+                    //return category.isMine() && !category.isPublic();
                 },
-                roles     : [ROLES.USER, ROLES.ADMINISTRATOR],
+                roles: [ROLES.USER, ROLES.ADMINISTRATOR],
                 attributes: { access: ACCESS.PRIVATE }
             }
         },
@@ -86,8 +86,8 @@ define(["jquery",
             events: {
                 "keyup #new-annotation": "keydownOnAnnotate",
                 "click #insert": "insert",
-                "keydown #new-annotation": "onFocusIn",
-                "focusout #new-annotation": "onFocusOut",
+                "focusin #new-annotation": "maybePause",
+                "keydown #new-annotation": "maybePause",
                 "click #label-tabs-buttons a": "showTab",
                 "click #editSwitch": "onSwitchEditModus",
                 "click #toggle-free-text button": "toggleFreeTextAnnotations",
@@ -141,12 +141,9 @@ define(["jquery",
                 // Set the current context for all these functions
                 _.bindAll(this,
                             "insert",
-                            "onFocusIn",
-                            "onFocusOut",
                             "changeTrack",
                             "addTab",
                             "onSwitchEditModus",
-                            "checkToContinueVideo",
                             "switchEditModus",
                             "keydownOnAnnotate",
                             "toggleFreeTextAnnotationPane",
@@ -225,13 +222,11 @@ define(["jquery",
                 annotationTool.createAnnotation({ text: value });
 
                 if (this.continueVideo) {
+                    this.continueVideo = false;
                     this.playerAdapter.play();
                 }
 
                 this.input.val("");
-                setTimeout(function () {
-                    $("#new-annotation").focus();
-                }, 500);
             },
 
             /**
@@ -261,39 +256,15 @@ define(["jquery",
             /**
              * Listener for when a user start to write a new annotation,
              * manage if the video has to be or not paused.
-             * @alias module:views-annotate.Annotate#onFocusIn
+             * @alias module:views-annotate.Annotate#maybePause
              */
-            onFocusIn: function () {
-                if (!this.$el.find("#pause-video").attr("checked") || (this.playerAdapter.getStatus() === PlayerAdapter.STATUS.PAUSED)) {
+            maybePause: function () {
+                if (!this.$el.find("#pause-video-freetext").prop("checked") || this.playerAdapter.getStatus() === PlayerAdapter.STATUS.PAUSED) {
                     return;
                 }
 
                 this.continueVideo = true;
                 this.playerAdapter.pause();
-
-                // If the video is moved, or played, we do no continue the video after insertion
-                $(this.playerAdapter).one(PlayerAdapter.EVENTS.TIMEUPDATE, function () {
-                    this.continueVideo = false;
-                });
-            },
-
-            /**
-             * Listener for when we leave the annotation input
-             * @alias module:views-annotate.Annotate#onFocusOut
-             */
-            onFocusOut: function () {
-                setTimeout(this.checkToContinueVideo, 200);
-            },
-
-            /**
-             * Check if the video must continue, and if yes, continue to play it
-             * @alias module:views-annotate.Annotate#checkToContinueVideo
-             */
-            checkToContinueVideo: function () {
-                if ((this.playerAdapter.getStatus() === PlayerAdapter.STATUS.PAUSED) && this.continueVideo) {
-                    this.continueVideo = false;
-                    this.playerAdapter.play();
-                }
             },
 
             /**
@@ -320,11 +291,11 @@ define(["jquery",
              */
             addTab: function (categories, attr) {
                 var params = {
-                        id        : attr.id,
-                        name      : attr.name,
+                        id: attr.id,
+                        name: attr.name,
                         categories: categories,
-                        filter    : attr.filter,
-                        roles     : attr.roles,
+                        filter: attr.filter,
+                        roles: attr.roles,
                         attributes: attr.attributes
                     },
                     newButton = this.tabsButtonTemplate(params),
