@@ -174,7 +174,7 @@ define(["underscore",
 
                 if (tracks && (tracks.length) === 0) {
                     tracks.fetch({
-                        async  : false,
+                        async: false,
                         success: function () {
                             self.tracksReady = true;
 
