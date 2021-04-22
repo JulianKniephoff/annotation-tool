@@ -52,9 +52,7 @@ define([
                 this.tooltipSelector,
                 _.bind(function (event) {
                     this.model.save({
-                        access: ACCESS.parse(
-                            $(event.currentTarget).data("access")
-                        )
+                        access: Number($(event.currentTarget).data("access"))
                     });
                 }, this)
             );
@@ -88,8 +86,7 @@ define([
             }
 
             var modelJSON = this.model.toJSON();
-            modelJSON.access = ACCESS.render(modelJSON.access);
-            this.$el.html(template(modelJSON));
+            this.$el.html(template(modelJSON, { data: { access: TimelineGroup.access() } }));
             this.visibilityButton = this.$el.find(".visibility")
                 .tooltip({
                     container: 'body',
@@ -109,6 +106,18 @@ define([
             "click .update": function (event) {
                 this.parent.initTrackModal(event, this.model);
             }
+        }
+    }, {
+        access: function () {
+            var access = [];
+            if (annotationTool.user.isAdmin()) {
+                access.push(ACCESS.SHARED_WITH_EVERYONE);
+            }
+            return access.concat([
+                ACCESS.PUBLIC,
+                ACCESS.SHARED_WITH_ADMIN,
+                ACCESS.PRIVATE
+            ]);
         }
     });
 

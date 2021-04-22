@@ -42,32 +42,14 @@
                             data-trigger="click"
                             title="
                                 <div class='visibility' data-id='{{id}}'>
-                                    {{#if (isAdmin)}}
-                                        <button type='button' data-access='shared-with-everyone'>
+                                    {{#each @access}}
+                                        <button type='button' data-access='{{.}}'>
                                             <i
-                                                class='icon-white icon-shared-with-everyone'
-                                                title='{{t "timeline.change visibility.to shared with everyone"}}'
+                                                class='icon-white icon-{{kebab (access .)}}'
+                                                title='{{t (join " " "timeline.change visibility.to" (bare (access .)))}}'
                                             ></i>
                                         </button>
-                                    {{/if}}
-                                    <button type='button' data-access='public'>
-                                        <i
-                                            class='icon-white icon-public'
-                                            title='{{t "timeline.change visibility.to public"}}'
-                                        ></i>
-                                    </button>
-                                    <button type='button' data-access='shared-with-admin'>
-                                        <i
-                                            class='icon-white icon-shared-with-admin'
-                                            title='{{t "timeline.change visibility.to shared with admin"}}'
-                                        ></i>
-                                    </button>
-                                    <button type='button' data-access='private'>
-                                        <i
-                                            class='icon-white icon-private'
-                                            title='{{t "timeline.change visibility.to private"}}'
-                                        ></i>
-                                    </button>
+                                    {{/each}}
                                 </div>
                             "
                             class="button"
@@ -75,7 +57,7 @@
                         >
                             <i
                                 title="{{t "timeline.change visibility.tooltip"}}"
-                                class="icon-dark-grey icon-{{access}}"
+                                class="icon-dark-grey icon-{{kebab (access access)}}"
                             ></i>
                         </button>
                     {{/if}}
