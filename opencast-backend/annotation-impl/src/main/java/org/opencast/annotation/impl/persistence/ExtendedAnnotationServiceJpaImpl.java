@@ -651,7 +651,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
 
       // Link a category to a master series category if they are "sufficiently" equal
       for (Category videoCategory : allCategories) {
-        for (Category seriesCategory: seriesCategories) {
+        for (Category seriesCategory : seriesCategories) {
           if (categoriesSufficientlyEqual(videoCategory, seriesCategory)) {
             Category update = new CategoryImpl(videoCategory.getId(), videoCategory.getVideoId(),
                     seriesCategory.getScaleId(), seriesCategory.getName(), seriesCategory.getDescription(),

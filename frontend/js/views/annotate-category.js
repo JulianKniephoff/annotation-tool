@@ -18,7 +18,9 @@
  * A module representing the category view in the annotate part
  * @module views-annotate-category
  */
-define(["jquery",
+define(
+    [
+        "jquery",
         "underscore",
         "backbone",
         "i18next",
@@ -26,12 +28,18 @@ define(["jquery",
         "access",
         "views/annotate-label",
         "templates/annotate-category",
-        "handlebarsHelpers",
-        "jquery.colorPicker"],
-
-
-    function ($, _, Backbone, i18next, util, ACCESS, LabelView, Template) {
-
+        "jquery.colorPicker"
+    ],
+    function (
+        $,
+        _,
+        Backbone,
+        i18next,
+        util,
+        ACCESS,
+        LabelView,
+        Template
+    ) {
         "use strict";
 
         /**
@@ -39,55 +47,47 @@ define(["jquery",
          * @see {@link http://www.backbonejs.org/#View}
          * @memberOf module:views-annotate-category
          * @augments module:Backbone.View
-         * @alias module:views-annotate-category.CategoryView
          */
         var CategoryView = Backbone.View.extend({
 
             /**
              * Tag name from the view element
-             * @alias module:views-annotate-category.Category#tagName
              * @type {string}
              */
             tagName: "div",
 
             /**
              * Class name from the view element
-             * @alias module:views-annotate-category.Category#className
              * @type {string}
              */
             className: "span1 category-item",
 
             /**
              * Prefix for the item id
-             * @alias module:views-annotate-category.Category#ID_PREFIX
              * @type {string}
              */
             ID_PREFIX: "catItem-",
 
             /**
              * Define if the view is or not in edit modus.
-             * @alias module:views-annotate-category.Category#editModus
              * @type {boolean}
              */
             editModus: false,
 
             /**
              * View template
-             * @alias module:views-annotate-category.Category#template
              * @type {HandlebarsTemplate}
              */
             template: Template,
 
             // /**
             //  * Main container of the editor modal
-            //  * @alias module:views-login.Login#el
             //  * @type {DOMElement}
             //  */
             // el: $("#series-categories-warning"),
 
             /**
              * Events to handle by the annotate-category view
-             * @alias module:views-annotate-category.CategoryView#events
              * @type {map}
              */
             events: {
@@ -104,7 +104,6 @@ define(["jquery",
 
             /**
              * Constructor
-             * @alias module:views-annotate-category.CategoryView#initialize
              * @param {PlainObject} attr Object literal containing the view initialization attributes.
              */
             initialize: function (attr) {
@@ -115,21 +114,23 @@ define(["jquery",
                 }
 
                 // Set the current context for all these functions
-                _.bindAll(this,
-                  "onDeleteCategory",
-                  "addLabels",
-                  "addLabel",
-                  "render",
-                  "switchEditModus",
-                  "onFocusOut",
-                  "onKeyDown",
-                  "onColorChange",
-                  "removeOne",
-                  "onCreateLabel",
-                  "editScale",
-                  "onChangeSharedVis",
-                  "updateInputWidth",
-                  "toVideoCategory");
+                _.bindAll(
+                    this,
+                    "onDeleteCategory",
+                    "addLabels",
+                    "addLabel",
+                    "render",
+                    "switchEditModus",
+                    "onFocusOut",
+                    "onKeyDown",
+                    "onColorChange",
+                    "removeOne",
+                    "onCreateLabel",
+                    "editScale",
+                    "onChangeSharedVis",
+                    "updateInputWidth",
+                    "toVideoCategory"
+                );
 
 
                 // Define the colors (global setting for all color pickers)
@@ -268,7 +269,6 @@ define(["jquery",
 
             /**
              * Listener for the "change" event from the view model (Category)
-             * @alias module:views-annotate-category.CategoryView#onChange
              */
             onChange: function () {
                 _.each(this.labelViews, function (labelView) {
@@ -284,7 +284,6 @@ define(["jquery",
 
             /**
              * Switch the edit modus to the given status.
-             * @alias module:views-annotate-category.CategoryView#switchEditModus
              * @param  {boolean} status The current status
              */
             switchEditModus: function (status) {
@@ -302,7 +301,6 @@ define(["jquery",
 
             /**
              * Show/hide categories
-             * @alias module:views-annotate-category.CategoryView#toggleVisibility
              */
             toggleVisibility: function (event) {
                 this.model.toggleVisibility();
@@ -310,7 +308,6 @@ define(["jquery",
 
             /**
              * Open the scales editor modal
-             * @alias module:views-annotate-category.CategoryView#editScale
              */
             editScale: function () {
                 if (this.model.get("seriesCategoryId")) {
@@ -324,7 +321,6 @@ define(["jquery",
 
             /**
              * Listener for category deletion request from UI
-             * @alias module:views-annotate-category.CategoryView#onDeleteCategory
              * @param  {Event} event
              */
             onDeleteCategory: function () {
@@ -333,7 +329,6 @@ define(["jquery",
 
             /**
              * Add a collection of labels to this view
-             * @alias module:views-annotate-category.CategoryView#addLabels
              * @param {Labels} labels Collection of label to add
              */
             addLabels: function (labels) {
@@ -344,7 +339,6 @@ define(["jquery",
 
             /**
              * Add one label to this view
-             * @alias module:views-annotate-category.CategoryView#addLabel
              * @param {Label} label  The label to add
              * @param {boolean} single Define if this is part of a list insertion (false) or a single insertion (true)
              */
@@ -364,7 +358,6 @@ define(["jquery",
 
             /**
              * Create a new label in the category of this view
-             * @alias module:views-annotate-category.CategoryView#onCreateLabel
              */
             onCreateLabel: function () {
                 this.model.get("labels").create({
@@ -377,7 +370,6 @@ define(["jquery",
 
             /**
              * Remove the given category from the views list
-             * @alias module:views-annotate-category.CategoryView#removeOne
              * @param {Category} Category from which the view has to be deleted
              */
             removeOne: function (delLabel) {
@@ -393,7 +385,6 @@ define(["jquery",
 
             /**
              * Listener for focus out event on name field
-             * @alias module:views-annotate-category.CategoryView#onFocusOut
              */
             onFocusOut: function () {
                 this.model.set("name", _.escape(this.nameInput.val()));
@@ -402,7 +393,6 @@ define(["jquery",
 
             /**
              * Listener for key down event on name field
-             * @alias module:views-annotate-category.CategoryView#onKeyDown
              */
             onKeyDown: function (e) {
                 e.stopImmediatePropagation();
@@ -419,7 +409,6 @@ define(["jquery",
 
             /**
              * Get the position of the caret in the given input element
-             * @alias module:views-annotate-category.CategoryView#getCaretPosition
              * @param  {DOMElement} inputElement The given element with focus
              * @return {integer}              The posisiton of the carret
              */
@@ -429,7 +418,6 @@ define(["jquery",
 
             /**
              * Listener for color selection through color picker
-             * @alias module:views-annotate-category.CategoryView#onColorChange
              * @param  {string} id       Id of the colorpicker element
              * @param  {string} newValue Value of the selected color
              */
@@ -440,7 +428,6 @@ define(["jquery",
 
             /**
              * Draw the view
-             * @alias module:views-annotate-category.CategoryView#render
              * @return {CategoryView} this category view
              */
             render: function () {
@@ -499,7 +486,6 @@ define(["jquery",
 
             /**
              * Remove this view from the DOM and clean up all of its data and event handlers
-             * @alias module:views-annotate-category.CategoryView#remove
              */
             remove: function () {
                 _.each(this.labelViews, function (labelView) {

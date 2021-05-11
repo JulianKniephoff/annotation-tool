@@ -139,13 +139,12 @@ define([
 
         /**
          * Get the current series id of the video (series_extid)
-         * @alias module:annotation-tool-configuration.Configuration.getVideoExtId
          * @return {Promise.<string>} video external id
          */
         getSeriesExtId: function () {
           return mediaPackage.then(function (mediaPackage) {
               return mediaPackage.series;
-          }.bind(this));
+          });
         },
 
         /**
