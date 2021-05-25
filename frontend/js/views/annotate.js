@@ -99,7 +99,7 @@ define(
                 "keydown #new-annotation": "maybePause",
                 "click #label-tabs-buttons a": "showTab",
                 "click #editSwitch": "onSwitchEditModus",
-                "click #toggle-free-text button": "toggleFreeTextAnnotations",
+                "click #toggle-free-text button": "toggleFreeTextAnnotations"
             },
 
             /**
@@ -131,8 +131,8 @@ define(
              * @type {Object}
              */
             layout: {
-                freeText   : true,
-                categories : true
+                freeText: true,
+                categories: true
             },
 
             /**
@@ -318,7 +318,7 @@ define(
             removeTab: function (id) {
                 delete this.categoriesTabs[id];
 
-                this.tabsButtonsElement.find('a[data-tabid="'+id+'"]').parent().remove();
+                this.tabsButtonsElement.find("a[data-tabid=\""+id+"\"]").parent().remove();
                 this.tabsContainerElement = this.$el.find("div#label-tabs-contents");
                 this.tabsContainerElement.children("#labelTab-"+id).remove();
             },

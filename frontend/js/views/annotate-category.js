@@ -101,7 +101,6 @@ define(
                 "click .catItem-header i.toggleSeries": "toggleSeries"
             },
 
-
             /**
              * Constructor
              * @param {PlainObject} attr Object literal containing the view initialization attributes.
@@ -132,7 +131,6 @@ define(
                     "toVideoCategory"
                 );
 
-
                 // Define the colors (global setting for all color pickers)
                 $.fn.colorPicker.defaults.colors = annotationTool.colorsManager.getColors();
 
@@ -147,7 +145,7 @@ define(
 
                 this.el.id = this.ID_PREFIX + attr.category.get("id");
                 // Not our category but someone elses? Should not be clickable
-                if(attr.category.get("settings").createdAsMine && attr.category.get("created_by") !== annotationTool.user.get("id")) {
+                if (attr.category.get("settings").createdAsMine && attr.category.get("created_by") !== annotationTool.user.get("id")) {
                     this.$el.addClass("read-only");
                 }
                 this.model = attr.category;
@@ -210,11 +208,11 @@ define(
              * Toggle the category between belonging to an event and belonging
              * to a series
              */
-            toggleSeries: function() {
-                let categorySeriesId = this.model.get("seriesExtId");
-                let categorySeriesCategoryId = this.model.get("seriesCategoryId");
-                let videoSeriesId = "";
-                $.when(annotationTool.getSeriesExtId()).then(function(seriesId){
+            toggleSeries: function () {
+                var categorySeriesId = this.model.get("seriesExtId");
+                var categorySeriesCategoryId = this.model.get("seriesCategoryId");
+                var videoSeriesId = "";
+                $.when(annotationTool.getSeriesExtId()).then(function (seriesId){
                     videoSeriesId = seriesId;
 
                 });
@@ -229,8 +227,8 @@ define(
                   // This doesn't really belong on scaleEditor, but I don't want to create
                   // a whole new class for a simple error modal.
                   if (this.model.get("settings").hasScale) {
-                    annotationTool.scaleEditor.showWarning({title: i18next.t("scale editor.warning.name"),
-                    message: i18next.t("scale editor.warning.messageScaleOnSeriesCategory")});
+                    annotationTool.scaleEditor.showWarning({ title: i18next.t("scale editor.warning.name"),
+                    message: i18next.t("scale editor.warning.messageScaleOnSeriesCategory") });
                   } else {
                     // Add to series
                     this.model.set("seriesExtId", videoSeriesId);
@@ -239,7 +237,6 @@ define(
                   this.model.save(null, { wait: true });
                 }
             },
-
 
             /**
              * Update the size of all the input for the label value
@@ -312,8 +309,8 @@ define(
             editScale: function () {
                 if (this.model.get("seriesCategoryId")) {
                   // Workaround for scales and series categories
-                  annotationTool.scaleEditor.showWarning({title: i18next.t("scale editor.warning.name"),
-                                                          message: i18next.t("scale editor.warning.message")});
+                  annotationTool.scaleEditor.showWarning({ title: i18next.t("scale editor.warning.name"),
+                                                          message: i18next.t("scale editor.warning.message") });
                 } else {
                   annotationTool.scaleEditor.show(this.model, this.model.get("access"));
                 }
@@ -344,9 +341,9 @@ define(
              */
             addLabel: function (label) {
                 var labelView = new LabelView({
-                    label        : label,
-                    editModus    : this.editModus,
-                    roles        : this.roles
+                    label: label,
+                    editModus: this.editModus,
+                    roles: this.roles
                 });
 
                 this.labelViews.push(labelView);
@@ -361,10 +358,10 @@ define(
              */
             onCreateLabel: function () {
                 this.model.get("labels").create({
-                    value       : i18next.t("new label defaults.description"),
+                    value: i18next.t("new label defaults.description"),
                     abbreviation: i18next.t("new label defaults.abbreviation"),
-                    category    : this.model,
-                    access      : this.model.get("access")
+                    category: this.model,
+                    access: this.model.get("access")
                 }, { wait: true });
             },
 
@@ -434,7 +431,7 @@ define(
                 if (this.visibilityButton) {
                     this.visibilityButton.tooltip("destroy");
                 }
-                
+
                 var modelJSON = this.model.toJSON();
 
                 this.undelegateEvents();
@@ -474,10 +471,9 @@ define(
 
                 this.delegateEvents(this.events);
 
-
                 this.visibilityButton = this.$el.find(".sharedVisibility")
                 .tooltip({
-                    container: 'body',
+                    container: "body",
                     html: true
                 });
 

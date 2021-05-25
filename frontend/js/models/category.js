@@ -53,10 +53,10 @@ define(
                 };
             },
 
-            sync: function(method, model, options) {
+            sync: function (method, model, options) {
 
                 // If the model is referencing another model, sync to the other model
-                if(model.get("seriesCategoryId")) {
+                if (model.get("seriesCategoryId")) {
                     model.id = model.get("seriesCategoryId");
                 } else if (model.tmpSeriesCategoryId) {
                     model.id = model.tmpSeriesCategoryId;
@@ -137,12 +137,7 @@ define(
                 delete json.labels;
 
                 if (this.attributes.scale) {
-                    if (this.attributes.scale.attributes) {
-                        json.scale_id = this.attributes.scale.get("id");
-                    } else {
-                        json.scale_id = this.attributes.scale.id;
-                    }
-
+                    json.scale_id = this.attributes.scale.id;
                     delete json.scale;
                 }
 
@@ -183,7 +178,7 @@ define(
                 }
 
                 return json;
-            },
+            }
         });
         return Category;
     }

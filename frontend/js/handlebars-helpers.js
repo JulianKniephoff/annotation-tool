@@ -79,7 +79,6 @@ define([
 
     /**
      * Check whether the current user is an annotation tool admin.
-     * @alias module:Handlebars#isAdmin
      */
     Handlebars.registerHelper("isAdmin", function () {
         return annotationTool.user.isAdmin();

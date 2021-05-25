@@ -23,6 +23,8 @@ define(
         "underscore",
         "backbone",
         "sortable",
+        "roles",
+        "access",
         "templates/tracks-selection-modal"
     ],
     function (
@@ -208,37 +210,37 @@ define(
             /**
              * Displays Categories Tabs for currently visible tracks
              */
-            updateCategories: function() {
-                let categories = annotationTool.video.get("categories");
+            updateCategories: function () {
+                var categories = annotationTool.video.get("categories");
 
-                _.each(this.tracks.getVisibleTracks(), function(visibleTrack) {
-                    let trackUserId = visibleTrack.get("created_by");
-                    
+                _.each(this.tracks.getVisibleTracks(), function (visibleTrack) {
+                    var trackUserId = visibleTrack.get("created_by");
+
                     // Create new category tab for user ids that or not ours or already present
-                    if(trackUserId !== annotationTool.user.get("id") &&
+                    if (trackUserId !== annotationTool.user.get("id") &&
                         !annotationTool.views.main.views.annotate.categoriesTabs.hasOwnProperty(trackUserId)) {
                         // Need to pass all categories here, else code ceases to work
-                        annotationTool.views.main.views.annotate.addTab(categories, {   
-                            id        : trackUserId,
-                            name      : visibleTrack.get("created_by_nickname"),
-                            filter    : function (category) {
+                        annotationTool.views.main.views.annotate.addTab(categories, {
+                            id: trackUserId,
+                            name: visibleTrack.get("created_by_nickname"),
+                            filter: function (category) {
                                 // Does the current user have permission to see the category?
-                                return ((annotationTool.user.get("role") === ROLES.ADMINISTRATOR && (category.get("access") === ACCESS.PUBLIC 
+                                return ((annotationTool.user.get("role") === ROLES.ADMINISTRATOR && (category.get("access") === ACCESS.PUBLIC
                                         || category.get("access") === ACCESS.SHARED_WITH_ADMIN))
                                 || (annotationTool.user.get("role") === ROLES.USER && (category.get("access")) === ACCESS.PUBLIC))
                                 // Is it from the mine category?
                                 && category.get("settings").createdAsMine
-                                // Was the category created by the user of the tab? 
+                                // Was the category created by the user of the tab?
                                 && category.get("created_by") === trackUserId;
                             },
-                            roles     : [],
-                            attributes: { access: ACCESS.PRIVATE },
+                            roles: [],
+                            attributes: { access: ACCESS.PRIVATE }
                         })
                     }
                 }, this);
 
                 // Try to remove respective category tab of every non-visible track
-                _.each(_.difference(this.tracks.models, this.tracks.getVisibleTracks()), function(notVisibleTrack) {
+                _.each(_.difference(this.tracks.models, this.tracks.getVisibleTracks()), function (notVisibleTrack) {
                     annotationTool.views.main.views.annotate.removeTab(notVisibleTrack.get("created_by"));
                 }, this);
             },
@@ -246,33 +248,33 @@ define(
             /**
              * Add/Remove views for createdAsMine categories in the all tab
              */
-            updateCategoriesForTheAllTab: function() {
-              let allTab = annotationTool.views.main.views.annotate.categoriesTabs["all"];
+            updateCategoriesForTheAllTab: function () {
+              var allTab = annotationTool.views.main.views.annotate.categoriesTabs["all"];
 
-              let categories = annotationTool.video.get("categories");
-              let t = this.tracks.getVisibleTracks();
-              _.each(this.tracks.getVisibleTracks(), function(visibleTrack) {
-                  let trackUserId = visibleTrack.get("created_by");
-                  
+              var categories = annotationTool.video.get("categories");
+              var t = this.tracks.getVisibleTracks();
+              _.each(this.tracks.getVisibleTracks(), function (visibleTrack) {
+                  var trackUserId = visibleTrack.get("created_by");
+
                   // Create new category tab for user ids that or not ours or already present
-                  if(trackUserId !== annotationTool.user.get("id")) {
+                  if (trackUserId !== annotationTool.user.get("id")) {
                       // Need to pass all categories here, else code ceases to work
-                      annotationTool.views.main.views.annotate.categoriesTabs["all"].addCategories(categories, function(category) {
-                        return ((annotationTool.user.get("role") === ROLES.ADMINISTRATOR && (category.get("access") === ACCESS.PUBLIC 
+                      annotationTool.views.main.views.annotate.categoriesTabs["all"].addCategories(categories, function (category) {
+                        return ((annotationTool.user.get("role") === ROLES.ADMINISTRATOR && (category.get("access") === ACCESS.PUBLIC
                         || category.get("access") === ACCESS.SHARED_WITH_ADMIN))
                         || (annotationTool.user.get("role") === ROLES.USER && (category.get("access")) === ACCESS.PUBLIC))
                         // Is it from the mine category?
                         && category.get("settings").createdAsMine
-                        // Was the category created by the user of the tab? 
+                        // Was the category created by the user of the tab?
                         && category.get("created_by") === trackUserId
                         // Is the category already present?
-                        && !annotationTool.views.main.views.annotate.categoriesTabs["all"].categoryViews.some(e => e.model.id === category.id);
+                              && !annotationTool.views.main.views.annotate.categoriesTabs["all"].categoryViews.some(function (e) { return e.model.id === category.id; });
                       });
                   }
               }, this);
 
-              _.each(_.difference(this.tracks.models, this.tracks.getVisibleTracks()), function(notVisibleTrack) {
-                _.each(annotationTool.views.main.views.annotate.categoriesTabs["all"].categories.models, function(category) {
+              _.each(_.difference(this.tracks.models, this.tracks.getVisibleTracks()), function (notVisibleTrack) {
+                _.each(annotationTool.views.main.views.annotate.categoriesTabs["all"].categories.models, function (category) {
                   if (category.get("created_by") === notVisibleTrack.get("created_by")
                       && category.get("settings").createdAsMine
                       && category.get("createy_by") !== annotationTool.user.get("id")) {

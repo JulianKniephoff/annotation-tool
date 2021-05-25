@@ -21,8 +21,7 @@ define([
     "util",
     "alerts",
     "models/user",
-    "roles",
-    "player_adapter_HTML5",
+    "player-adapter-html5"
 ], function (
     $,
     _,
@@ -30,7 +29,6 @@ define([
     util,
     alerts,
     User,
-    ROLES,
     HTML5PlayerAdapter
 ) {
     "use strict";
@@ -65,9 +63,9 @@ define([
             // Sanitize query strings, so that they're actually at the end
             // TODO: Clean this up OR find a better way to do this
             var queryString = this.url.match(/\?(.*?)\//);
-            if(queryString && queryString[0]) {
+            if (queryString && queryString[0]) {
                 this.url = this.url.replace(queryString[0], "");
-                if (queryString[0].slice(-1) === "/") {queryString[0] = queryString[0].slice(0, -1)}
+                if (queryString[0].slice(-1) === "/") { queryString[0] = queryString[0].slice(0, -1) }
                 this.url = this.url + queryString[0];
             }
 
@@ -96,7 +94,7 @@ define([
         return request;
     }
 
-    var annotationInfo = dieOnError($.ajax(apiBase + '/annotate', {
+    var annotationInfo = dieOnError($.ajax(apiBase + "/annotate", {
         beforeSend: function (request) {
             // TODO Fix the headers
             request.setRequestHeader(
@@ -114,7 +112,7 @@ define([
     // Establish a heartbeat with the server
     // to refresh our Shibboleth session.
     window.setInterval(function () {
-        dieOnError($.ajax('/info/me.json'));
+        dieOnError($.ajax("/info/me.json"));
     }, 1000 * 60);
     // end codediff
 
@@ -142,18 +140,7 @@ define([
         },
 
         /**
-         * Get the external parameters related to video. The supported parameters are now the following:
-         *     - title: The title of the video
-         *     - src_owner: The owner of the video in the system
-         *     - src_creation_date: The date of the course, when the video itself was created.
-         * @example
-         * {
-         *     video_extid: 123, // Same as the value returned by getVideoExtId
-         *     title: "Math lesson 4", // The title of the video
-         *     src_owner: "Professor X", // The owner of the video in the system
-         *     src_creation_date: "12-12-1023" // The date of the course, when the video itself was created.
-         * }
-         * @return {Object} The literal object containing all the parameters described in the example.
+         * @return {Promise.<object>} Metadata about the video
          */
         getVideoParameters: function () {
             return annotationInfo.then(function (info) {

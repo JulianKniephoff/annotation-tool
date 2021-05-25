@@ -4,7 +4,7 @@
 require.config({
     baseUrl: "js",
     paths: {
-        "backbone": "libs/backbone-0.9.9",
+        "backbone": "libs/backbone-min",
         "bootstrap": "libs/bootstrap/bootstrap.min",
         "chroma": "libs/chroma.min",
         "domReady": "libs/require/domReady",
@@ -31,7 +31,7 @@ require.config({
         "xlsx": "libs/xlsx.full.min",
         "vis-timeline": "libs/vis-timeline/vis-timeline-graph2d.min",
         "papaparse": "libs/papaparse.min",
-        "filesaver": "libs/FileSaver.min",
+        "filesaver": "libs/FileSaver.min"
     },
     waitSeconds: 10,
 
