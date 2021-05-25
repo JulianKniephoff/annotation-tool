@@ -63,17 +63,11 @@ define(
              * Default model values
              */
             defaults: function () {
-                var categories = new Categories([], { video: this });
-
-                $.when(annotationTool.getSeriesExtId(), function (seriesExtId) {
-                    categories.seriesExtId = seriesExtId;
-                });
-
                 return {
                     access: ACCESS.PUBLIC,
 
                     tracks: new Tracks([], { video: this }),
-                    categories: categories,
+                    categories: new Categories([], { video: this }),
                     scales: new Scales([], { video: this })
                 };
             },
@@ -82,7 +76,14 @@ define(
              * (Re-)Fetch the scale values once our ID changes.
              */
             fetchChildren: function () {
-                this.get("categories").fetch({ async: false });
+
+                var categories = this.get("categories");
+
+                $.when(annotationTool.getSeriesExtId()).done(function (seriesExtId) {
+                    categories.seriesExtId = seriesExtId;
+                });
+
+                categories.fetch({ async: false });
                 this.get("tracks").fetch({ async: false });
                 this.get("scales").fetch({ async: false });
                 this.trigger("ready");
