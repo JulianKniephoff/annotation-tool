@@ -103,13 +103,13 @@ var LoginView = Backbone.View.extend({
     login: function () {
 
         // Fields from the login form
-        var userNickname = this.$el.find("#nickname").val(),
-            userEmail = this.$el.find("#email").val(),
-            userRemember = this.$el.find("#remember").prop("checked"),
-            userSupervisor = this.$el.find("#supervisor").prop("checked"),
-            alert = this.$el.find(".alert"),
-            userError = alert.find("#content"),
-            validationErrors = false;
+        var userNickname = this.$el.find("#nickname").val();
+        var userEmail = this.$el.find("#email").val();
+        var userRemember = this.$el.find("#remember").prop("checked");
+        var userSupervisor = this.$el.find("#supervisor").prop("checked");
+        var alert = this.$el.find(".alert");
+        var userError = alert.find("#content");
+        var validationErrors = false;
 
         // Remove potential previous validation errors
         this.$el.find(".error").removeClass("error");
