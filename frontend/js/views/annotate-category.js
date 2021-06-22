@@ -89,7 +89,7 @@ define(
                 "focusout .catItem-header input": "onFocusOut",
                 "keydown .catItem-header input": "onKeyDown",
                 "click .catItem-add": "onCreateLabel",
-                "click .catItem-header i.toggleSeries": "toggleSeries"
+                "click .catItem-header i.toggle-series": "toggleSeries"
             },
 
             /**
