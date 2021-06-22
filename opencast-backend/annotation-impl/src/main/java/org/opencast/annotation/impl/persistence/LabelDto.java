@@ -94,14 +94,14 @@ public class LabelDto extends AbstractResourceDto {
   @CollectionTable(name = "xannotations_label_tags", joinColumns = @JoinColumn(name = "label_id"))
   protected Map<String, String> tags = new HashMap<String, String>();
 
-  public static LabelDto create(long categoryId, String value, String abbreviation, Option<String> description,
-          Option<Long> seriesLabelId, Option<String> settings, Resource resource) {
-    LabelDto dto = new LabelDto().update(value, abbreviation, description, seriesLabelId, settings, resource);
+  public static LabelDto create(long categoryId, Option<Long> seriesLabelId, String value, String abbreviation,
+          Option<String> description, Option<String> settings, Resource resource) {
+    LabelDto dto = new LabelDto().update(seriesLabelId, value, abbreviation, description, settings, resource);
     dto.categoryId = categoryId;
     return dto;
   }
 
-  public LabelDto update(String value, String abbreviation, Option<String> description, Option<Long> seriesLabelId, Option<String> settings,
+  public LabelDto update(Option<Long> seriesLabelId, String value, String abbreviation, Option<String> description, Option<String> settings,
           Resource resource) {
     super.update(resource);
     this.value = value;
@@ -115,7 +115,7 @@ public class LabelDto extends AbstractResourceDto {
   }
 
   public Label toLabel() {
-    return new LabelImpl(id, categoryId, value, abbreviation, option(description), option(seriesLabelId), option(settings), new ResourceImpl(
+    return new LabelImpl(id, categoryId, option(seriesLabelId), value, abbreviation, option(description), option(settings), new ResourceImpl(
             option(access), option(createdBy), option(updatedBy), option(deletedBy), option(createdAt),
             option(updatedAt), option(deletedAt), tags));
   }

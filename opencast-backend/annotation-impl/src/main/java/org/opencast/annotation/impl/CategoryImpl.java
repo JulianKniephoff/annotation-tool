@@ -29,26 +29,26 @@ public class CategoryImpl extends ResourceImpl implements Category {
 
   private final long id;
   private final Option<Long> videoId;
+  private final Option<String> seriesExtId;
+  private final Option<Long> seriesCategoryId;
   private final Option<Long> scaleId;
   private final String name;
   private final Option<String> description;
   private final Option<String> settings;
-  private final Option<String> seriesExtId;
-  private final Option<Long> seriesCategoryId;
 
-  public CategoryImpl(long id, Option<Long> videoId, Option<Long> scaleId, String name, Option<String> description,
-          Option<String> settings, Resource resource, Option<String> seriesExtId, Option<Long> seriesCategoryId) {
+  public CategoryImpl(long id, Option<Long> videoId, Option<String> seriesExtId, Option<Long> seriesCategoryId,
+          Option<Long> scaleId, String name, Option<String> description, Option<String> settings, Resource resource) {
     super(Option.option(resource.getAccess()), resource.getCreatedBy(), resource.getUpdatedBy(), resource
             .getDeletedBy(), resource.getCreatedAt(), resource.getUpdatedAt(), resource.getDeletedAt(), resource
             .getTags());
     this.id = id;
     this.videoId = videoId;
+    this.seriesExtId = seriesExtId;
+    this.seriesCategoryId = seriesCategoryId;
     this.scaleId = scaleId;
     this.name = name;
     this.description = description;
     this.settings = settings;
-    this.seriesExtId = seriesExtId;
-    this.seriesCategoryId = seriesCategoryId;
   }
 
   @Override
@@ -64,6 +64,16 @@ public class CategoryImpl extends ResourceImpl implements Category {
   @Override
   public Option<Long> getVideoId() {
     return videoId;
+  }
+
+  @Override
+  public Option<String> getSeriesExtId() {
+    return seriesExtId;
+  }
+
+  @Override
+  public Option<Long> getSeriesCategoryId() {
+    return seriesCategoryId;
   }
 
   @Override
@@ -87,26 +97,17 @@ public class CategoryImpl extends ResourceImpl implements Category {
   }
 
   @Override
-  public Option<String> getSeriesExtId() {
-    return seriesExtId;
-  }
-
-  @Override
-  public Option<Long> getSeriesCategoryId() {
-    return seriesCategoryId;
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
     Category category = (Category) o;
-    return id == category.getId() && videoId.equals(category.getVideoId()) && scaleId.equals(category.getScaleId())
-            && name.equals(category.getName()) && description.equals(category.getDescription())
-            && settings.equals(category.getSettings()) && getTags().equals(category.getTags())
-            && seriesExtId.equals(category.getSeriesExtId()) && seriesCategoryId.equals(category.getSeriesCategoryId());
+    return id == category.getId() && videoId.equals(category.getVideoId())
+            && seriesExtId.equals(category.getSeriesExtId()) && seriesCategoryId.equals(category.getSeriesCategoryId())
+            && scaleId.equals(category.getScaleId()) && name.equals(category.getName())
+            && description.equals(category.getDescription()) && settings.equals(category.getSettings())
+            && getTags().equals(category.getTags());
   }
 
   @Override

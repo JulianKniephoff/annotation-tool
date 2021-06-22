@@ -537,18 +537,17 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   }
 
   @Override
-  public Category createCategory(Option<Long> videoId, Option<Long> scaleId, String name, Option<String> description,
-          Option<String> settings, Resource resource, Option<String> seriesExtId, Option<Long> seriesCategoryId)
+  public Category createCategory(Option<Long> videoId, Option<String> seriesExtId, Option<Long> seriesCategoryId,
+          Option<Long> scaleId, String name, Option<String> description, Option<String> settings, Resource resource)
           throws ExtendedAnnotationException {
-    final CategoryDto dto = CategoryDto.create(videoId, scaleId, name, description, settings, resource, seriesExtId,
-            seriesCategoryId);
+    final CategoryDto dto = CategoryDto.create(videoId, seriesExtId, seriesCategoryId, scaleId, name, description, settings, resource);
 
     return tx(Queries.persist(dto)).toCategory();
   }
 
   @Override
-  public Option<Category> createCategoryFromTemplate(final long videoId, final long templateCategoryId,
-          final Resource resource, final String seriesExtId, final Long seriesCategoryId) throws ExtendedAnnotationException {
+  public Option<Category> createCategoryFromTemplate(final long videoId, final String seriesExtId, final Long seriesCategoryId, final long templateCategoryId,
+          final Resource resource) throws ExtendedAnnotationException {
     return getCategory(templateCategoryId, false).map(new Function<Category, Category>() {
       @Override
       public Category apply(Category c) {
@@ -567,8 +566,8 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
           }
         }
         // Copy category
-        final CategoryDto copyDto = CategoryDto.create(Option.some(videoId), option(scaleId), c.getName(),
-                c.getDescription(), c.getSettings(), resource, option(seriesExtId), option(seriesCategoryId));
+        final CategoryDto copyDto = CategoryDto.create(Option.some(videoId), option(seriesExtId), option(seriesCategoryId), option(scaleId), c.getName(),
+                c.getDescription(), c.getSettings(), resource);
         Category category = (Category) tx(new Function<EntityManager, Object>() {
           @Override
           public Object apply(EntityManager em) {
@@ -591,8 +590,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     update("Category.findById", c.getId(), new Effect<CategoryDto>() {
       @Override
       public void run(CategoryDto dto) {
-        dto.update(c.getVideoId(), c.getName(), c.getDescription(), c.getScaleId(), c.getSettings(), c, c.getSeriesExtId(),
-                c.getSeriesCategoryId());
+        dto.update(c.getVideoId(), c.getSeriesExtId(), c.getSeriesCategoryId(), c.getName(), c.getDescription(), c.getScaleId(), c.getSettings(), c);
       }
     });
   }
@@ -637,9 +635,9 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   }
 
   @Override
-  public List<Category> getCategories(final Option<Long> videoId, final Option<Integer> offset,
-          final Option<Integer> limit, Option<Date> since, final Option<Map<String, String>> tagsAnd,
-          final Option<Map<String, String>> tagsOr, final Option<String> seriesExtId)
+  public List<Category> getCategories(final Option<Long> videoId, final Option<String> seriesExtId,
+          final Option<Integer> offset, final Option<Integer> limit, Option<Date> since,
+          final Option<Map<String, String>> tagsAnd, final Option<Map<String, String>> tagsOr)
           throws ExtendedAnnotationException {
     List<Category> categories = videoId.fold(new Option.Match<Long, List<Category>>() {
       @Override
@@ -671,11 +669,11 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
         for (Category seriesCategory: seriesCategories) {
           if (categoriesSufficientlyEqual(videoCategory, seriesCategory)) {
             Category update = new CategoryImpl(videoCategory.getId(), videoCategory.getVideoId(),
-                    seriesCategory.getScaleId(), seriesCategory.getName(), seriesCategory.getDescription(),
+                    seriesCategory.getSeriesExtId(), option(seriesCategory.getId()), seriesCategory.getScaleId(), seriesCategory.getName(), seriesCategory.getDescription(),
                     seriesCategory.getSettings(), new ResourceImpl(option(seriesCategory.getAccess()),
                     seriesCategory.getCreatedBy(), seriesCategory.getUpdatedBy(), seriesCategory.getDeletedBy(),
                     seriesCategory.getCreatedAt(), seriesCategory.getUpdatedAt(), seriesCategory.getDeletedAt(),
-                    seriesCategory.getTags()), seriesCategory.getSeriesExtId(), option(seriesCategory.getId()));
+                    seriesCategory.getTags()));
             updateCategory(update);
             allCategories.set(allCategories.indexOf(videoCategory), update);
           }
@@ -699,21 +697,22 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
         // If we have, update the existing video category
         if (alreadyExists) {
           Category update = new CategoryImpl(existingCategory.getId(), videoId,
-                  seriesCategory.getScaleId(), seriesCategory.getName(), seriesCategory.getDescription(),
+                  seriesCategory.getSeriesExtId(), option(seriesCategory.getId()), seriesCategory.getScaleId(), seriesCategory.getName(), seriesCategory.getDescription(),
                   seriesCategory.getSettings(), new ResourceImpl(option(seriesCategory.getAccess()),
                   seriesCategory.getCreatedBy(), seriesCategory.getUpdatedBy(), seriesCategory.getDeletedBy(),
                   seriesCategory.getCreatedAt(), seriesCategory.getUpdatedAt(), seriesCategory.getDeletedAt(),
-                  seriesCategory.getTags()), seriesCategory.getSeriesExtId(), option(seriesCategory.getId()));
+                  seriesCategory.getTags()));
           updateCategory(update);
           allCategories.set(allCategories.indexOf(existingCategory), update);
           // If we don't have, create a new video category
         } else {
           Category newCategory;
-          newCategory = createCategory(videoId, seriesCategory.getScaleId(), seriesCategory.getName(), seriesCategory.getDescription(),
+          newCategory = createCategory(videoId, seriesCategory.getSeriesExtId(), option(seriesCategory.getId()),
+                  seriesCategory.getScaleId(), seriesCategory.getName(), seriesCategory.getDescription(),
                   seriesCategory.getSettings(), new ResourceImpl(option(seriesCategory.getAccess()),
                           seriesCategory.getCreatedBy(), seriesCategory.getUpdatedBy(), seriesCategory.getDeletedBy(),
                           seriesCategory.getCreatedAt(), seriesCategory.getUpdatedAt(), seriesCategory.getDeletedAt(),
-                          seriesCategory.getTags()), seriesCategory.getSeriesExtId(), option(seriesCategory.getId()));
+                          seriesCategory.getTags()));
           createdCategories.add(newCategory);
         }
       }
@@ -761,9 +760,8 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
 
   public boolean deleteCategoryImpl(Category category) throws ExtendedAnnotationException {
     Resource deleteResource = deleteResource(category);
-    final Category updated = new CategoryImpl(category.getId(), category.getVideoId(), category.getScaleId(),
-            category.getName(), category.getDescription(), category.getSettings(), deleteResource,
-            category.getSeriesExtId(), category.getSeriesCategoryId());
+    final Category updated = new CategoryImpl(category.getId(), category.getVideoId(), category.getSeriesExtId(), category.getSeriesCategoryId(), category.getScaleId(),
+            category.getName(), category.getDescription(), category.getSettings(), deleteResource);
     updateCategory(updated);
 
     for (Label l : getLabelsByCategoryId(category.getId())) {
@@ -786,13 +784,13 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
       seriesCategory = getCategory(categorySeriesCategoryId, false);
       // And the category is not itself (aka the master series category)
       if (seriesCategory.isSome() && categoryId != (seriesCategory.get().getId())) {
-        final LabelDto dto = LabelDto.create(categorySeriesCategoryId, value, abbreviation, description, none(), settings, resource);
+        final LabelDto dto = LabelDto.create(categorySeriesCategoryId, none(), value, abbreviation, description, settings, resource);
         return tx(Queries.persist(dto)).toLabel();
       }
     }
 
     // Normal Create
-    final LabelDto dto = LabelDto.create(categoryId, value, abbreviation, description, none(), settings, resource);
+    final LabelDto dto = LabelDto.create(categoryId, none(), value, abbreviation, description, settings, resource);
     return tx(Queries.persist(dto)).toLabel();
   }
 
@@ -808,7 +806,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     update("Label.findById", updateLabelId, new Effect<LabelDto>() {
       @Override
       protected void run(LabelDto dto) {
-        dto.update(l.getValue(), l.getAbbreviation(), l.getDescription(), l.getSeriesLabelId(), l.getSettings(), l);
+        dto.update(l.getSeriesLabelId(), l.getValue(), l.getAbbreviation(), l.getDescription(), l.getSettings(), l);
       }
     });
   }
@@ -858,8 +856,8 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
         }
         List<Label> newLabels = new ArrayList<>();
         for (Label seriesLabel : seriesCategoryLabels) {
-          final LabelDto dto = LabelDto.create(categoryId, seriesLabel.getValue(), seriesLabel.getAbbreviation(), seriesLabel.getDescription(),
-                  some(seriesLabel.getId()), seriesLabel.getSettings(),
+          final LabelDto dto = LabelDto.create(categoryId, some(seriesLabel.getId()), seriesLabel.getValue(), seriesLabel.getAbbreviation(), seriesLabel.getDescription(),
+                  seriesLabel.getSettings(),
                   new ResourceImpl(option(seriesLabel.getAccess()),
                           seriesLabel.getCreatedBy(), seriesLabel.getUpdatedBy(), seriesLabel.getDeletedBy(),
                           seriesLabel.getCreatedAt(), seriesLabel.getUpdatedAt(), seriesLabel.getDeletedAt(),
@@ -892,8 +890,8 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   @Override
   public boolean deleteLabel(Label label) throws ExtendedAnnotationException {
     Resource deleteResource = deleteResource(label);
-    final Label updated = new LabelImpl(label.getId(), label.getCategoryId(), label.getValue(),
-            label.getAbbreviation(), label.getDescription(), none(), label.getSettings(), deleteResource);
+    final Label updated = new LabelImpl(label.getId(), label.getCategoryId(), none(), label.getValue(),
+            label.getAbbreviation(), label.getDescription(), label.getSettings(), deleteResource);
     updateLabel(updated);
     return true;
   }

@@ -31,23 +31,23 @@ public final class LabelImpl extends ResourceImpl implements Label {
 
   private final long id;
   private final long categoryId;
+  private final Option<Long> seriesLabelId;
   private final String value;
   private final String abbreviation;
   private final Option<String> description;
-  private final Option<Long> seriesLabelId;
   private final Option<String> settings;
 
-  public LabelImpl(long id, long categoryId, String value, String abbreviation, Option<String> description,
-          Option<Long> seriesLabelId, Option<String> settings, Resource resource) {
+  public LabelImpl(long id, long categoryId, Option<Long> seriesLabelId, String value, String abbreviation,
+          Option<String> description, Option<String> settings, Resource resource) {
     super(Option.option(resource.getAccess()), resource.getCreatedBy(), resource.getUpdatedBy(), resource
             .getDeletedBy(), resource.getCreatedAt(), resource.getUpdatedAt(), resource.getDeletedAt(), resource
             .getTags());
     this.id = id;
     this.categoryId = categoryId;
+    this.seriesLabelId = seriesLabelId;
     this.value = value;
     this.abbreviation = abbreviation;
     this.description = description;
-    this.seriesLabelId = seriesLabelId;
     this.settings = settings;
   }
 
@@ -73,6 +73,11 @@ public final class LabelImpl extends ResourceImpl implements Label {
   }
 
   @Override
+  public Option<Long> getSeriesLabelId() {
+    return seriesLabelId;
+  }
+
+  @Override
   public String getValue() {
     return value;
   }
@@ -88,11 +93,6 @@ public final class LabelImpl extends ResourceImpl implements Label {
   }
 
   @Override
-  public Option<Long> getSeriesLabelId() {
-    return seriesLabelId;
-  }
-
-  @Override
   public Option<String> getSettings() {
     return settings;
   }
@@ -104,9 +104,10 @@ public final class LabelImpl extends ResourceImpl implements Label {
     if (o == null || getClass() != o.getClass())
       return false;
     Label label = (Label) o;
-    return id == label.getId() && categoryId == label.getCategoryId() && value.equals(label.getValue())
-            && abbreviation.equals(label.getAbbreviation()) && description.equals(label.getDescription())
-            && settings.equals(label.getSettings()) && getTags().equals(label.getTags());
+    return id == label.getId() && categoryId == label.getCategoryId() && seriesLabelId == label.getSeriesLabelId()
+            && value.equals(label.getValue()) && abbreviation.equals(label.getAbbreviation())
+            && description.equals(label.getDescription()) && settings.equals(label.getSettings())
+            && getTags().equals(label.getTags());
   }
 
   @Override

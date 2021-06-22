@@ -100,37 +100,36 @@ public class CategoryDto extends AbstractResourceDto {
   @CollectionTable(name = "xannotations_category_tags", joinColumns = @JoinColumn(name = "category_id"))
   protected Map<String, String> tags = new HashMap<String, String>();
 
-  public static CategoryDto create(Option<Long> videoId, Option<Long> scaleId, String name, Option<String> description,
-          Option<String> settings, Resource resource, Option<String> seriesExtId, Option<Long> seriesCategoryId) {
-    CategoryDto dto = new CategoryDto().update(videoId, name, description, scaleId, settings, resource, seriesExtId,
-            seriesCategoryId);
+  public static CategoryDto create(Option<Long> videoId, Option<String> seriesExtId, Option<Long> seriesCategoryId,
+          Option<Long> scaleId, String name, Option<String> description, Option<String> settings, Resource resource) {
+    CategoryDto dto = new CategoryDto().update(videoId, seriesExtId, seriesCategoryId, name, description, scaleId,
+            settings, resource);
     dto.videoId = videoId.getOrElseNull();
-    dto.scaleId = scaleId.getOrElseNull();
     dto.seriesExtId = seriesExtId.getOrElseNull();
     dto.seriesCategoryId = seriesCategoryId.getOrElseNull();
+    dto.scaleId = scaleId.getOrElseNull();
     return dto;
   }
 
-  public CategoryDto update(Option<Long> videoId, String name, Option<String> description, Option<Long> scaleId, Option<String> settings,
-          Resource resource, Option<String> seriesExtId, Option<Long> seriesCategoryId) {
+  public CategoryDto update(Option<Long> videoId, Option<String> seriesExtId, Option<Long> seriesCategoryId, String name,
+          Option<String> description, Option<Long> scaleId, Option<String> settings, Resource resource) {
     super.update(resource);
     this.videoId = videoId.getOrElseNull();
+    this.seriesExtId = seriesExtId.getOrElseNull();
+    this.seriesCategoryId = seriesCategoryId.getOrElseNull();
     this.name = name;
     this.description = description.getOrElseNull();
     this.scaleId = scaleId.getOrElseNull();
     this.settings = settings.getOrElseNull();
     if (resource.getTags() != null)
       this.tags = resource.getTags();
-    this.seriesExtId = seriesExtId.getOrElseNull();
-    this.seriesCategoryId = seriesCategoryId.getOrElseNull();
     return this;
   }
 
   public Category toCategory() {
-    return new CategoryImpl(id, option(videoId), option(scaleId), name, option(description), option(settings),
+    return new CategoryImpl(id, option(videoId), option(seriesExtId), option(seriesCategoryId), option(scaleId), name, option(description), option(settings),
             new ResourceImpl(option(access), option(createdBy), option(updatedBy), option(deletedBy), option(createdAt),
-                    option(updatedAt), option(deletedAt), tags),
-            option(seriesExtId), option(seriesCategoryId));
+                    option(updatedAt), option(deletedAt), tags));
   }
 
   public static final Function<CategoryDto, Category> toCategory = new Function<CategoryDto, Category>() {

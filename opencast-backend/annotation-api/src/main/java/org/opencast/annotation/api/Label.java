@@ -24,6 +24,9 @@ public interface Label extends Resource {
   /** The category that is used for this label. */
   long getCategoryId();
 
+  /** The id of the original label this is a copy from */
+  Option<Long> getSeriesLabelId();
+
   /** The label value */
   String getValue();
 
@@ -32,9 +35,6 @@ public interface Label extends Resource {
 
   /** The label description */
   Option<String> getDescription();
-
-  /** The id of the original label this is a copy from */
-  Option<Long> getSeriesLabelId();
 
   /** The label settings */
   Option<String> getSettings();
