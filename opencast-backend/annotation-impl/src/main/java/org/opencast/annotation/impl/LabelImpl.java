@@ -114,5 +114,4 @@ public final class LabelImpl extends ResourceImpl implements Label {
   public int hashCode() {
     return EqualsUtil.hash(id, categoryId, value, abbreviation, description, seriesLabelId, settings, getTags());
   }
-
 }
