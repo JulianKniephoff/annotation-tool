@@ -117,8 +117,7 @@ define(
                     "removeOne",
                     "onCreateLabel",
                     "editScale",
-                    "updateInputWidth",
-                    "toVideoCategory"
+                    "updateInputWidth"
                 );
 
                 // Define the colors (global setting for all color pickers)
