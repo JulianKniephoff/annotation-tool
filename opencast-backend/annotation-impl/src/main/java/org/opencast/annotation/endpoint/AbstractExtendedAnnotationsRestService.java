@@ -658,8 +658,8 @@ public abstract class AbstractExtendedAnnotationsRestService {
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/categories")
-  public Response postCategoryTemplate(@FormParam("seriesExtId") final String seriesExtId,
-          @FormParam("seriesCategoryId") final Long seriesCategoryId, @FormParam("name") final String name,
+  public Response postCategoryTemplate(@FormParam("series_extid") final String seriesExtId,
+          @FormParam("series_category_id") final Long seriesCategoryId, @FormParam("name") final String name,
           @FormParam("description") final String description, @FormParam("scale_id") final Long scaleId,
           @FormParam("settings") final String settings, @FormParam("access") final Integer access,
           @FormParam("tags") final String tags) {
@@ -690,8 +690,9 @@ public abstract class AbstractExtendedAnnotationsRestService {
   @PUT
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/categories/{categoryId}")
-  public Response putCategory(@PathParam("categoryId") final long id, @FormParam("seriesExtId") final String seriesExtId,
-          @FormParam("seriesCategoryId") final Long seriesCategoryId, @FormParam("name") final String name,
+  public Response putCategory(@PathParam("categoryId") final long id,
+          @FormParam("series_extid") final String seriesExtId,
+          @FormParam("series_category_id") final Long seriesCategoryId, @FormParam("name") final String name,
           @FormParam("description") final String description, @FormParam("scale_id") final Long scaleId,
           @FormParam("settings") final String settings, @FormParam("tags") final String tags) {
     return putCategoryResponse(id, none(), option(seriesExtId), option(seriesCategoryId), name, description,

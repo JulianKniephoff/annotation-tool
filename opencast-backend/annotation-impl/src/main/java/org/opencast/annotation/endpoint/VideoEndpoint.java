@@ -618,8 +618,8 @@ public class VideoEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("categories")
   public Response postCategory(@FormParam("category_id") final Long id,
-          @FormParam("seriesExtId") final String seriesExtId,
-          @FormParam("seriesCategoryId") final Long seriesCategoryId, @FormParam("name") final String name,
+          @FormParam("series_extid") final String seriesExtId,
+          @FormParam("series_category_id") final Long seriesCategoryId, @FormParam("name") final String name,
           @FormParam("description") final String description, @FormParam("scale_id") final Long scaleId,
           @FormParam("settings") final String settings, @FormParam("access") final Integer access,
           @FormParam("tags") final String tags) {
@@ -658,8 +658,8 @@ public class VideoEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("categories/{categoryId}")
   public Response putCategory(@PathParam("categoryId") final long id,
-          @FormParam("seriesExtId") final String seriesExtId,
-          @FormParam("seriesCategoryId") final Long seriesCategoryId, @FormParam("name") final String name,
+          @FormParam("series_extid") final String seriesExtId,
+          @FormParam("series_category_id") final Long seriesCategoryId, @FormParam("name") final String name,
           @FormParam("description") final String description, @FormParam("scale_id") final Long scaleId,
           @FormParam("settings") final String settings, @FormParam("tags") final String tags) {
     return host.putCategoryResponse(id, some(videoId), trimToNone(seriesExtId), option(seriesCategoryId), name,
