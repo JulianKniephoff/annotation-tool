@@ -694,13 +694,15 @@ public abstract class AbstractExtendedAnnotationsRestService {
           @FormParam("series_extid") final String seriesExtId,
           @FormParam("series_category_id") final Long seriesCategoryId, @FormParam("name") final String name,
           @FormParam("description") final String description, @FormParam("scale_id") final Long scaleId,
-          @FormParam("settings") final String settings, @FormParam("tags") final String tags) {
+          @FormParam("settings") final String settings, @FormParam("access") final Integer access,
+          @FormParam("tags") final String tags) {
     return putCategoryResponse(id, none(), option(seriesExtId), option(seriesCategoryId), name, description,
-            option(scaleId), settings, tags);
+            option(scaleId), settings, option(access), tags);
   }
 
-  Response putCategoryResponse(final long id, final Option<Long> videoId, final Option<String> seriesExtId, final Option<Long> seriesCategoryId, final String name,
-          final String description, final Option<Long> scaleId, final String settings, final String tags) {
+  Response putCategoryResponse(final long id, final Option<Long> videoId, final Option<String> seriesExtId,
+          final Option<Long> seriesCategoryId, final String name, final String description, final Option<Long> scaleId,
+          final String settings, final Option<Integer> access, final String tags) {
     return run(array(name), new Function0<Response>() {
       @Override
       public Response apply() {
@@ -725,8 +727,12 @@ public abstract class AbstractExtendedAnnotationsRestService {
               seriesCategoryVideoId = eas().getCategory(seriesCategoryId.get(), false).get().getVideoId();
             }
 
-            final Category updated = new CategoryImpl(id, seriesCategoryVideoId.isSome() ? seriesCategoryVideoId : videoId , seriesExtId, seriesCategoryId, scaleId,
-                    name, trimToNone(description), trimToNone(settings), resource);
+            final Category updated = new CategoryImpl(id,
+                    seriesCategoryVideoId.isSome() ? seriesCategoryVideoId : videoId, seriesExtId, seriesCategoryId,
+                    scaleId, name, trimToNone(description), trimToNone(settings), new ResourceImpl(access,
+                            resource.getCreatedBy(), resource.getUpdatedBy(), resource.getDeletedBy(),
+                            resource.getCreatedAt(), resource.getUpdatedAt(), resource.getDeletedAt(),
+                            resource.getTags()));
             if (!c.equals(updated)) {
               if (seriesCategoryId.isNone()) {
                 eas().updateCategoryAndDeleteOtherSeriesCategories(updated);
@@ -743,7 +749,9 @@ public abstract class AbstractExtendedAnnotationsRestService {
           public Response none() {
             Resource resource = eas().createResource(tags);
             final Category category = eas().createCategory(videoId, seriesExtId, seriesCategoryId, scaleId, name,
-                    trimToNone(description), trimToNone(settings), resource);
+                    trimToNone(description), trimToNone(settings), new ResourceImpl(access, resource.getCreatedBy(),
+                            resource.getUpdatedBy(), resource.getDeletedBy(), resource.getCreatedAt(),
+                            resource.getUpdatedAt(), resource.getDeletedAt(), resource.getTags()));
 
             return Response.created(categoryLocationUri(category, videoId.isSome()))
                     .entity(Strings.asStringNull().apply(CategoryDto.toJson.apply(eas(), category))).build();
