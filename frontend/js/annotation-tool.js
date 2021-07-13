@@ -752,7 +752,7 @@ define(
 
                         // Arbitrarily increase len by one to avoid cases where just len would
                         // lead to too small columns
-                        var len = value.toString().length + 1
+                        var len = value.toString().length + 1;
 
                         objectMaxLength[key] = Math.max(objectMaxLength[key] || 0, len);
                     });
