@@ -54,7 +54,7 @@ define(
 
             /**
              * Get the url for this collection
-             * @return {String} The url of this collection
+             * @return {string} The url of this collection
              */
             url: function () {
                 return (this.video ? _.result(this.video, "url") : "")
