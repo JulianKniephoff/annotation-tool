@@ -27,6 +27,7 @@ define(
         "util",
         "access",
         "views/annotate-label",
+        "views/category-modal",
         "templates/annotate-category",
         "jquery.colorPicker"
     ],
@@ -38,6 +39,7 @@ define(
         util,
         ACCESS,
         LabelView,
+        CategoryModal,
         Template
     ) {
         "use strict";
@@ -98,7 +100,10 @@ define(
                 "focusout .catItem-header input": "onFocusOut",
                 "keydown .catItem-header input": "onKeyDown",
                 "click .catItem-add": "onCreateLabel",
-                "click .catItem-header i.toggleSeries": "toggleSeries"
+                "click .catItem-header i.toggleSeries": "toggleSeries",
+                "click .moo": function () {
+                    new CategoryModal({ model: this.model }).show();
+                }
             },
 
             /**
@@ -131,6 +136,7 @@ define(
                 );
 
                 // Define the colors (global setting for all color pickers)
+                // TODO Do this somewhere else
                 $.fn.colorPicker.defaults.colors = annotationTool.colorsManager.getColors();
 
                 // Type use for delete operation
@@ -192,13 +198,13 @@ define(
             /**
              * Callback for modal spawned by toggleSeries.
              * Turns a series category back to a video category
-             * @param {Id of the series} categorySeriesCategoryId
+             * @param categorySeriesCategoryId id of the series
              */
             toVideoCategory: function (categorySeriesCategoryId) {
-              this.model.tmpSeriesCategoryId = categorySeriesCategoryId;
-              this.model.set("seriesExtId", "");
-              this.model.set("seriesCategoryId", "");
-              this.model.save(null, { wait: true });
+                this.model.tmpSeriesCategoryId = categorySeriesCategoryId;
+                this.model.set("seriesExtId", "");
+                this.model.set("seriesCategoryId", "");
+                this.model.save(null, { wait: true });
             },
 
             /**
@@ -219,18 +225,20 @@ define(
                     annotationTool.seriesCategoryOperation.start(this, categorySeriesCategoryId);
 
                 } else if (!categorySeriesCategoryId && videoSeriesId) {
-                  // If there's a scale, show an error message instead.
-                  // This doesn't really belong on scaleEditor, but I don't want to create
-                  // a whole new class for a simple error modal.
-                  if (this.model.get("settings").hasScale) {
-                    annotationTool.scaleEditor.showWarning({ title: i18next.t("scale editor.warning.name"),
-                    message: i18next.t("scale editor.warning.messageScaleOnSeriesCategory") });
-                  } else {
-                    // Add to series
-                    this.model.set("seriesExtId", videoSeriesId);
-                    this.model.set("seriesCategoryId", this.model.id);
-                  }
-                  this.model.save(null, { wait: true });
+                    // If there's a scale, show an error message instead.
+                    // This doesn't really belong on scaleEditor, but I don't want to create
+                    // a whole new class for a simple error modal.
+                    if (this.model.get("settings").hasScale) {
+                        annotationTool.scaleEditor.showWarning({
+                            title: i18next.t("scale editor.warning.name"),
+                            message: i18next.t("scale editor.warning.messageScaleOnSeriesCategory")
+                        });
+                    } else {
+                        // Add to series
+                        this.model.set("seriesExtId", videoSeriesId);
+                        this.model.set("seriesCategoryId", this.model.id);
+                    }
+                    this.model.save(null, { wait: true });
                 }
             },
 
@@ -264,7 +272,7 @@ define(
              */
             onChange: function () {
                 _.each(this.labelViews, function (labelView) {
-                    labelView.changeCategory(this.model.toJSON());
+                    labelView.changeCategory();
                 }, this);
                 this.render();
             },
@@ -306,13 +314,13 @@ define(
              */
             editScale: function () {
                 if (this.model.get("seriesCategoryId")) {
-                  // Workaround for scales and series categories
+                    // Workaround for scales and series categories
                     annotationTool.scaleEditor.showWarning({
                         title: i18next.t("scale editor.warning.name"),
                         message: i18next.t("scale editor.warning.message")
                     });
                 } else {
-                  annotationTool.scaleEditor.show(this.model, this.model.get("access"));
+                    annotationTool.scaleEditor.show(this.model, this.model.get("access"));
                 }
             },
 
