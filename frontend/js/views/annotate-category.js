@@ -236,7 +236,6 @@ define(
 
             /**
              * Update the size of all the input for the label value
-             * alias module:views-annotate-category.CategoryView#updateInputWidth
              */
             updateInputWidth: function () {
                 var $headerEl   = this.$el.find(".catItem-header"),
@@ -280,7 +279,7 @@ define(
 
             /**
              * Switch the edit modus to the given status.
-             * @param  {boolean} status The current status
+             * @param {boolean} status The current status
              */
             switchEditModus: function (status) {
                 this.editModus = status;
@@ -319,7 +318,7 @@ define(
 
             /**
              * Listener for category deletion request from UI
-             * @param  {Event} event
+             * @param {Event} event
              */
             onDeleteCategory: function () {
                 annotationTool.deleteOperation.start(this.model, this.typeForDelete);
@@ -337,7 +336,7 @@ define(
 
             /**
              * Add one label to this view
-             * @param {Label} label  The label to add
+             * @param {Label} label The label to add
              * @param {boolean} single Define if this is part of a list insertion (false) or a single insertion (true)
              */
             addLabel: function (label) {
@@ -408,7 +407,7 @@ define(
             /**
              * Get the position of the caret in the given input element
              * @param  {DOMElement} inputElement The given element with focus
-             * @return {integer}              The posisiton of the carret
+             * @return {integer} The posisiton of the carret
              */
             getCaretPosition: function (inputElement) {
                 return inputElement.selectionStart;
@@ -416,8 +415,8 @@ define(
 
             /**
              * Listener for color selection through color picker
-             * @param  {string} id       Id of the colorpicker element
-             * @param  {string} newValue Value of the selected color
+             * @param {string} id Id of the colorpicker element
+             * @param {string} newValue Value of the selected color
              */
             onColorChange: function (id, newValue) {
                 this.model.setColor(newValue);
