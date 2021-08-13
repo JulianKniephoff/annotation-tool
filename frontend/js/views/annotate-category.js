@@ -126,6 +126,7 @@ define(
                     "removeOne",
                     "onCreateLabel",
                     "editScale",
+                    "onChangeAccess",
                     "updateInputWidth"
                 );
 
