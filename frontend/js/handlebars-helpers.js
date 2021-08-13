@@ -2,14 +2,15 @@ define([
     "handlebars",
     "underscore",
     "i18next",
-    "util"
+    "util",
+    "access"
 ], function (
     Handlebars,
     _,
     i18next,
-    util
+    util,
+    ACCESS
 ) {
-
     /**
      * Expose the global annotation tool to the templates to access configuration.
      * @param {String} key The property to access from the global anntoation tool
@@ -80,8 +81,51 @@ define([
     /**
      * Check whether the current user is an annotation tool admin.
      */
-    Handlebars.registerHelper("isAdmin", function () {
-        return annotationTool.user.isAdmin();
+    Handlebars.registerHelper("join", function () {
+        return Array.prototype.slice.call(arguments, 1, -1)
+            .join(arguments[0]);
+    });
+
+    function wordsFromConstant(constant) {
+        return _.map(
+            constant.split(/_/),
+            function (word) {
+                return word.toLowerCase();
+            }
+        );
+    }
+
+    /**
+     * Convert <code>CONSTANT_CASE</code> to bare words
+     * @alias module:Handlebars#bare
+     * @param {string} constant a string in <code>CONSTANT_CASE</code>
+     */
+    Handlebars.registerHelper("bare", function (constant) {
+        return wordsFromConstant(constant).join(" ");
+    });
+
+    /**
+     * Convert <code>CONSTANT_CASE</code> to <code>kebab-case</code>
+     * @alias module:Handlebars#bare
+     * @param {string} constant a string in <code>CONSTANT_CASE</code>
+     */
+    Handlebars.registerHelper("kebab", function (constant) {
+        return wordsFromConstant(constant).join("-");
+    });
+
+    var accesses = [];
+    _.each(_.keys(ACCESS), function (access) {
+        accesses[ACCESS[access]] = access;
+    });
+
+    /**
+     * Look up the name of an access level by its value
+     * @alias module:Handlebars#access
+     * @param {number} the access code
+     * @see ACCESS
+     */
+    Handlebars.registerHelper("access", function (value) {
+        return accesses[value];
     });
 
     return Handlebars;

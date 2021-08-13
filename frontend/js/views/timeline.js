@@ -658,7 +658,7 @@ define([
                 groupModalTemplate(_.extend(
                     { action: action },
                     track && track.attributes
-                ))
+                ), { data: { access: TimelineGroup.access() } })
             );
 
             var dismissModal = function () {
@@ -682,7 +682,7 @@ define([
                 var access;
                 var accessRadio = modal.find("input[name='access-radio']:checked");
                 if (accessRadio.length > 0) {
-                    access = ACCESS.parse(accessRadio.val());
+                    access = Number(accessRadio.val());
                 } else {
                     access = ACCESS.PUBLIC;
                 }
@@ -712,11 +712,9 @@ define([
 
             modal.on("shown", function () {
                 modal.find("#name").focus();
-                var access = ACCESS.render(
-                    track
-                        ? track.get("access")
-                        : ACCESS.PUBLIC
-                );
+                var access = track
+                    ? track.get("access")
+                    : ACCESS.PUBLIC;
                 modal.find("[name='access-radio'][value='" + access + "']").prop("checked", true);
             });
             modal.modal({
