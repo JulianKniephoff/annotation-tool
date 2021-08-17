@@ -51,7 +51,8 @@
     "show free text": "Show free text annotations",
     "hide free text": "Hide free text annotations",
     "event category": "Category belongs to this video",
-    "series category": "Category belongs to the series & is shown in all videos"
+    "series category": "Category belongs to the series & is shown in all videos",
+    "structured annotations": "Structured Annotations"
   },
   "annotation": {
     "author": "Created by",
