@@ -101,9 +101,8 @@ define(
                 "keydown .catItem-header input": "onKeyDown",
                 "click .catItem-add": "onCreateLabel",
                 "click .catItem-header i.toggleSeries": "toggleSeries",
-                "click .moo": function () {
-                    new CategoryModal({ model: this.model }).show();
-                }
+                "click .editt": "onEditCategory",
+                "click .delete": "onDeleteCategory"
             },
 
             /**
@@ -121,6 +120,7 @@ define(
                 _.bindAll(
                     this,
                     "onDeleteCategory",
+                    "onEditCategory",
                     "addLabels",
                     "addLabel",
                     "render",
@@ -330,6 +330,13 @@ define(
              */
             onDeleteCategory: function () {
                 annotationTool.deleteOperation.start(this.model, this.typeForDelete);
+            },
+
+            /**
+             * Shows the edit modal
+             */
+            onEditCategory: function () {
+              new CategoryModal({ model: this.model }).show();
             },
 
             /**
