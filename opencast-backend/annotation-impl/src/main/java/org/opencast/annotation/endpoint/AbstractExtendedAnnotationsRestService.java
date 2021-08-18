@@ -870,7 +870,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
 
         Resource resource = eas().createResource(option(access), tagsMap.bind(Functions.identity()));
         final Label label = eas().createLabel(categoryId, value, abbreviation, trimToNone(description),
-                some(position), trimToNone(settings), resource);
+                Option.option(position), trimToNone(settings), resource);
 
         return Response.created(labelLocationUri(label, videoId))
                 .entity(Strings.asStringNull().apply(LabelDto.toJson.apply(eas(), label))).build();
@@ -924,7 +924,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
           public Response none() {
             Resource resource = eas().createResource(option(access), tags);
             final Label label = eas().createLabel(categoryId, value, abbreviation, trimToNone(description),
-                    Option.some(position), trimToNone(settings), resource);
+                    Option.option(position), trimToNone(settings), resource);
 
             return Response.created(labelLocationUri(label, videoId))
                     .entity(Strings.asStringNull().apply(LabelDto.toJson.apply(eas(), label))).build();
