@@ -345,7 +345,7 @@ public class ExtendedAnnotationServiceJpaImplTest {
 
     final Category categoryTemplate = eas.createCategory(none(), some(s.getId()), "Sozialform",
             some("description Sozialform"), some("sozial form settings"), resource, none(), none());
-    eas.createLabel(categoryTemplate.getId(), "Bla", "Test", none(), none(), resource);
+    eas.createLabel(categoryTemplate.getId(), "Bla", "Test", none(), none(), none(), resource);
 
     final Category c = eas.createCategory(some(3L), some(32L), "Verhalten", some("verhalten "), some("settings"),
             resource, some("seriesId"), none());
@@ -529,7 +529,7 @@ public class ExtendedAnnotationServiceJpaImplTest {
     final ExtendedAnnotationService eas = newExtendedAnnotationService();
     final Resource resource = eas.createResource(tags);
 
-    final Label l = eas.createLabel(32, "Good", "abbreviation3", some("cool"), some("no settings"), resource);
+    final Label l = eas.createLabel(32, "Good", "abbreviation3", some("cool"), some(new Long(2)), some("no settings"), resource);
     Option<Label> label = eas.getLabel(l.getId(), false);
 
     assertTrue(label.isSome());
@@ -550,15 +550,15 @@ public class ExtendedAnnotationServiceJpaImplTest {
     expectCause(Cause.NOT_FOUND, new Effect0() {
       @Override
       protected void run() {
-        eas.updateLabel(new LabelImpl(323, 29, "test", "i dont know", none(), none(), none(), resource));
+        eas.updateLabel(new LabelImpl(323, 29, "test", "i dont know", none(), none(), none(), none(), resource));
       }
     });
     // create
-    final Label l = eas.createLabel(32, "Good", "abbreviation3", none(), none(), resource);
+    final Label l = eas.createLabel(32, "Good", "abbreviation3", none(), none(), none(), resource);
     assertEquals("Good", eas.getLabel(l.getId(), false).get().getValue());
 
     final Resource updatedResource = eas.updateResource(resource, tags);
-    eas.updateLabel(new LabelImpl(l.getId(), 11, "test", "i dont know", none(), none(), none(), updatedResource));
+    eas.updateLabel(new LabelImpl(l.getId(), 11, "test", "i dont know", none(), none(), none(), none(), updatedResource));
     assertEquals("test", eas.getLabel(l.getId(), false).get().getValue());
     assertEquals(tags.get(), eas.getLabel(l.getId(), false).get().getTags());
   }
@@ -568,7 +568,7 @@ public class ExtendedAnnotationServiceJpaImplTest {
     final ExtendedAnnotationService eas = newExtendedAnnotationService();
     final Resource resource = eas.createResource();
     // create
-    final Label l = eas.createLabel(32, "Good", "abbreviation3", none(), none(), resource);
+    final Label l = eas.createLabel(32, "Good", "abbreviation3", none(), none(), none(), resource);
     assertTrue(eas.getLabel(l.getId(), false).isSome());
     // delete
     eas.deleteLabel(l);

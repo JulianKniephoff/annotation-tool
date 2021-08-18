@@ -676,10 +676,11 @@ public class VideoEndpoint {
   @Path("categories/{categoryId}/labels")
   public Response postLabel(@PathParam("categoryId") final long categoryId, @FormParam("value") final String value,
           @FormParam("abbreviation") final String abbreviation, @FormParam("description") final String description,
-          @FormParam("access") final Integer access, @FormParam("settings") final String settings,
-          @FormParam("tags") final String tags, @Context final HttpServletRequest request) {
-    return host.postLabelResponse(some(videoId), categoryId, value, abbreviation, description, access, settings, tags,
-            request);
+          @FormParam("position") final Long position, @FormParam("access") final Integer access,
+          @FormParam("settings") final String settings, @FormParam("tags") final String tags,
+          @Context final HttpServletRequest request) {
+    return host.postLabelResponse(some(videoId), categoryId, value, abbreviation, description, position, access,
+            settings, tags, request);
   }
 
   @PUT
@@ -687,11 +688,12 @@ public class VideoEndpoint {
   @Path("categories/{categoryId}/labels/{labelId}")
   public Response putLabel(@PathParam("categoryId") final long categoryId, @PathParam("labelId") final long id,
           @FormParam("value") final String value, @FormParam("abbreviation") final String abbreviation,
-          @FormParam("description") final String description, @FormParam("access") final Integer access,
-          @FormParam("settings") final String settings, @FormParam("tags") final String tags,
+          @FormParam("description") final String description, @FormParam("position") final Long position,
+          @FormParam("access") final Integer access, @FormParam("settings") final String settings,
+          @FormParam("tags") final String tags,
           @Context final HttpServletRequest request) {
-    return host.putLabelResponse(some(videoId), categoryId, id, value, abbreviation, description, access, settings,
-            tags, request);
+    return host.putLabelResponse(some(videoId), categoryId, id, value, abbreviation, description, position, access,
+            settings, tags, request);
   }
 
   @GET

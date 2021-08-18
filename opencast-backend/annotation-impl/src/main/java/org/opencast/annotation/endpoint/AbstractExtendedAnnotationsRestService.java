@@ -850,15 +850,16 @@ public abstract class AbstractExtendedAnnotationsRestService {
   @Path("/categories/{categoryId}/labels")
   public Response postLabel(@PathParam("categoryId") final long categoryId, @FormParam("value") final String value,
           @FormParam("abbreviation") final String abbreviation, @FormParam("description") final String description,
-          @FormParam("access") final Integer access, @FormParam("settings") final String settings,
-          @FormParam("tags") final String tags, @Context final HttpServletRequest request) {
-    return postLabelResponse(none(), categoryId, value, abbreviation, description, access, settings,
+          @FormParam("position") final Long position, @FormParam("access") final Integer access,
+          @FormParam("settings") final String settings, @FormParam("tags") final String tags,
+          @Context final HttpServletRequest request) {
+    return postLabelResponse(none(), categoryId, value, abbreviation, description, position, access, settings,
             tags, request);
   }
 
   Response postLabelResponse(final Option<Long> videoId, final long categoryId, final String value,
-          final String abbreviation, final String description, final Integer access, final String settings,
-          final String tags, HttpServletRequest request) {
+          final String abbreviation, final String description, final Long position, final Integer access,
+          final String settings, final String tags, HttpServletRequest request) {
     return run(array(value, abbreviation), request, new Function<VideoInterface, Response>() {
       @Override
       public Response apply(VideoInterface videoInterface) {
@@ -869,7 +870,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
 
         Resource resource = eas().createResource(option(access), tagsMap.bind(Functions.identity()));
         final Label label = eas().createLabel(categoryId, value, abbreviation, trimToNone(description),
-                trimToNone(settings), resource);
+                some(position), trimToNone(settings), resource);
 
         return Response.created(labelLocationUri(label, videoId))
                 .entity(Strings.asStringNull().apply(LabelDto.toJson.apply(eas(), label))).build();
@@ -882,16 +883,17 @@ public abstract class AbstractExtendedAnnotationsRestService {
   @Path("/categories/{categoryId}/labels/{labelId}")
   public Response putLabel(@PathParam("categoryId") final long categoryId, @PathParam("labelId") final long id,
           @FormParam("value") final String value, @FormParam("abbreviation") final String abbreviation,
-          @FormParam("description") final String description, @FormParam("access") final Integer access,
-          @FormParam("settings") final String settings, @FormParam("tags") final String tags,
+          @FormParam("description") final String description, @FormParam("position") final Long position,
+          @FormParam("access") final Integer access, @FormParam("settings") final String settings,
+          @FormParam("tags") final String tags,
           @Context final HttpServletRequest request) {
-    return putLabelResponse(none(), categoryId, id, value, abbreviation, description, access, settings,
+    return putLabelResponse(none(), categoryId, id, value, abbreviation, description, position, access, settings,
             tags, request);
   }
 
   Response putLabelResponse(final Option<Long> videoId, final long categoryId, final long id,
-          final String value, final String abbreviation, final String description, final Integer access,
-          final String settings, final String tags, final HttpServletRequest request) {
+          final String value, final String abbreviation, final String description, final Long position,
+          final Integer access, final String settings, final String tags, final HttpServletRequest request) {
     return run(array(value, abbreviation), request, new Function<VideoInterface, Response>() {
       @Override
       public Response apply(VideoInterface videoInterface) {
@@ -909,7 +911,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
               return UNAUTHORIZED;
             Resource resource = eas().updateResource(l, tags);
             final Label updated = new LabelImpl(id, categoryId, value, abbreviation, trimToNone(description), l.getSeriesLabelId(),
-                    trimToNone(settings), resource);
+                    l.getPosition(), trimToNone(settings), resource);
             if (!l.equals(updated)) {
               eas().updateLabel(updated);
               l = updated;
@@ -922,7 +924,7 @@ public abstract class AbstractExtendedAnnotationsRestService {
           public Response none() {
             Resource resource = eas().createResource(option(access), tags);
             final Label label = eas().createLabel(categoryId, value, abbreviation, trimToNone(description),
-                    trimToNone(settings), resource);
+                    Option.some(position), trimToNone(settings), resource);
 
             return Response.created(labelLocationUri(label, videoId))
                     .entity(Strings.asStringNull().apply(LabelDto.toJson.apply(eas(), label))).build();

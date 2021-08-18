@@ -572,8 +572,8 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
 
         // Copy labels
         for (Label l : getLabelsByCategoryId(templateCategoryId)) {
-          createLabel(category.getId(), l.getValue(), l.getAbbreviation(), l.getDescription(), l.getSettings(),
-                  resource);
+          createLabel(category.getId(), l.getValue(), l.getAbbreviation(), l.getDescription(), l.getPosition(),
+                  l.getSettings(), resource);
         }
         return category;
       }
@@ -769,7 +769,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
 
   @Override
   public Label createLabel(long categoryId, String value, String abbreviation, Option<String> description,
-          Option<String> settings, Resource resource) throws ExtendedAnnotationException {
+          Option<Long> position, Option<String> settings, Resource resource) throws ExtendedAnnotationException {
     // Handle series categories
     // If the category belongs to a series, create the label on the series category instead
     Option<Category> category = getCategory(categoryId, false);
@@ -780,13 +780,13 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
       seriesCategory = getCategory(categorySeriesCategoryId, false);
       // And the category is not itself (aka the master series category)
       if (seriesCategory.isSome() && categoryId != (seriesCategory.get().getId())) {
-        final LabelDto dto = LabelDto.create(categorySeriesCategoryId, value, abbreviation, description, none(), settings, resource);
+        final LabelDto dto = LabelDto.create(categorySeriesCategoryId, value, abbreviation, description, none(), position, settings, resource);
         return tx(Queries.persist(dto)).toLabel();
       }
     }
 
     // Normal Create
-    final LabelDto dto = LabelDto.create(categoryId, value, abbreviation, description, none(), settings, resource);
+    final LabelDto dto = LabelDto.create(categoryId, value, abbreviation, description, none(), position, settings, resource);
     return tx(Queries.persist(dto)).toLabel();
   }
 
@@ -802,7 +802,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
     update("Label.findById", updateLabelId, new Effect<LabelDto>() {
       @Override
       protected void run(LabelDto dto) {
-        dto.update(l.getValue(), l.getAbbreviation(), l.getDescription(), l.getSeriesLabelId(), l.getSettings(), l);
+        dto.update(l.getValue(), l.getAbbreviation(), l.getDescription(), l.getSeriesLabelId(), l.getPosition(), l.getSettings(), l);
       }
     });
   }
@@ -853,7 +853,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
         List<Label> newLabels = new ArrayList<>();
         for (Label seriesLabel : seriesCategoryLabels) {
           final LabelDto dto = LabelDto.create(categoryId, seriesLabel.getValue(), seriesLabel.getAbbreviation(), seriesLabel.getDescription(),
-                  some(seriesLabel.getId()), seriesLabel.getSettings(),
+                  some(seriesLabel.getId()), seriesLabel.getPosition(), seriesLabel.getSettings(),
                   new ResourceImpl(option(seriesLabel.getAccess()),
                           seriesLabel.getCreatedBy(), seriesLabel.getUpdatedBy(), seriesLabel.getDeletedBy(),
                           seriesLabel.getCreatedAt(), seriesLabel.getUpdatedAt(), seriesLabel.getDeletedAt(),
@@ -887,7 +887,7 @@ public final class ExtendedAnnotationServiceJpaImpl implements ExtendedAnnotatio
   public boolean deleteLabel(Label label) throws ExtendedAnnotationException {
     Resource deleteResource = deleteResource(label);
     final Label updated = new LabelImpl(label.getId(), label.getCategoryId(), label.getValue(),
-            label.getAbbreviation(), label.getDescription(), none(), label.getSettings(), deleteResource);
+            label.getAbbreviation(), label.getDescription(), none(), label.getPosition(), label.getSettings(), deleteResource);
     updateLabel(updated);
     return true;
   }

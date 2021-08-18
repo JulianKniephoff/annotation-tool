@@ -644,6 +644,8 @@ public interface ExtendedAnnotationService {
    *          the label abbreviation
    * @param description
    *          the label description
+   * @param position
+   *          the label position
    * @param settings
    *          the label settings
    * @param resource
@@ -653,7 +655,7 @@ public interface ExtendedAnnotationService {
    *           if an error occurs while storing/retrieving from persistence storage
    */
   Label createLabel(long categoryId, String value, String abbreviation, Option<String> description,
-          Option<String> settings, Resource resource) throws ExtendedAnnotationException;
+          Option<Long> position, Option<String> settings, Resource resource) throws ExtendedAnnotationException;
 
   /**
    * Get a label by id.

@@ -32,10 +32,11 @@ public final class LabelImpl extends ResourceImpl implements Label {
   private final String abbreviation;
   private final Option<String> description;
   private final Option<Long> seriesLabelId;
+  private final Option<Long> position;
   private final Option<String> settings;
 
   public LabelImpl(long id, long categoryId, String value, String abbreviation, Option<String> description,
-          Option<Long> seriesLabelId, Option<String> settings, Resource resource) {
+          Option<Long> seriesLabelId, Option<Long> position, Option<String> settings, Resource resource) {
     super(Option.option(resource.getAccess()), resource.getCreatedBy(), resource.getUpdatedBy(), resource
             .getDeletedBy(), resource.getCreatedAt(), resource.getUpdatedAt(), resource.getDeletedAt(), resource
             .getTags());
@@ -45,6 +46,7 @@ public final class LabelImpl extends ResourceImpl implements Label {
     this.abbreviation = abbreviation;
     this.description = description;
     this.seriesLabelId = seriesLabelId;
+    this.position = position;
     this.settings = settings;
   }
 
@@ -79,6 +81,11 @@ public final class LabelImpl extends ResourceImpl implements Label {
   }
 
   @Override
+  public Option<Long> getPosition() {
+    return position;
+  }
+
+  @Override
   public Option<String> getSettings() {
     return settings;
   }
@@ -97,7 +104,7 @@ public final class LabelImpl extends ResourceImpl implements Label {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(id, categoryId, value, abbreviation, description, seriesLabelId, settings, getTags());
+    return EqualsUtil.hash(id, categoryId, value, abbreviation, description, seriesLabelId, position, settings, getTags());
   }
 
 }
