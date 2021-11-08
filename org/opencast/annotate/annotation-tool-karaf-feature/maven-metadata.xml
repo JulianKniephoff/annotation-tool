@@ -3,7 +3,7 @@
   <groupId>org.opencast.annotate</groupId>
   <artifactId>annotation-tool-karaf-feature</artifactId>
   <versioning>
-    <release>2021.1108.135322-6b9e5702b68b135d2ae4641f9156214f15001a49</release>
+    <release>2021.1108.135743-b6dc0b40af732c3374c8037df19c2fc1960af9d7</release>
     <versions>
       <version>0-SNAPSHOT</version>
       <version>2020.1201.160646-b1b47c914064ca2bff23c899fee05024d369c899</version>
@@ -125,7 +125,8 @@
       <version>2021.1108.105945-4f1111b0060573cbbedc022241ef9ec4912449b3</version>
       <version>2021.1108.134838-839625b38722aa49c0e168b299003e50bb6709cd</version>
       <version>2021.1108.135322-6b9e5702b68b135d2ae4641f9156214f15001a49</version>
+      <version>2021.1108.135743-b6dc0b40af732c3374c8037df19c2fc1960af9d7</version>
     </versions>
-    <lastUpdated>20211108135324</lastUpdated>
+    <lastUpdated>20211108135745</lastUpdated>
   </versioning>
 </metadata>
