@@ -87,6 +87,8 @@ public abstract class AbstractResourceDto {
       Long updatedBy = resource.getUpdatedBy().getOrElseNull();
       Long deletedBy = resource.getDeletedBy().getOrElseNull();
 
+      // TODO `getUserNickname` can return `null` and thus can't be used with `map`!
+      //   Or can it?! (i.e. will it ever if everything is right?)
       String createdByNickname = resource.getCreatedBy().map(getUserNickname.curry(s)).getOrElseNull();
       String updatedByNickname = resource.getUpdatedBy().map(getUserNickname.curry(s)).getOrElseNull();
       String deletedByNickname = resource.getDeletedBy().map(getUserNickname.curry(s)).getOrElseNull();
